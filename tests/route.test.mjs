@@ -5,7 +5,7 @@ const SH = process.env.FF_SHOTS || '/workspace/fair-finder-shots';
 const ME = { latitude: 35.79485, longitude: -78.7093, accuracy: 5 };
 const fails = []; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails.push(m); };
 const b = await eng.launch();
-const ctx = await b.newContext({ ...devices['iPhone 14 Pro'], geolocation: ME, permissions: ['geolocation'] });
+const ctx = await b.newContext({ ...devices['iPhone 14 Pro'], geolocation: ME, permissions: process.env.FF_ENGINE === 'webkit' ? ['geolocation'] : ['geolocation', 'accelerometer', 'gyroscope', 'magnetometer'] });
 const p = await ctx.newPage(); p.on('pageerror', e => fails.push('pageerror ' + e.message));
 await p.goto(URL, { waitUntil: 'networkidle' });
 await p.waitForFunction(() => window.__ff && window.__ff.graph && window.__ff.dj && window.__ff.me, null, { timeout: 20000 });
@@ -41,14 +41,15 @@ let turnHints = 0, lookOk = 0, steps = 0, routeSteps = 0, lastRem = Infinity, mo
 for (const [lat, lon] of pts) {
   await ctx.setGeolocation({ latitude: lat, longitude: lon, accuracy: 5 }); await p.waitForTimeout(450);
   g = await p.evaluate(() => __ff.guide); steps++;
-  const exp = await p.evaluate(([la, lo]) => { const R = __ff.route.points, pr = Route.project(R, [la, lo]), look = Route.pointAt(R, pr.along + 18); return { br: Geo.bearingDeg(la, lo, look[0], look[1]), straight: Geo.bearingDeg(la, lo, __ff.target.lat, __ff.target.lon) }; }, [lat, lon]);
-  if (g.mode === 'route') { routeSteps++; if (Math.abs(((g.bearing - exp.br + 540) % 360) - 180) < 2) lookOk++; }
+  const exp = await p.evaluate(([la, lo]) => { const R = __ff.route.points, G = __ff.guide, pr = Route.project(R, [la, lo]), look = G.lookahead || Route.pointAt(R, pr.along + 18), lp = Route.project(R, look);
+    return { br: Geo.bearingDeg(la, lo, look[0], look[1]), straight: Geo.bearingDeg(la, lo, __ff.target.lat, __ff.target.lon), onRoute: lp.d < 0.5, ahead: lp.along - pr.along, capOk: !G.turn || lp.along - pr.along <= G.turn.inM + 4.5 }; }, [lat, lon]);
+  if (g.mode === 'route') { routeSteps++; if (Math.abs(((g.bearing - exp.br + 540) % 360) - 180) < 2 && exp.onRoute && exp.ahead > 0 && exp.ahead <= 18.5 && exp.capOk) lookOk++; }
   if (Math.abs(((exp.br - exp.straight + 540) % 360) - 180) > 20) differs++;
-  const hint = await p.textContent('#guideHint'); if (/^In \d+ ft (turn|bear) (left|right)/.test(hint)) turnHints++;
+  const hint = await p.textContent('#guideHint'); if (/(in \d+ ft, (turn|bear) (left|right))|((turn|bear) (left|right) now)/i.test(hint)) turnHints++;
   if (g.remainingM > lastRem + 3) monotone = false; lastRem = g.remainingM;
   if (steps === 4) { await p.screenshot({ path: `${SH}/15-route-walking.png` }); console.log('  hint at step 4:', hint); }
 }
-ok(lookOk === routeSteps && routeSteps >= steps - 2, `arrow points at 18 m look-ahead on route (${lookOk}/${routeSteps} route steps of ${steps}; last step(s) within 15 m = arrived)`);
+ok(lookOk === routeSteps && routeSteps >= steps - 2, `arrow points at look-ahead on route (≤18 m, capped at next turn) (${lookOk}/${routeSteps} route steps of ${steps}; last step(s) within 15 m = arrived)`);
 ok(differs > 0, `look-ahead arrow differs from crow-flies bearing on ${differs}/${steps} steps`);
 ok(turnHints > 0, `"In N ft turn left/right" hints shown on ${turnHints} steps`);
 ok(monotone, 'remaining walk distance decreases while walking');
@@ -65,8 +66,23 @@ const off = await p.evaluate(() => { const R = __ff.route.points; let best = nul
 const before = await p.evaluate(() => ({ n: __ff.reroutes || 0 }));
 await ctx.setGeolocation({ latitude: off[0], longitude: off[1], accuracy: 5 }); await p.waitForTimeout(4200);
 const after = await p.evaluate(() => ({ n: __ff.reroutes || 0, off: Route.project(__ff.route.points, __ff.me).d, mode: __ff.guide.mode }));
-ok(after.n === before.n + 1 && after.off < 1 && after.mode === 'route', `off-route 40 m -> rerouted (reroutes ${after.n}, new route starts ${after.off.toFixed(1)} m from me)`);
+ok(after.n === before.n + 1 && after.off < 26 && after.mode === 'route', `off-route 40 m -> rerouted (reroutes ${after.n}, new route starts ${after.off.toFixed(1)} m from me)`);
 await p.screenshot({ path: `${SH}/16-route-rerouted.png` });
+// 4b. arrow/hint consistency after the reroute, for compass headings all the way round
+const compass = h => p.evaluate(h => { const e = new Event('deviceorientation'); e.webkitCompassHeading = h; window.dispatchEvent(e); }, h);
+try { await p.click('#btnCompassMini', { timeout: 2000 }); } catch (e) {}
+let incons = [], checked = 0;
+for (let hd = 0; hd < 360; hd += 15) {
+  await compass(hd); await p.waitForTimeout(220);
+  const r = await p.evaluate(() => ({ rel: __ff.guide.arrowRotation, hint: document.getElementById('guideHint').textContent, src: __ff.guide.headingSource, mode: __ff.guide.mode }));
+  if (r.src !== 'compass' || r.mode !== 'route') continue; checked++;
+  const a = Math.abs(r.rel), side = r.rel < 0 ? 'left' : 'right';
+  const good = a > 120 ? /^Turn around/.test(r.hint) : a > 50 ? new RegExp('^Turn ' + side + ' to face').test(r.hint) : !/behind|Turn around|to face/.test(r.hint);
+  if (!good || /behind you/.test(r.hint) && /turn (left|right)/i.test(r.hint)) incons.push(`${hd}°: rel ${r.rel.toFixed(0)} "${r.hint}"`);
+}
+ok(checked >= 20 && incons.length === 0, `after reroute, hint agrees with arrow for ${checked} compass headings` + (incons.length ? ': ' + incons.slice(0, 3).join(' | ') : ''));
+// the exact v6 bug: just-rerouted near a corner must never say "turn X · now behind you"
+ok(!/·\s*now behind you/.test(await p.textContent('#guideHint')), 'no contradictory "turn … · now behind you" hint');
 // 5. arrival
 await p.evaluate(() => 0); const tg = await p.evaluate(() => [__ff.target.lat, __ff.target.lon]);
 await ctx.setGeolocation({ latitude: tg[0] + 0.00004, longitude: tg[1], accuracy: 5 }); await p.waitForTimeout(1500);

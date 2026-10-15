@@ -46,7 +46,7 @@ ok(await page.locator('#guide').isVisible(), 'guide visible: ' + await page.text
 await page.screenshot({ path: `${SHOTS}/04-guide-northup.png` });
 
 // Simulated compass via deviceorientation with webkitCompassHeading (iOS style); button tap requests permission like on iPhone
-await page.click('#btnCompass'); await page.waitForTimeout(300);
+await page.click('#btnCompassMini'); await page.waitForTimeout(300);
 await page.evaluate(() => { const e = new Event('deviceorientation'); e.webkitCompassHeading = 90; e.alpha = 0; window.dispatchEvent(e); });
 await page.waitForTimeout(500);
 const g2 = await page.evaluate(() => __ff.guide);

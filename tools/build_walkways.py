@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build data/walkways.json: a pedestrian graph for the NC State Fairgrounds.
 Sources: OpenStreetMap (© OpenStreetMap contributors, ODbL) via the OSM API map call for the fairgrounds bbox,
-plus the official fair booth points (data/booths.json) used as soft obstacles.
+plus the fair's published booth points (data/booths.json) used as soft obstacles.
 - Edges: OSM highway=footway/path/steps/pedestrian/service/residential/unclassified/tertiary/cycleway/living_street/track/construction
   inside the fairgrounds polygon (way 267485236) buffered by 40 m (catches gate approaches).
 - Segments whose midpoint is inside an OSM building or water area (the pond) are dropped (you can't walk through Dorton Arena).
@@ -115,7 +115,7 @@ idx = {}; out_nodes = []
 for n in sorted(big, key=str): idx[n] = len(out_nodes); out_nodes.append([round(nodes[n][0], 6), round(nodes[n][1], 6)])
 out_edges = [[idx[a], idx[b], round(L, 1), f] + ([1] if hw == "connector" else []) for (a, b), (L, f, hw) in edges.items() if a in big and b in big]
 out = {"generated": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
-  "source": "OpenStreetMap contributors (ODbL), OSM API map call for bbox -78.7225,35.7890,-78.7030,35.8010; fairgrounds polygon = OSM way 267485236. Booth points from the official fair GIS used as soft obstacles.",
+  "source": "OpenStreetMap contributors (ODbL), OSM API map call for bbox -78.7225,35.7890,-78.7030,35.8010; fairgrounds polygon = OSM way 267485236. Booth points from the fair's published booth data used as soft obstacles.",
   "approximate": True,
   "notes": ["OSM paths reflect the permanent fairgrounds, not this year's temporary booth layout, so routes are approximate.",
             "Edge format: [nodeA, nodeB, length_m, costFactor, (1 = straight connector across open ground)]. costFactor 2 = passes within 3 m of a booth point."],

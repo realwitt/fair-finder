@@ -1,6 +1,6 @@
 {
  "generated": "2026-10-15T19:54:53+00:00",
- "source": "ATM ($) icons on the official 2026 NC State Fair grounds map tile layer (Graphic_2026_WTL1, georeferenced by the fair: https://tiles.arcgis.com/tiles/3Sj1fiIDvQtFfbvg/arcgis/rest/services/Graphic_2026_WTL1/MapServer). Same icons as the official map PDF legend 'ATM'.",
+ "source": "ATM ($) icons on the fair's published 2026 grounds map tile layer (Graphic_2026_WTL1, georeferenced by the fair: https://tiles.arcgis.com/tiles/3Sj1fiIDvQtFfbvg/arcgis/rest/services/Graphic_2026_WTL1/MapServer). Same icons as the fair's grounds map PDF legend 'ATM'.",
  "method": "Template-matched the ATM icon on level-17 tiles (0.6 m/px) and converted icon centers to lat/lon. The position is the icon center on the cartoon map, so it is approximate (cartoon icons are placed near, not exactly on, the machine; expect ~10-30 m).",
  "location": "approximate",
  "atms": [

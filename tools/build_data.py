@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build data/booths.json from the official NC State Fair 2026 Food & Ride Finder
+"""Build data/booths.json from the N.C. State Fair 2026 Food & Ride Finder (fair's published booth data)
 ArcGIS feature service (published by NCDA&CS, used by https://www.ncmhtd.com/foodandridefinder/).
 Every booth, item and coordinate comes straight from that service. Nothing is invented."""
 import json, re, sys, urllib.request, datetime
@@ -59,7 +59,7 @@ def main():
             "lat": round(g["coordinates"][1], 7) if g else None,
             "lon": round(g["coordinates"][0], 7) if g else None,
             "location": "exact" if g else "unknown",
-            "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)" if g else "No coordinates published",
+            "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)" if g else "No coordinates published",
         }
         counts[k] = counts.get(k, 0) + 1
         booths.append(b)
@@ -68,17 +68,17 @@ def main():
         "generated": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
         "fair": "2026 North Carolina State Fair, Oct 15-25, 2026, State Fairgrounds, 1025 Blue Ridge Rd, Raleigh NC",
         "sources": [
-            {"name": "Official Food & Ride Finder (NCDA&CS / NC State Fair)", "url": "https://www.ncmhtd.com/foodandridefinder/"},
+            {"name": "N.C. State Fair Food & Ride Finder (published by the fair / NCDA&CS)", "url": "https://www.ncmhtd.com/foodandridefinder/"},
             {"name": "Feature service layer 0: feature_Points_WM_2026 (Vendor, New Foods 2026, Rides)", "url": BASE + "/0"},
             {"name": "Feature service layer 1: sponsor_Points_WM_2026", "url": BASE + "/1"},
-            {"name": "Official grounds map (cartoon) tile layer, already georeferenced by the fair", "url": "https://tiles.arcgis.com/tiles/3Sj1fiIDvQtFfbvg/arcgis/rest/services/Graphic_2026_WTL1/MapServer"},
-            {"name": "Official grounds map PDF", "url": "https://www.ncagr.gov/divisions/nc-state-fair/grounds-map/open"},
+            {"name": "Fair's published grounds map (cartoon) tile layer, georeferenced by the fair", "url": "https://tiles.arcgis.com/tiles/3Sj1fiIDvQtFfbvg/arcgis/rest/services/Graphic_2026_WTL1/MapServer"},
+            {"name": "Fair's published grounds map PDF", "url": "https://www.ncagr.gov/divisions/nc-state-fair/grounds-map/open"},
             {"name": "Fair Foods page", "url": "https://www.ncagr.gov/divisions/nc-state-fair/fair-foods"},
         ],
         "notes": [
-            "Booth names, menu text (PRODUCT field) and coordinates are copied verbatim from the official feature service. 'items' is that menu text split on commas/pipes.",
+            "Booth names, menu text (PRODUCT field) and coordinates are copied verbatim from the fair's published feature service. 'items' is that menu text split on commas/pipes.",
             "location='exact' means the fair's own GIS point for the booth (WGS84, reprojected by the ArcGIS server). Those points are placed by the fair on its map, typically within a few meters of the booth.",
-            "'food' and 'drinks' are keyword flags computed from the official menu text. They are not official categories.",
+            "'food' and 'drinks' are keyword flags computed from the fair's menu text. They are not categories published by the fair.",
             "Rides and gates are excluded, as are placeholder points with no name and no menu text (skipped_blank). Kinds: vendor = 'Vendor' features, newfood = 'New Foods 2026' features (separate points from the vendor list, often the same operator), sponsor = sponsor layer.",
         ],
         "counts": counts,

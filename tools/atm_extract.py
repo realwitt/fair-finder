@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Locate ATM ($) icons on the official 2026 fair map tiles -> data/atms.json.
+"""Locate ATM ($) icons on the fair's published 2026 grounds map tiles -> data/atms.json.
 Requires opencv-python-headless, numpy, pillow. Run tools/atm_stitch.py first (writes stitch.png, level 17, 0.6 m/px).
 Template: ATM icon from level-17 tile 17/51562/36878, x162 y229, 44x45 px. Matches with score >= 0.6, non-max suppressed."""
 import cv2, numpy as np, math, json, urllib.request, datetime
@@ -18,5 +18,5 @@ for i, (sc, px, py) in enumerate(pts):
     atms.append({"id": f"atm{i+1}", "lat": round(math.degrees(2 * math.atan(math.exp(Y / R)) - math.pi / 2), 6), "lon": round(math.degrees(X / R), 6), "location": "approximate", "matchScore": round(float(sc), 3)})
 print(len(atms), "ATMs")
 json.dump({"generated": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"), "location": "approximate",
-  "source": "ATM ($) icons on the official 2026 NC State Fair grounds map tile layer (Graphic_2026_WTL1), georeferenced by the fair.",
+  "source": "ATM ($) icons on the fair's published 2026 grounds map tile layer (Graphic_2026_WTL1), georeferenced by the fair.",
   "method": "Template match of the ATM icon on level-17 tiles. Icon centers converted to lat/lon. Approximate (~10-30 m).", "atms": atms}, open("atms.json", "w"), indent=1)

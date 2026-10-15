@@ -3,7 +3,7 @@
  "fair": "2026 North Carolina State Fair, Oct 15-25, 2026, State Fairgrounds, 1025 Blue Ridge Rd, Raleigh NC",
  "sources": [
   {
-   "name": "Official Food & Ride Finder (NCDA&CS / NC State Fair)",
+   "name": "N.C. State Fair Food & Ride Finder (published by the fair / NCDA&CS)",
    "url": "https://www.ncmhtd.com/foodandridefinder/"
   },
   {
@@ -15,11 +15,11 @@
    "url": "https://services6.arcgis.com/3Sj1fiIDvQtFfbvg/arcgis/rest/services/StateFairFRFapp2026_WFL1_view/FeatureServer/1"
   },
   {
-   "name": "Official grounds map (cartoon) tile layer, already georeferenced by the fair",
+   "name": "Fair's published grounds map (cartoon) tile layer, georeferenced by the fair",
    "url": "https://tiles.arcgis.com/tiles/3Sj1fiIDvQtFfbvg/arcgis/rest/services/Graphic_2026_WTL1/MapServer"
   },
   {
-   "name": "Official grounds map PDF",
+   "name": "Fair's published grounds map PDF",
    "url": "https://www.ncagr.gov/divisions/nc-state-fair/grounds-map/open"
   },
   {
@@ -28,9 +28,9 @@
   }
  ],
  "notes": [
-  "Booth names, menu text (PRODUCT field) and coordinates are copied verbatim from the official feature service. 'items' is that menu text split on commas/pipes.",
+  "Booth names, menu text (PRODUCT field) and coordinates are copied verbatim from the fair's published feature service. 'items' is that menu text split on commas/pipes.",
   "location='exact' means the fair's own GIS point for the booth (WGS84, reprojected by the ArcGIS server). Those points are placed by the fair on its map, typically within a few meters of the booth.",
-  "'food' and 'drinks' are keyword flags computed from the official menu text. They are not official categories.",
+  "'food' and 'drinks' are keyword flags computed from the fair's menu text. They are not categories published by the fair.",
   "Rides and gates are excluded, as are placeholder points with no name and no menu text (skipped_blank). Kinds: vendor = 'Vendor' features, newfood = 'New Foods 2026' features (separate points from the vendor list, often the same operator), sponsor = sponsor layer."
  ],
  "counts": {
@@ -58,7 +58,7 @@
    "lat": 35.7962483,
    "lon": -78.7083673,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1322",
@@ -82,7 +82,7 @@
    "lat": 35.7963008,
    "lon": -78.7095921,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1319",
@@ -107,7 +107,7 @@
    "lat": 35.7956265,
    "lon": -78.7096715,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1312",
@@ -125,7 +125,7 @@
    "lat": 35.7956394,
    "lon": -78.7096015,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1368",
@@ -153,7 +153,7 @@
    "lat": 35.79406,
    "lon": -78.7092129,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1364",
@@ -185,7 +185,7 @@
    "lat": 35.7960866,
    "lon": -78.7093899,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1299",
@@ -210,7 +210,7 @@
    "lat": 35.7947827,
    "lon": -78.709657,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1224",
@@ -239,7 +239,7 @@
    "lat": 35.7950795,
    "lon": -78.7123703,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1624",
@@ -257,7 +257,7 @@
    "lat": 35.7961989,
    "lon": -78.7083379,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1294",
@@ -297,7 +297,7 @@
    "lat": 35.7948907,
    "lon": -78.709401,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1639",
@@ -315,7 +315,7 @@
    "lat": 35.7962116,
    "lon": -78.7081899,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1472",
@@ -333,7 +333,7 @@
    "lat": 35.7944909,
    "lon": -78.7083663,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1221",
@@ -359,7 +359,7 @@
    "lat": 35.7951942,
    "lon": -78.7123276,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1195",
@@ -379,7 +379,7 @@
    "lat": 35.7949593,
    "lon": -78.7110421,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1281",
@@ -408,7 +408,7 @@
    "lat": 35.7951017,
    "lon": -78.7088822,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1429",
@@ -443,7 +443,7 @@
    "lat": 35.7964577,
    "lon": -78.7151165,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1607",
@@ -463,7 +463,7 @@
    "lat": 35.7963256,
    "lon": -78.7080948,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-7",
@@ -481,7 +481,7 @@
    "lat": 35.7954403,
    "lon": -78.7083842,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1591",
@@ -509,7 +509,7 @@
    "lat": 35.7961128,
    "lon": -78.7079379,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1592",
@@ -530,7 +530,7 @@
    "lat": 35.7961375,
    "lon": -78.7079526,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1665",
@@ -560,7 +560,7 @@
    "lat": 35.7945085,
    "lon": -78.712819,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1568",
@@ -578,7 +578,7 @@
    "lat": 35.7956203,
    "lon": -78.7129713,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1569",
@@ -596,7 +596,7 @@
    "lat": 35.7956045,
    "lon": -78.7129438,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1247",
@@ -619,7 +619,7 @@
    "lat": 35.7944392,
    "lon": -78.7114699,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1636",
@@ -641,7 +641,7 @@
    "lat": 35.7962267,
    "lon": -78.7084219,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1637",
@@ -661,7 +661,7 @@
    "lat": 35.7962514,
    "lon": -78.7084367,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1484",
@@ -682,7 +682,7 @@
    "lat": 35.7945031,
    "lon": -78.708487,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1343",
@@ -704,7 +704,7 @@
    "lat": 35.7932584,
    "lon": -78.7105843,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1308",
@@ -732,7 +732,7 @@
    "lat": 35.7951725,
    "lon": -78.7094044,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1541",
@@ -756,7 +756,7 @@
    "lat": 35.7966023,
    "lon": -78.7148391,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1400",
@@ -782,7 +782,7 @@
    "lat": 35.7961257,
    "lon": -78.7151851,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1686",
@@ -805,7 +805,7 @@
    "lat": 35.7950055,
    "lon": -78.7105945,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1321",
@@ -836,7 +836,7 @@
    "lat": 35.7960916,
    "lon": -78.7095372,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1362",
@@ -863,7 +863,7 @@
    "lat": 35.7948686,
    "lon": -78.7088769,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1309",
@@ -901,7 +901,7 @@
    "lat": 35.7954495,
    "lon": -78.709338,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1577",
@@ -924,7 +924,7 @@
    "lat": 35.7956626,
    "lon": -78.7128693,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1578",
@@ -948,7 +948,7 @@
    "lat": 35.7956467,
    "lon": -78.7128418,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1336",
@@ -982,7 +982,7 @@
    "lat": 35.7953385,
    "lon": -78.7127146,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1502",
@@ -1004,7 +1004,7 @@
    "lat": 35.7946384,
    "lon": -78.7083063,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-33",
@@ -1022,7 +1022,7 @@
    "lat": 35.7963386,
    "lon": -78.7145171,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1589",
@@ -1052,7 +1052,7 @@
    "lat": 35.796621,
    "lon": -78.7147533,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1455",
@@ -1081,7 +1081,7 @@
    "lat": 35.7943556,
    "lon": -78.7084716,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1466",
@@ -1110,7 +1110,7 @@
    "lat": 35.7943802,
    "lon": -78.7084867,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1402",
@@ -1128,7 +1128,7 @@
    "lat": 35.7934604,
    "lon": -78.7103951,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1303",
@@ -1154,7 +1154,7 @@
    "lat": 35.7948268,
    "lon": -78.7099245,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1571",
@@ -1175,7 +1175,7 @@
    "lat": 35.7955728,
    "lon": -78.7128887,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1572",
@@ -1196,7 +1196,7 @@
    "lat": 35.7955569,
    "lon": -78.7128611,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1582",
@@ -1217,7 +1217,7 @@
    "lat": 35.7955411,
    "lon": -78.7128335,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1603",
@@ -1237,7 +1237,7 @@
    "lat": 35.7962268,
    "lon": -78.7080358,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1604",
@@ -1257,7 +1257,7 @@
    "lat": 35.7962515,
    "lon": -78.7080506,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1225",
@@ -1284,7 +1284,7 @@
    "lat": 35.7951436,
    "lon": -78.7123962,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1375",
@@ -1309,7 +1309,7 @@
    "lat": 35.7946809,
    "lon": -78.7109268,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-5",
@@ -1327,7 +1327,7 @@
    "lat": 35.7976118,
    "lon": -78.7156037,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1260",
@@ -1369,7 +1369,7 @@
    "lat": 35.7948535,
    "lon": -78.711242,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1196",
@@ -1393,7 +1393,7 @@
    "lat": 35.7949993,
    "lon": -78.71209,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1306",
@@ -1413,7 +1413,7 @@
    "lat": 35.7960077,
    "lon": -78.7093687,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1544",
@@ -1455,7 +1455,7 @@
    "lat": 35.7955242,
    "lon": -78.7094141,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1307",
@@ -1492,7 +1492,7 @@
    "lat": 35.7961676,
    "lon": -78.7093789,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1378",
@@ -1521,7 +1521,7 @@
    "lat": 35.7940669,
    "lon": -78.7093625,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1398",
@@ -1541,7 +1541,7 @@
    "lat": 35.7935286,
    "lon": -78.7109681,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1409",
@@ -1564,7 +1564,7 @@
    "lat": 35.7931177,
    "lon": -78.7102062,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1561",
@@ -1587,7 +1587,7 @@
    "lat": 35.793081,
    "lon": -78.7102819,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1667",
@@ -1609,7 +1609,7 @@
    "lat": 35.7937065,
    "lon": -78.7114382,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1416",
@@ -1640,7 +1640,7 @@
    "lat": 35.794971,
    "lon": -78.709175,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1245",
@@ -1672,7 +1672,7 @@
    "lat": 35.7942024,
    "lon": -78.7117111,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1656",
@@ -1699,7 +1699,7 @@
    "lat": 35.7944908,
    "lon": -78.7084417,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1202",
@@ -1724,7 +1724,7 @@
    "lat": 35.7952602,
    "lon": -78.7085105,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1205",
@@ -1750,7 +1750,7 @@
    "lat": 35.7949995,
    "lon": -78.7095358,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1355",
@@ -1771,7 +1771,7 @@
    "lat": 35.7952296,
    "lon": -78.7085552,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1301",
@@ -1798,7 +1798,7 @@
    "lat": 35.7947047,
    "lon": -78.7098389,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1487",
@@ -1821,7 +1821,7 @@
    "lat": 35.7945524,
    "lon": -78.7083665,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1207",
@@ -1845,7 +1845,7 @@
    "lat": 35.7950306,
    "lon": -78.7094339,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1272",
@@ -1888,7 +1888,7 @@
    "lat": 35.7945251,
    "lon": -78.711291,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1465",
@@ -1908,7 +1908,7 @@
    "lat": 35.7944912,
    "lon": -78.7081401,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1534",
@@ -1928,7 +1928,7 @@
    "lat": 35.7945036,
    "lon": -78.70811,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1535",
@@ -1948,7 +1948,7 @@
    "lat": 35.7945159,
    "lon": -78.7080799,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1359",
@@ -1970,7 +1970,7 @@
    "lat": 35.7937626,
    "lon": -78.7111671,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1372",
@@ -1995,7 +1995,7 @@
    "lat": 35.7938131,
    "lon": -78.7111871,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1499",
@@ -2015,7 +2015,7 @@
    "lat": 35.7946015,
    "lon": -78.7083967,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1490",
@@ -2036,7 +2036,7 @@
    "lat": 35.794614,
    "lon": -78.7082158,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-24",
@@ -2056,7 +2056,7 @@
    "lat": 35.7962546,
    "lon": -78.7081199,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1683",
@@ -2074,7 +2074,7 @@
    "lat": 35.7956002,
    "lon": -78.7098267,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1515",
@@ -2098,7 +2098,7 @@
    "lat": 35.7951242,
    "lon": -78.707119,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1352",
@@ -2120,7 +2120,7 @@
    "lat": 35.7964737,
    "lon": -78.7092073,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-28",
@@ -2138,7 +2138,7 @@
    "lat": 35.7941247,
    "lon": -78.7112593,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1688",
@@ -2156,7 +2156,7 @@
    "lat": 35.795202,
    "lon": -78.7097882,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-38",
@@ -2174,7 +2174,7 @@
    "lat": 35.7947777,
    "lon": -78.71022,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-39",
@@ -2192,7 +2192,7 @@
    "lat": 35.7936375,
    "lon": -78.7097548,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1481",
@@ -2212,7 +2212,7 @@
    "lat": 35.7945648,
    "lon": -78.7082609,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1489",
@@ -2232,7 +2232,7 @@
    "lat": 35.7945893,
    "lon": -78.7082761,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1566",
@@ -2250,7 +2250,7 @@
    "lat": 35.7955496,
    "lon": -78.7127195,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1193",
@@ -2300,7 +2300,7 @@
    "lat": 35.7952659,
    "lon": -78.7121633,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1363",
@@ -2328,7 +2328,7 @@
    "lat": 35.794591,
    "lon": -78.7087136,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1347",
@@ -2349,7 +2349,7 @@
    "lat": 35.7934881,
    "lon": -78.709364,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-30",
@@ -2367,7 +2367,7 @@
    "lat": 35.7956672,
    "lon": -78.713588,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1691",
@@ -2387,7 +2387,7 @@
    "lat": 35.7955382,
    "lon": -78.7091684,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1356",
@@ -2414,7 +2414,7 @@
    "lat": 35.7958163,
    "lon": -78.7091486,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1353",
@@ -2437,7 +2437,7 @@
    "lat": 35.796462,
    "lon": -78.709289,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1277",
@@ -2468,7 +2468,7 @@
    "lat": 35.7952053,
    "lon": -78.7087007,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1677",
@@ -2491,7 +2491,7 @@
    "lat": 35.7953707,
    "lon": -78.7084847,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1242",
@@ -2519,7 +2519,7 @@
    "lat": 35.7947939,
    "lon": -78.7121747,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1219",
@@ -2542,7 +2542,7 @@
    "lat": 35.7951442,
    "lon": -78.7118493,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1236",
@@ -2566,7 +2566,7 @@
    "lat": 35.7943555,
    "lon": -78.7116534,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1279",
@@ -2588,7 +2588,7 @@
    "lat": 35.7951197,
    "lon": -78.7088045,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1519",
@@ -2618,7 +2618,7 @@
    "lat": 35.7948534,
    "lon": -78.7074804,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1520",
@@ -2646,7 +2646,7 @@
    "lat": 35.7948779,
    "lon": -78.7074955,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1266",
@@ -2673,7 +2673,7 @@
    "lat": 35.7949495,
    "lon": -78.7116904,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1238",
@@ -2696,7 +2696,7 @@
    "lat": 35.7948472,
    "lon": -78.7117273,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1679",
@@ -2717,7 +2717,7 @@
    "lat": 35.7961774,
    "lon": -78.7080064,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1560",
@@ -2738,7 +2738,7 @@
    "lat": 35.7964207,
    "lon": -78.7152698,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1228",
@@ -2759,7 +2759,7 @@
    "lat": 35.7947113,
    "lon": -78.7121138,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1450",
@@ -2777,7 +2777,7 @@
    "lat": 35.794866,
    "lon": -78.707224,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1451",
@@ -2795,7 +2795,7 @@
    "lat": 35.7948783,
    "lon": -78.7071939,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1479",
@@ -2813,7 +2813,7 @@
    "lat": 35.7944785,
    "lon": -78.7084719,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1201",
@@ -2840,7 +2840,7 @@
    "lat": 35.7950472,
    "lon": -78.7114377,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1593",
@@ -2861,7 +2861,7 @@
    "lat": 35.7961623,
    "lon": -78.7079674,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1678",
@@ -2879,7 +2879,7 @@
    "lat": 35.7960784,
    "lon": -78.7083335,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1551",
@@ -2917,7 +2917,7 @@
    "lat": 35.794769,
    "lon": -78.7097166,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1265",
@@ -2944,7 +2944,7 @@
    "lat": 35.7949271,
    "lon": -78.7116122,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1595",
@@ -2965,7 +2965,7 @@
    "lat": 35.7962117,
    "lon": -78.7079968,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1596",
@@ -2986,7 +2986,7 @@
    "lat": 35.7962364,
    "lon": -78.7080116,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1456",
@@ -3004,7 +3004,7 @@
    "lat": 35.794368,
    "lon": -78.7084415,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1457",
@@ -3022,7 +3022,7 @@
    "lat": 35.7943803,
    "lon": -78.7084113,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1628",
@@ -3043,7 +3043,7 @@
    "lat": 35.7959796,
    "lon": -78.7082746,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1337",
@@ -3079,7 +3079,7 @@
    "lat": 35.7954018,
    "lon": -78.7128759,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1382",
@@ -3117,7 +3117,7 @@
    "lat": 35.7946281,
    "lon": -78.711565,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1383",
@@ -3149,7 +3149,7 @@
    "lat": 35.7945464,
    "lon": -78.7115313,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1505",
@@ -3169,7 +3169,7 @@
    "lat": 35.7946754,
    "lon": -78.7082159,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1629",
@@ -3194,7 +3194,7 @@
    "lat": 35.7960043,
    "lon": -78.7082893,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1630",
@@ -3219,7 +3219,7 @@
    "lat": 35.796029,
    "lon": -78.708304,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1650",
@@ -3244,7 +3244,7 @@
    "lat": 35.7960537,
    "lon": -78.7083188,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1350",
@@ -3270,7 +3270,7 @@
    "lat": 35.7947832,
    "lon": -78.7088225,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1365",
@@ -3293,7 +3293,7 @@
    "lat": 35.7962457,
    "lon": -78.7094207,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1392",
@@ -3323,7 +3323,7 @@
    "lat": 35.7965369,
    "lon": -78.7141522,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1302",
@@ -3349,7 +3349,7 @@
    "lat": 35.7947546,
    "lon": -78.7098839,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1232",
@@ -3370,7 +3370,7 @@
    "lat": 35.7943087,
    "lon": -78.7118618,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1290",
@@ -3397,7 +3397,7 @@
    "lat": 35.7950838,
    "lon": -78.7092367,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1526",
@@ -3419,7 +3419,7 @@
    "lat": 35.7950009,
    "lon": -78.7074203,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1527",
@@ -3440,7 +3440,7 @@
    "lat": 35.7949886,
    "lon": -78.7074505,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1425",
@@ -3458,7 +3458,7 @@
    "lat": 35.7943867,
    "lon": -78.7125298,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1410",
@@ -3483,7 +3483,7 @@
    "lat": 35.7964453,
    "lon": -78.7146942,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1293",
@@ -3522,7 +3522,7 @@
    "lat": 35.7949573,
    "lon": -78.7092572,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1310",
@@ -3548,7 +3548,7 @@
    "lat": 35.7955984,
    "lon": -78.7094088,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1377",
@@ -3572,7 +3572,7 @@
    "lat": 35.7942398,
    "lon": -78.7095203,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1344",
@@ -3598,7 +3598,7 @@
    "lat": 35.7942717,
    "lon": -78.7095581,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1666",
@@ -3619,7 +3619,7 @@
    "lat": 35.793838,
    "lon": -78.7117188,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1346",
@@ -3669,7 +3669,7 @@
    "lat": 35.7940191,
    "lon": -78.7092896,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1204",
@@ -3694,7 +3694,7 @@
    "lat": 35.7949086,
    "lon": -78.7098429,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1287",
@@ -3719,7 +3719,7 @@
    "lat": 35.7949212,
    "lon": -78.7098051,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1418",
@@ -3766,7 +3766,7 @@
    "lat": 35.7966139,
    "lon": -78.7149983,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1240",
@@ -3788,7 +3788,7 @@
    "lat": 35.7950405,
    "lon": -78.712008,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1274",
@@ -3810,7 +3810,7 @@
    "lat": 35.7953037,
    "lon": -78.7086618,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-11",
@@ -3828,7 +3828,7 @@
    "lat": 35.7959332,
    "lon": -78.7145114,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1289",
@@ -3846,7 +3846,7 @@
    "lat": 35.7950855,
    "lon": -78.7092888,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1537",
@@ -3866,7 +3866,7 @@
    "lat": 35.793291,
    "lon": -78.7108216,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1485",
@@ -3886,7 +3886,7 @@
    "lat": 35.7945154,
    "lon": -78.7084569,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1684",
@@ -3904,7 +3904,7 @@
    "lat": 35.7962826,
    "lon": -78.7083578,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1296",
@@ -3925,7 +3925,7 @@
    "lat": 35.794737,
    "lon": -78.7097609,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-40",
@@ -3945,7 +3945,7 @@
    "lat": 35.7945155,
    "lon": -78.7083815,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1661",
@@ -3963,7 +3963,7 @@
    "lat": 35.7961696,
    "lon": -78.7160386,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1531",
@@ -3991,7 +3991,7 @@
    "lat": 35.7945029,
    "lon": -78.7085624,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1532",
@@ -4019,7 +4019,7 @@
    "lat": 35.7944784,
    "lon": -78.7085473,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1318",
@@ -4043,7 +4043,7 @@
    "lat": 35.7959302,
    "lon": -78.7094884,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1259",
@@ -4069,7 +4069,7 @@
    "lat": 35.7948252,
    "lon": -78.7111831,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1467",
@@ -4087,7 +4087,7 @@
    "lat": 35.7948965,
    "lon": -78.7073749,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1468",
@@ -4105,7 +4105,7 @@
    "lat": 35.7949951,
    "lon": -78.7071338,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1494",
@@ -4123,7 +4123,7 @@
    "lat": 35.7950628,
    "lon": -78.7070434,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1518",
@@ -4141,7 +4141,7 @@
    "lat": 35.7949892,
    "lon": -78.7069981,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1521",
@@ -4159,7 +4159,7 @@
    "lat": 35.7950383,
    "lon": -78.7070283,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1522",
@@ -4177,7 +4177,7 @@
    "lat": 35.7950137,
    "lon": -78.7070132,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1524",
@@ -4195,7 +4195,7 @@
    "lat": 35.7949646,
    "lon": -78.7069829,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1672",
@@ -4217,7 +4217,7 @@
    "lat": 35.7937666,
    "lon": -78.7114792,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1267",
@@ -4237,7 +4237,7 @@
    "lat": 35.7949702,
    "lon": -78.7117604,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1276",
@@ -4278,7 +4278,7 @@
    "lat": 35.7952012,
    "lon": -78.7086057,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1208",
@@ -4298,7 +4298,7 @@
    "lat": 35.7954492,
    "lon": -78.7125781,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1687",
@@ -4316,7 +4316,7 @@
    "lat": 35.7951893,
    "lon": -78.7098218,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1567",
@@ -4344,7 +4344,7 @@
    "lat": 35.7957487,
    "lon": -78.7130836,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1448",
@@ -4362,7 +4362,7 @@
    "lat": 35.7949276,
    "lon": -78.7070733,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1565",
@@ -4382,7 +4382,7 @@
    "lat": 35.7955047,
    "lon": -78.7127584,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1608",
@@ -4402,7 +4402,7 @@
    "lat": 35.7963751,
    "lon": -78.7081243,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1638",
@@ -4422,7 +4422,7 @@
    "lat": 35.7963503,
    "lon": -78.7081095,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1503",
@@ -4442,7 +4442,7 @@
    "lat": 35.7946508,
    "lon": -78.7082762,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1594",
@@ -4462,7 +4462,7 @@
    "lat": 35.796187,
    "lon": -78.7079821,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1689",
@@ -4480,7 +4480,7 @@
    "lat": 35.7951765,
    "lon": -78.7098555,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1300",
@@ -4504,7 +4504,7 @@
    "lat": 35.7947259,
    "lon": -78.7098031,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1206",
@@ -4541,7 +4541,7 @@
    "lat": 35.7950046,
    "lon": -78.7094763,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1676",
@@ -4563,7 +4563,7 @@
    "lat": 35.7936011,
    "lon": -78.7113686,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1209",
@@ -4588,7 +4588,7 @@
    "lat": 35.7949489,
    "lon": -78.7089207,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1227",
@@ -4613,7 +4613,7 @@
    "lat": 35.7949245,
    "lon": -78.7122684,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1373",
@@ -4634,7 +4634,7 @@
    "lat": 35.7943605,
    "lon": -78.7118857,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1414",
@@ -4678,7 +4678,7 @@
    "lat": 35.7966973,
    "lon": -78.7089563,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1311",
@@ -4704,7 +4704,7 @@
    "lat": 35.795653,
    "lon": -78.7094706,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1317",
@@ -4726,7 +4726,7 @@
    "lat": 35.7959044,
    "lon": -78.7096035,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1403",
@@ -4746,7 +4746,7 @@
    "lat": 35.7953391,
    "lon": -78.7086096,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1623",
@@ -4768,7 +4768,7 @@
    "lat": 35.7961742,
    "lon": -78.7083231,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1333",
@@ -4790,7 +4790,7 @@
    "lat": 35.7953086,
    "lon": -78.7123241,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1514",
@@ -4829,7 +4829,7 @@
    "lat": 35.7951118,
    "lon": -78.7071491,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1216",
@@ -4853,7 +4853,7 @@
    "lat": 35.7950605,
    "lon": -78.7115854,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1217",
@@ -4877,7 +4877,7 @@
    "lat": 35.7950887,
    "lon": -78.7116384,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1444",
@@ -4895,7 +4895,7 @@
    "lat": 35.794829,
    "lon": -78.7073144,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1261",
@@ -4919,7 +4919,7 @@
    "lat": 35.7948715,
    "lon": -78.711346,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1463",
@@ -4939,7 +4939,7 @@
    "lat": 35.7944666,
    "lon": -78.7082004,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1464",
@@ -4959,7 +4959,7 @@
    "lat": 35.7944789,
    "lon": -78.7081703,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1348",
@@ -4983,7 +4983,7 @@
    "lat": 35.7946481,
    "lon": -78.7087582,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1305",
@@ -5007,7 +5007,7 @@
    "lat": 35.79593,
    "lon": -78.7093259,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1385",
@@ -5025,7 +5025,7 @@
    "lat": 35.7934722,
    "lon": -78.7105993,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1692",
@@ -5056,7 +5056,7 @@
    "lat": 35.793439,
    "lon": -78.7095507,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1244",
@@ -5079,7 +5079,7 @@
    "lat": 35.7941752,
    "lon": -78.7117908,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1340",
@@ -5097,7 +5097,7 @@
    "lat": 35.7955763,
    "lon": -78.7132877,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1564",
@@ -5127,7 +5127,7 @@
    "lat": 35.7932312,
    "lon": -78.7100778,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1229",
@@ -5177,7 +5177,7 @@
    "lat": 35.7946054,
    "lon": -78.7120455,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1407",
@@ -5206,7 +5206,7 @@
    "lat": 35.7934536,
    "lon": -78.7109184,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1659",
@@ -5246,7 +5246,7 @@
    "lat": 35.7942051,
    "lon": -78.7093662,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1660",
@@ -5264,7 +5264,7 @@
    "lat": 35.7941861,
    "lon": -78.7092299,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1575",
@@ -5290,7 +5290,7 @@
    "lat": 35.7957101,
    "lon": -78.712952,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1576",
@@ -5316,7 +5316,7 @@
    "lat": 35.7956784,
    "lon": -78.7128969,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1583",
@@ -5342,7 +5342,7 @@
    "lat": 35.7956942,
    "lon": -78.7129244,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1657",
@@ -5360,7 +5360,7 @@
    "lat": 35.793961,
    "lon": -78.7111701,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1445",
@@ -5378,7 +5378,7 @@
    "lat": 35.7948413,
    "lon": -78.7072843,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1446",
@@ -5396,7 +5396,7 @@
    "lat": 35.7948537,
    "lon": -78.7072541,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1461",
@@ -5417,7 +5417,7 @@
    "lat": 35.7944419,
    "lon": -78.7082607,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1214",
@@ -5460,7 +5460,7 @@
    "lat": 35.7959104,
    "lon": -78.7092532,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1285",
@@ -5496,7 +5496,7 @@
    "lat": 35.7952783,
    "lon": -78.7087832,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1415",
@@ -5523,7 +5523,7 @@
    "lat": 35.7954835,
    "lon": -78.7126774,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1682",
@@ -5543,7 +5543,7 @@
    "lat": 35.7934886,
    "lon": -78.7107083,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1220",
@@ -5566,7 +5566,7 @@
    "lat": 35.7952087,
    "lon": -78.7123831,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1497",
@@ -5587,7 +5587,7 @@
    "lat": 35.7945522,
    "lon": -78.7085173,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1426",
@@ -5605,7 +5605,7 @@
    "lat": 35.7946463,
    "lon": -78.7123996,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-32",
@@ -5623,7 +5623,7 @@
    "lat": 35.7957918,
    "lon": -78.7142044,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1600",
@@ -5643,7 +5643,7 @@
    "lat": 35.7961032,
    "lon": -78.7079622,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1203",
@@ -5663,7 +5663,7 @@
    "lat": 35.7951973,
    "lon": -78.709014,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1250",
@@ -5683,7 +5683,7 @@
    "lat": 35.7949319,
    "lon": -78.7115549,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1264",
@@ -5703,7 +5703,7 @@
    "lat": 35.7949218,
    "lon": -78.7115146,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1270",
@@ -5723,7 +5723,7 @@
    "lat": 35.7948563,
    "lon": -78.712232,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1315",
@@ -5743,7 +5743,7 @@
    "lat": 35.7958708,
    "lon": -78.7098638,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1354",
@@ -5763,7 +5763,7 @@
    "lat": 35.7957845,
    "lon": -78.7092655,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1366",
@@ -5783,7 +5783,7 @@
    "lat": 35.7951098,
    "lon": -78.7121255,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1369",
@@ -5803,7 +5803,7 @@
    "lat": 35.7949426,
    "lon": -78.7097368,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1550",
@@ -5823,7 +5823,7 @@
    "lat": 35.7952229,
    "lon": -78.7124234,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1513",
@@ -5841,7 +5841,7 @@
    "lat": 35.7950995,
    "lon": -78.7071792,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1511",
@@ -5862,7 +5862,7 @@
    "lat": 35.7950748,
    "lon": -78.7072395,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1512",
@@ -5883,7 +5883,7 @@
    "lat": 35.7950872,
    "lon": -78.7072094,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1430",
@@ -5909,7 +5909,7 @@
    "lat": 35.7942921,
    "lon": -78.7093806,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1562",
@@ -5936,7 +5936,7 @@
    "lat": 35.7942639,
    "lon": -78.7094462,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1388",
@@ -5963,7 +5963,7 @@
    "lat": 35.7966325,
    "lon": -78.7146788,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1507",
@@ -5981,7 +5981,7 @@
    "lat": 35.7949516,
    "lon": -78.7075409,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1528",
@@ -5999,7 +5999,7 @@
    "lat": 35.7949639,
    "lon": -78.7075107,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1529",
@@ -6017,7 +6017,7 @@
    "lat": 35.7949762,
    "lon": -78.7074806,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-44",
@@ -6043,7 +6043,7 @@
    "lat": 35.7961808,
    "lon": -78.7145261,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1645",
@@ -6081,7 +6081,7 @@
    "lat": 35.7963074,
    "lon": -78.7079865,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-10",
@@ -6099,7 +6099,7 @@
    "lat": 35.7936587,
    "lon": -78.7091048,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1493",
@@ -6127,7 +6127,7 @@
    "lat": 35.7949298,
    "lon": -78.7072634,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1226",
@@ -6151,7 +6151,7 @@
    "lat": 35.7952678,
    "lon": -78.7125967,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1327",
@@ -6174,7 +6174,7 @@
    "lat": 35.7970191,
    "lon": -78.7108971,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1329",
@@ -6210,7 +6210,7 @@
    "lat": 35.7963757,
    "lon": -78.709443,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1380",
@@ -6231,7 +6231,7 @@
    "lat": 35.7970098,
    "lon": -78.7108042,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1212",
@@ -6260,7 +6260,7 @@
    "lat": 35.7953888,
    "lon": -78.709052,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1222",
@@ -6289,7 +6289,7 @@
    "lat": 35.7951563,
    "lon": -78.7121702,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1231",
@@ -6310,7 +6310,7 @@
    "lat": 35.7944793,
    "lon": -78.7119128,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1237",
@@ -6339,7 +6339,7 @@
    "lat": 35.7945013,
    "lon": -78.7117308,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1282",
@@ -6360,7 +6360,7 @@
    "lat": 35.7950753,
    "lon": -78.7089543,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1381",
@@ -6389,7 +6389,7 @@
    "lat": 35.7950507,
    "lon": -78.7122889,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1393",
@@ -6418,7 +6418,7 @@
    "lat": 35.7951821,
    "lon": -78.712252,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1586",
@@ -6442,7 +6442,7 @@
    "lat": 35.794656,
    "lon": -78.7120725,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1197",
@@ -6472,7 +6472,7 @@
    "lat": 35.7939825,
    "lon": -78.7113414,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1557",
@@ -6496,7 +6496,7 @@
    "lat": 35.7940391,
    "lon": -78.7113406,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1506",
@@ -6516,7 +6516,7 @@
    "lat": 35.7946878,
    "lon": -78.7081858,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1223",
@@ -6540,7 +6540,7 @@
    "lat": 35.795091,
    "lon": -78.712191,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-12",
@@ -6560,7 +6560,7 @@
    "lat": 35.7945768,
    "lon": -78.708457,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-13",
@@ -6580,7 +6580,7 @@
    "lat": 35.7945645,
    "lon": -78.7084871,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1211",
@@ -6603,7 +6603,7 @@
    "lat": 35.7972642,
    "lon": -78.7089644,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1417",
@@ -6626,7 +6626,7 @@
    "lat": 35.7938169,
    "lon": -78.7090516,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1662",
@@ -6649,7 +6649,7 @@
    "lat": 35.7975737,
    "lon": -78.7153896,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1412",
@@ -6672,7 +6672,7 @@
    "lat": 35.7973784,
    "lon": -78.7114764,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1286",
@@ -6699,7 +6699,7 @@
    "lat": 35.7948912,
    "lon": -78.709895,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1587",
@@ -6725,7 +6725,7 @@
    "lat": 35.7931734,
    "lon": -78.7101408,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1215",
@@ -6747,7 +6747,7 @@
    "lat": 35.7951758,
    "lon": -78.7126435,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1539",
@@ -6778,7 +6778,7 @@
    "lat": 35.7954872,
    "lon": -78.7139273,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1681",
@@ -6796,7 +6796,7 @@
    "lat": 35.7935644,
    "lon": -78.7108058,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1338",
@@ -6830,7 +6830,7 @@
    "lat": 35.7954658,
    "lon": -78.7130533,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1408",
@@ -6864,7 +6864,7 @@
    "lat": 35.7954903,
    "lon": -78.7131138,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1552",
@@ -6892,7 +6892,7 @@
    "lat": 35.7931669,
    "lon": -78.7107647,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1590",
@@ -6917,7 +6917,7 @@
    "lat": 35.7936011,
    "lon": -78.7110161,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-25",
@@ -6937,7 +6937,7 @@
    "lat": 35.7963287,
    "lon": -78.7081641,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-26",
@@ -6957,7 +6957,7 @@
    "lat": 35.7963534,
    "lon": -78.7081789,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1620",
@@ -6979,7 +6979,7 @@
    "lat": 35.7962579,
    "lon": -78.7083431,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1558",
@@ -6997,7 +6997,7 @@
    "lat": 35.7963142,
    "lon": -78.7158289,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1627",
@@ -7018,7 +7018,7 @@
    "lat": 35.796273,
    "lon": -78.7083821,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1543",
@@ -7038,7 +7038,7 @@
    "lat": 35.7961185,
    "lon": -78.7152044,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1471",
@@ -7059,7 +7059,7 @@
    "lat": 35.7944663,
    "lon": -78.7084266,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1542",
@@ -7079,7 +7079,7 @@
    "lat": 35.7947533,
    "lon": -78.708051,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1609",
@@ -7099,7 +7099,7 @@
    "lat": 35.7961558,
    "lon": -78.708061,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1610",
@@ -7121,7 +7121,7 @@
    "lat": 35.7961805,
    "lon": -78.7080757,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1652",
@@ -7151,7 +7151,7 @@
    "lat": 35.7963599,
    "lon": -78.7080853,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1530",
@@ -7171,7 +7171,7 @@
    "lat": 35.7944296,
    "lon": -78.7082908,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1644",
@@ -7196,7 +7196,7 @@
    "lat": 35.7962827,
    "lon": -78.7079717,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1545",
@@ -7216,7 +7216,7 @@
    "lat": 35.7968256,
    "lon": -78.7086911,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1498",
@@ -7237,7 +7237,7 @@
    "lat": 35.7945891,
    "lon": -78.7084269,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1341",
@@ -7264,7 +7264,7 @@
    "lat": 35.7956446,
    "lon": -78.7140347,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1553",
@@ -7282,7 +7282,7 @@
    "lat": 35.796043,
    "lon": -78.7159029,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-36",
@@ -7300,7 +7300,7 @@
    "lat": 35.7960456,
    "lon": -78.7145158,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1673",
@@ -7322,7 +7322,7 @@
    "lat": 35.7933267,
    "lon": -78.7112199,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1615",
@@ -7344,7 +7344,7 @@
    "lat": 35.7961343,
    "lon": -78.7082694,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1411",
@@ -7367,7 +7367,7 @@
    "lat": 35.7969277,
    "lon": -78.714678,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1396",
@@ -7387,7 +7387,7 @@
    "lat": 35.7934363,
    "lon": -78.7105012,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1475",
@@ -7405,7 +7405,7 @@
    "lat": 35.7945402,
    "lon": -78.7082458,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1473",
@@ -7426,7 +7426,7 @@
    "lat": 35.7945033,
    "lon": -78.7083362,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1474",
@@ -7447,7 +7447,7 @@
    "lat": 35.7945279,
    "lon": -78.7082759,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1510",
@@ -7474,7 +7474,7 @@
    "lat": 35.7950625,
    "lon": -78.7072697,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1625",
@@ -7495,7 +7495,7 @@
    "lat": 35.7962236,
    "lon": -78.7083526,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1424",
@@ -7517,7 +7517,7 @@
    "lat": 35.794193,
    "lon": -78.7124086,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1486",
@@ -7538,7 +7538,7 @@
    "lat": 35.79454,
    "lon": -78.7083966,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1399",
@@ -7559,7 +7559,7 @@
    "lat": 35.7944795,
    "lon": -78.7128859,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1470",
@@ -7581,7 +7581,7 @@
    "lat": 35.7944539,
    "lon": -78.7084567,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1357",
@@ -7601,7 +7601,7 @@
    "lat": 35.7939291,
    "lon": -78.7123367,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1668",
@@ -7628,7 +7628,7 @@
    "lat": 35.7937821,
    "lon": -78.7116777,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1540",
@@ -7654,7 +7654,7 @@
    "lat": 35.7964981,
    "lon": -78.7162812,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1646",
@@ -7674,7 +7674,7 @@
    "lat": 35.7963321,
    "lon": -78.7080012,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-34",
@@ -7692,7 +7692,7 @@
    "lat": 35.7963042,
    "lon": -78.7145172,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-8",
@@ -7710,7 +7710,7 @@
    "lat": 35.7941997,
    "lon": -78.711309,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1358",
@@ -7730,7 +7730,7 @@
    "lat": 35.7931961,
    "lon": -78.7104799,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1428",
@@ -7757,7 +7757,7 @@
    "lat": 35.7944325,
    "lon": -78.713005,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1549",
@@ -7795,7 +7795,7 @@
    "lat": 35.794979,
    "lon": -78.7095884,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1641",
@@ -7816,7 +7816,7 @@
    "lat": 35.7962086,
    "lon": -78.7079275,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1642",
@@ -7837,7 +7837,7 @@
    "lat": 35.7962333,
    "lon": -78.7079423,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1643",
@@ -7858,7 +7858,7 @@
    "lat": 35.796258,
    "lon": -78.707957,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1218",
@@ -7880,7 +7880,7 @@
    "lat": 35.7951225,
    "lon": -78.7117416,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1376",
@@ -7902,7 +7902,7 @@
    "lat": 35.7941766,
    "lon": -78.7096672,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1601",
@@ -7926,7 +7926,7 @@
    "lat": 35.7961279,
    "lon": -78.7079769,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1602",
@@ -7950,7 +7950,7 @@
    "lat": 35.7961527,
    "lon": -78.7079916,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1647",
@@ -7970,7 +7970,7 @@
    "lat": 35.7963568,
    "lon": -78.7080159,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1670",
@@ -7990,7 +7990,7 @@
    "lat": 35.7938787,
    "lon": -78.7117466,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1675",
@@ -8010,7 +8010,7 @@
    "lat": 35.796364,
    "lon": -78.7082602,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1328",
@@ -8038,7 +8038,7 @@
    "lat": 35.796479,
    "lon": -78.7095672,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1605",
@@ -8056,7 +8056,7 @@
    "lat": 35.7962762,
    "lon": -78.7080653,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1606",
@@ -8074,7 +8074,7 @@
    "lat": 35.7963009,
    "lon": -78.7080801,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1235",
@@ -8100,7 +8100,7 @@
    "lat": 35.7943847,
    "lon": -78.7115886,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1339",
@@ -8133,7 +8133,7 @@
    "lat": 35.7955386,
    "lon": -78.7131925,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1255",
@@ -8161,7 +8161,7 @@
    "lat": 35.794785,
    "lon": -78.7109224,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1210",
@@ -8182,7 +8182,7 @@
    "lat": 35.793232,
    "lon": -78.7107958,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1480",
@@ -8202,7 +8202,7 @@
    "lat": 35.7945278,
    "lon": -78.7083513,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1452",
@@ -8220,7 +8220,7 @@
    "lat": 35.7948907,
    "lon": -78.7071637,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1453",
@@ -8238,7 +8238,7 @@
    "lat": 35.794903,
    "lon": -78.7071336,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1268",
@@ -8295,7 +8295,7 @@
    "lat": 35.7949552,
    "lon": -78.7118085,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1460",
@@ -8313,7 +8313,7 @@
    "lat": 35.7944173,
    "lon": -78.7083209,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1342",
@@ -8339,7 +8339,7 @@
    "lat": 35.7956827,
    "lon": -78.7141685,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1538",
@@ -8360,7 +8360,7 @@
    "lat": 35.7930922,
    "lon": -78.7107587,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-14",
@@ -8378,7 +8378,7 @@
    "lat": 35.7962552,
    "lon": -78.7145174,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1478",
@@ -8396,7 +8396,7 @@
    "lat": 35.7949544,
    "lon": -78.7072785,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1384",
@@ -8421,7 +8421,7 @@
    "lat": 35.7940498,
    "lon": -78.7120833,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1387",
@@ -8446,7 +8446,7 @@
    "lat": 35.7951274,
    "lon": -78.710637,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1404",
@@ -8476,7 +8476,7 @@
    "lat": 35.7939238,
    "lon": -78.7112834,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1230",
@@ -8506,7 +8506,7 @@
    "lat": 35.7945575,
    "lon": -78.7120128,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1292",
@@ -8526,7 +8526,7 @@
    "lat": 35.7949369,
    "lon": -78.7093257,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1421",
@@ -8547,7 +8547,7 @@
    "lat": 35.7949208,
    "lon": -78.7093649,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1559",
@@ -8573,7 +8573,7 @@
    "lat": 35.7940183,
    "lon": -78.7111889,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1200",
@@ -8593,7 +8593,7 @@
    "lat": 35.7947315,
    "lon": -78.7108812,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1271",
@@ -8613,7 +8613,7 @@
    "lat": 35.7951968,
    "lon": -78.7119733,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1291",
@@ -8633,7 +8633,7 @@
    "lat": 35.7950325,
    "lon": -78.7091881,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1420",
@@ -8653,7 +8653,7 @@
    "lat": 35.7948109,
    "lon": -78.710592,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1685",
@@ -8671,7 +8671,7 @@
    "lat": 35.7948961,
    "lon": -78.7104055,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1213",
@@ -8691,7 +8691,7 @@
    "lat": 35.7958937,
    "lon": -78.7093221,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1249",
@@ -8711,7 +8711,7 @@
    "lat": 35.7945419,
    "lon": -78.7112408,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1257",
@@ -8731,7 +8731,7 @@
    "lat": 35.7948192,
    "lon": -78.7110559,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1269",
@@ -8751,7 +8751,7 @@
    "lat": 35.7942766,
    "lon": -78.711845,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1325",
@@ -8771,7 +8771,7 @@
    "lat": 35.7970337,
    "lon": -78.7111882,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1664",
@@ -8791,7 +8791,7 @@
    "lat": 35.7973823,
    "lon": -78.7146108,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1406",
@@ -8820,7 +8820,7 @@
    "lat": 35.7938637,
    "lon": -78.7112283,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1263",
@@ -8845,7 +8845,7 @@
    "lat": 35.794908,
    "lon": -78.7114702,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1690",
@@ -8863,7 +8863,7 @@
    "lat": 35.7951638,
    "lon": -78.7098891,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1295",
@@ -8889,7 +8889,7 @@
    "lat": 35.7948709,
    "lon": -78.7094492,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1613",
@@ -8910,7 +8910,7 @@
    "lat": 35.7962793,
    "lon": -78.7081347,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1614",
@@ -8930,7 +8930,7 @@
    "lat": 35.796304,
    "lon": -78.7081494,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1395",
@@ -8950,7 +8950,7 @@
    "lat": 35.7965933,
    "lon": -78.7089207,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1330",
@@ -8980,7 +8980,7 @@
    "lat": 35.7965678,
    "lon": -78.7089877,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1239",
@@ -9007,7 +9007,7 @@
    "lat": 35.7949639,
    "lon": -78.7119624,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1500",
@@ -9027,7 +9027,7 @@
    "lat": 35.7946138,
    "lon": -78.7083666,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1501",
@@ -9047,7 +9047,7 @@
    "lat": 35.7946261,
    "lon": -78.7083364,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1449",
@@ -9065,7 +9065,7 @@
    "lat": 35.79494,
    "lon": -78.7070432,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1469",
@@ -9086,7 +9086,7 @@
    "lat": 35.7949667,
    "lon": -78.7072483,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1488",
@@ -9107,7 +9107,7 @@
    "lat": 35.794577,
    "lon": -78.7083062,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-23",
@@ -9125,7 +9125,7 @@
    "lat": 35.7961063,
    "lon": -78.7080315,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-27",
@@ -9145,7 +9145,7 @@
    "lat": 35.7960816,
    "lon": -78.7080168,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-45",
@@ -9163,7 +9163,7 @@
    "lat": 35.796131,
    "lon": -78.7080462,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1674",
@@ -9184,7 +9184,7 @@
    "lat": 35.7940222,
    "lon": -78.7116583,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1283",
@@ -9209,7 +9209,7 @@
    "lat": 35.7951083,
    "lon": -78.7090276,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1397",
@@ -9248,7 +9248,7 @@
    "lat": 35.7951726,
    "lon": -78.7119151,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1251",
@@ -9268,7 +9268,7 @@
    "lat": 35.7945872,
    "lon": -78.7111349,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-6",
@@ -9286,7 +9286,7 @@
    "lat": 35.7968575,
    "lon": -78.7104059,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1313",
@@ -9318,7 +9318,7 @@
    "lat": 35.7956171,
    "lon": -78.7097294,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1314",
@@ -9346,7 +9346,7 @@
    "lat": 35.7958698,
    "lon": -78.7098021,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1391",
@@ -9364,7 +9364,7 @@
    "lat": 35.7936797,
    "lon": -78.7098159,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1584",
@@ -9385,7 +9385,7 @@
    "lat": 35.7956362,
    "lon": -78.712999,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1585",
@@ -9406,7 +9406,7 @@
    "lat": 35.7956521,
    "lon": -78.7130265,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1360",
@@ -9426,7 +9426,7 @@
    "lat": 35.7962374,
    "lon": -78.7095777,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1405",
@@ -9449,7 +9449,7 @@
    "lat": 35.7933461,
    "lon": -78.7108453,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1579",
@@ -9472,7 +9472,7 @@
    "lat": 35.7956309,
    "lon": -78.7128142,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1580",
@@ -9495,7 +9495,7 @@
    "lat": 35.795615,
    "lon": -78.7127867,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1581",
@@ -9518,7 +9518,7 @@
    "lat": 35.7955992,
    "lon": -78.7127591,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-43",
@@ -9540,7 +9540,7 @@
    "lat": 35.7945525,
    "lon": -78.7082911,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1419",
@@ -9562,7 +9562,7 @@
    "lat": 35.7957106,
    "lon": -78.7131166,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1243",
@@ -9590,7 +9590,7 @@
    "lat": 35.7941376,
    "lon": -78.7118694,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1554",
@@ -9630,7 +9630,7 @@
    "lat": 35.7941151,
    "lon": -78.7113985,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1555",
@@ -9673,7 +9673,7 @@
    "lat": 35.7940705,
    "lon": -78.7113614,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1275",
@@ -9693,7 +9693,7 @@
    "lat": 35.7953036,
    "lon": -78.7087214,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1198",
@@ -9719,7 +9719,7 @@
    "lat": 35.794466,
    "lon": -78.7114072,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1256",
@@ -9745,7 +9745,7 @@
    "lat": 35.7948063,
    "lon": -78.7109887,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1284",
@@ -9771,7 +9771,7 @@
    "lat": 35.795155,
    "lon": -78.7090507,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1297",
@@ -9797,7 +9797,7 @@
    "lat": 35.7948346,
    "lon": -78.7095079,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1278",
@@ -9832,7 +9832,7 @@
    "lat": 35.795142,
    "lon": -78.7087503,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1570",
@@ -9852,7 +9852,7 @@
    "lat": 35.7955886,
    "lon": -78.7129162,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1241",
@@ -9878,7 +9878,7 @@
    "lat": 35.7949535,
    "lon": -78.7121824,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1546",
@@ -9905,7 +9905,7 @@
    "lat": 35.7952205,
    "lon": -78.7088784,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1547",
@@ -9925,7 +9925,7 @@
    "lat": 35.7952087,
    "lon": -78.7089685,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1492",
@@ -9943,7 +9943,7 @@
    "lat": 35.7949421,
    "lon": -78.7072332,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1655",
@@ -9966,7 +9966,7 @@
    "lat": 35.7963847,
    "lon": -78.7081,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1640",
@@ -9984,7 +9984,7 @@
    "lat": 35.7961839,
    "lon": -78.7079128,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-2",
@@ -10002,7 +10002,7 @@
    "lat": 35.797506,
    "lon": -78.7149849,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1394",
@@ -10027,7 +10027,7 @@
    "lat": 35.7962713,
    "lon": -78.7147262,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1508",
@@ -10047,7 +10047,7 @@
    "lat": 35.7950255,
    "lon": -78.7073601,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1509",
@@ -10067,7 +10067,7 @@
    "lat": 35.7950379,
    "lon": -78.7073299,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1361",
@@ -10090,7 +10090,7 @@
    "lat": 35.7957235,
    "lon": -78.7092672,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1611",
@@ -10110,7 +10110,7 @@
    "lat": 35.7962052,
    "lon": -78.7080904,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1612",
@@ -10130,7 +10130,7 @@
    "lat": 35.7962299,
    "lon": -78.7081052,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1401",
@@ -10160,7 +10160,7 @@
    "lat": 35.7964339,
    "lon": -78.7093674,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1351",
@@ -10181,7 +10181,7 @@
    "lat": 35.794418,
    "lon": -78.7098444,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1248",
@@ -10202,7 +10202,7 @@
    "lat": 35.79451,
    "lon": -78.7113479,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1298",
@@ -10231,7 +10231,7 @@
    "lat": 35.7948018,
    "lon": -78.7095877,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1693",
@@ -10249,7 +10249,7 @@
    "lat": 35.7962021,
    "lon": -78.7080211,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1254",
@@ -10272,7 +10272,7 @@
    "lat": 35.7946597,
    "lon": -78.7109836,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1326",
@@ -10293,7 +10293,7 @@
    "lat": 35.796977,
    "lon": -78.7106241,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1246",
@@ -10327,7 +10327,7 @@
    "lat": 35.7942154,
    "lon": -78.7115147,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1194",
@@ -10350,7 +10350,7 @@
    "lat": 35.7950156,
    "lon": -78.7109702,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1680",
@@ -10368,7 +10368,7 @@
    "lat": 35.7936024,
    "lon": -78.7108902,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1483",
@@ -10388,7 +10388,7 @@
    "lat": 35.7946018,
    "lon": -78.7081705,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1491",
@@ -10408,7 +10408,7 @@
    "lat": 35.7946263,
    "lon": -78.7081856,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1390",
@@ -10429,7 +10429,7 @@
    "lat": 35.7939168,
    "lon": -78.7111217,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-9",
@@ -10447,7 +10447,7 @@
    "lat": 35.7942941,
    "lon": -78.7113713,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1335",
@@ -10465,7 +10465,7 @@
    "lat": 35.7950204,
    "lon": -78.7127418,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-4",
@@ -10483,7 +10483,7 @@
    "lat": 35.7956441,
    "lon": -78.7135008,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-15",
@@ -10503,7 +10503,7 @@
    "lat": 35.7960355,
    "lon": -78.7082105,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-16",
@@ -10523,7 +10523,7 @@
    "lat": 35.7960602,
    "lon": -78.7082252,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-17",
@@ -10543,7 +10543,7 @@
    "lat": 35.7960849,
    "lon": -78.7082399,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-18",
@@ -10563,7 +10563,7 @@
    "lat": 35.7960259,
    "lon": -78.7082347,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-19",
@@ -10583,7 +10583,7 @@
    "lat": 35.7960506,
    "lon": -78.7082495,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-20",
@@ -10603,7 +10603,7 @@
    "lat": 35.7960753,
    "lon": -78.7082642,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-21",
@@ -10623,7 +10623,7 @@
    "lat": 35.7960012,
    "lon": -78.70822,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-22",
@@ -10643,7 +10643,7 @@
    "lat": 35.7960108,
    "lon": -78.7081957,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-41",
@@ -10663,7 +10663,7 @@
    "lat": 35.7961,
    "lon": -78.7082789,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-42",
@@ -10683,7 +10683,7 @@
    "lat": 35.7961096,
    "lon": -78.7082547,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1345",
@@ -10709,7 +10709,7 @@
    "lat": 35.7941394,
    "lon": -78.7094647,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1621",
@@ -10727,7 +10727,7 @@
    "lat": 35.7961247,
    "lon": -78.7082937,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1622",
@@ -10745,7 +10745,7 @@
    "lat": 35.7961495,
    "lon": -78.7083084,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1653",
@@ -10765,7 +10765,7 @@
    "lat": 35.7961344,
    "lon": -78.7078833,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1654",
@@ -10785,7 +10785,7 @@
    "lat": 35.7961592,
    "lon": -78.707898,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1199",
@@ -10805,7 +10805,7 @@
    "lat": 35.7947644,
    "lon": -78.7107102,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1422",
@@ -10831,7 +10831,7 @@
    "lat": 35.7969574,
    "lon": -78.710708,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1617",
@@ -10853,7 +10853,7 @@
    "lat": 35.7961838,
    "lon": -78.7082989,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1371",
@@ -10878,7 +10878,7 @@
    "lat": 35.7948932,
    "lon": -78.7119282,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1324",
@@ -10907,7 +10907,7 @@
    "lat": 35.7970562,
    "lon": -78.7112688,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1477",
@@ -10928,7 +10928,7 @@
    "lat": 35.7945772,
    "lon": -78.7081554,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1332",
@@ -10958,7 +10958,7 @@
    "lat": 35.7953373,
    "lon": -78.7123734,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1334",
@@ -10986,7 +10986,7 @@
    "lat": 35.7952928,
    "lon": -78.7122774,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1663",
@@ -11015,7 +11015,7 @@
    "lat": 35.7974729,
    "lon": -78.7146331,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1423",
@@ -11033,7 +11033,7 @@
    "lat": 35.7941848,
    "lon": -78.7128804,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1253",
@@ -11054,7 +11054,7 @@
    "lat": 35.7946423,
    "lon": -78.7110352,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1548",
@@ -11086,7 +11086,7 @@
    "lat": 35.7949529,
    "lon": -78.7096484,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1258",
@@ -11107,7 +11107,7 @@
    "lat": 35.7948298,
    "lon": -78.7111119,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1273",
@@ -11131,7 +11131,7 @@
    "lat": 35.7953487,
    "lon": -78.7085632,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1280",
@@ -11151,7 +11151,7 @@
    "lat": 35.7951036,
    "lon": -78.7088363,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1427",
@@ -11169,7 +11169,7 @@
    "lat": 35.7946763,
    "lon": -78.7123249,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1349",
@@ -11193,7 +11193,7 @@
    "lat": 35.7946997,
    "lon": -78.7087937,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1379",
@@ -11221,7 +11221,7 @@
    "lat": 35.7961663,
    "lon": -78.7095618,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1523",
@@ -11248,7 +11248,7 @@
    "lat": 35.794575,
    "lon": -78.7080031,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1634",
@@ -11266,7 +11266,7 @@
    "lat": 35.7961773,
    "lon": -78.7083925,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1635",
@@ -11284,7 +11284,7 @@
    "lat": 35.796202,
    "lon": -78.7084072,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1386",
@@ -11302,7 +11302,7 @@
    "lat": 35.7949457,
    "lon": -78.7102761,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1462",
@@ -11320,7 +11320,7 @@
    "lat": 35.7944543,
    "lon": -78.7082305,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1320",
@@ -11352,7 +11352,7 @@
    "lat": 35.7960276,
    "lon": -78.7095178,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1367",
@@ -11389,7 +11389,7 @@
    "lat": 35.7939048,
    "lon": -78.709082,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1658",
@@ -11426,7 +11426,7 @@
    "lat": 35.7939583,
    "lon": -78.7091167,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1563",
@@ -11454,7 +11454,7 @@
    "lat": 35.7954433,
    "lon": -78.7129824,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1495",
@@ -11474,7 +11474,7 @@
    "lat": 35.7945275,
    "lon": -78.7085775,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1496",
@@ -11494,7 +11494,7 @@
    "lat": 35.7945398,
    "lon": -78.7085474,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1389",
@@ -11517,7 +11517,7 @@
    "lat": 35.7963489,
    "lon": -78.7149477,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-1",
@@ -11540,7 +11540,7 @@
    "lat": 35.7961547,
    "lon": -78.7149364,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1316",
@@ -11564,7 +11564,7 @@
    "lat": 35.7958552,
    "lon": -78.7097175,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1323",
@@ -11585,7 +11585,7 @@
    "lat": 35.7970868,
    "lon": -78.7113562,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1631",
@@ -11610,7 +11610,7 @@
    "lat": 35.7961278,
    "lon": -78.708363,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1633",
@@ -11635,7 +11635,7 @@
    "lat": 35.7961526,
    "lon": -78.7083777,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1516",
@@ -11655,7 +11655,7 @@
    "lat": 35.7951365,
    "lon": -78.7070888,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1517",
@@ -11675,7 +11675,7 @@
    "lat": 35.7951119,
    "lon": -78.7070737,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1447",
@@ -11693,7 +11693,7 @@
    "lat": 35.7949153,
    "lon": -78.7071035,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1252",
@@ -11729,7 +11729,7 @@
    "lat": 35.7946157,
    "lon": -78.7110866,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1648",
@@ -11747,7 +11747,7 @@
    "lat": 35.7963816,
    "lon": -78.7080307,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1649",
@@ -11765,7 +11765,7 @@
    "lat": 35.7964063,
    "lon": -78.7080454,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-37",
@@ -11783,7 +11783,7 @@
    "lat": 35.7948097,
    "lon": -78.7101212,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1618",
@@ -11803,7 +11803,7 @@
    "lat": 35.7962085,
    "lon": -78.7083136,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1597",
@@ -11830,7 +11830,7 @@
    "lat": 35.7962611,
    "lon": -78.7080263,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1598",
@@ -11857,7 +11857,7 @@
    "lat": 35.7962858,
    "lon": -78.7080411,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1442",
@@ -11875,7 +11875,7 @@
    "lat": 35.7948044,
    "lon": -78.7073747,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1443",
@@ -11893,7 +11893,7 @@
    "lat": 35.7948167,
    "lon": -78.7073446,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1370",
@@ -11917,7 +11917,7 @@
    "lat": 35.7956015,
    "lon": -78.7091992,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1556",
@@ -11941,7 +11941,7 @@
    "lat": 35.7938636,
    "lon": -78.7110864,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-29",
@@ -11959,7 +11959,7 @@
    "lat": 35.7940715,
    "lon": -78.7112241,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L1-3",
@@ -11977,7 +11977,7 @@
    "lat": 35.7976718,
    "lon": -78.7159567,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1262",
@@ -12005,7 +12005,7 @@
    "lat": 35.7948871,
    "lon": -78.7114055,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1458",
@@ -12023,7 +12023,7 @@
    "lat": 35.7943926,
    "lon": -78.7083812,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1459",
@@ -12044,7 +12044,7 @@
    "lat": 35.794405,
    "lon": -78.7083511,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1304",
@@ -12080,7 +12080,7 @@
    "lat": 35.7956715,
    "lon": -78.7092533,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1476",
@@ -12100,7 +12100,7 @@
    "lat": 35.7945649,
    "lon": -78.7081855,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1482",
@@ -12120,7 +12120,7 @@
    "lat": 35.7945894,
    "lon": -78.7082006,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1599",
@@ -12140,7 +12140,7 @@
    "lat": 35.7963105,
    "lon": -78.7080558,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1651",
@@ -12160,7 +12160,7 @@
    "lat": 35.7963352,
    "lon": -78.7080705,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1234",
@@ -12197,7 +12197,7 @@
    "lat": 35.7943496,
    "lon": -78.7117263,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1233",
@@ -12217,7 +12217,7 @@
    "lat": 35.7943025,
    "lon": -78.7117893,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1288",
@@ -12244,7 +12244,7 @@
    "lat": 35.7950496,
    "lon": -78.7093589,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1374",
@@ -12264,7 +12264,7 @@
    "lat": 35.7946433,
    "lon": -78.7117652,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1413",
@@ -12285,7 +12285,7 @@
    "lat": 35.7944478,
    "lon": -78.7101768,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1525",
@@ -12303,7 +12303,7 @@
    "lat": 35.7950132,
    "lon": -78.7073902,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1504",
@@ -12321,7 +12321,7 @@
    "lat": 35.7946631,
    "lon": -78.708246,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1533",
@@ -12341,7 +12341,7 @@
    "lat": 35.7944293,
    "lon": -78.708517,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1331",
@@ -12368,7 +12368,7 @@
    "lat": 35.7953531,
    "lon": -78.7124548,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1573",
@@ -12388,7 +12388,7 @@
    "lat": 35.7957417,
    "lon": -78.7130071,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   },
   {
    "id": "L0-1574",
@@ -12408,7 +12408,7 @@
    "lat": 35.7957259,
    "lon": -78.7129795,
    "location": "exact",
-   "locationSource": "Official fair GIS point (NCDA&CS Food & Ride Finder feature service)"
+   "locationSource": "Fair's published booth data (N.C. State Fair Food & Ride Finder feature service)"
   }
  ]
 }

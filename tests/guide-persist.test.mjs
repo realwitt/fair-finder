@@ -14,7 +14,7 @@ await p.fill('#q', 'turkey leg'); await p.waitForTimeout(500);
 await p.locator('#resList li').nth(2).click(); await p.waitForTimeout(500);
 const T = await p.evaluate(() => ({ id: __ff.target.id, lat: __ff.target.lat, lon: __ff.target.lon, name: __ff.target.name }));
 console.log('target', T.name);
-try { await p.click('#btnCompass', { timeout: 2000 }); } catch (e) {}
+try { await p.click('#btnCompassMini', { timeout: 2000 }); } catch (e) {}
 const visible = async (tag) => { const v = await p.locator('#guide').isVisible(); const id = await p.evaluate(() => __ff.target && __ff.target.id); ok(v && id === T.id, `guide visible + same target after: ${tag} [visible=${v} target=${id}]`); return v; };
 const compass = h => p.evaluate(h => { const e = new Event('deviceorientation'); e.webkitCompassHeading = h; window.dispatchEvent(e); }, h);
 const t0 = Date.now(); let i = 0, lastD = null, dChanged = 0;

@@ -4,10 +4,10 @@
 const FAIR_TILES = 'https://tiles.arcgis.com/tiles/3Sj1fiIDvQtFfbvg/arcgis/rest/services/Graphic_2026_WTL1/MapServer/tile/{z}/{y}/{x}';
 const SAT = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 const OSM = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-// Official fair tile layer full extent (EPSG:3857) converted to lat/lon
+// Fair's published grounds-map tile layer full extent (EPSG:3857) converted to lat/lon
 const FAIR_BOUNDS = L.latLngBounds([35.79119, -78.72134], [35.79952, -78.70469]);
 const CENTER = [35.7948, -78.7115];
-const APP_VERSION = 'v6 · Oct 15 6:00 PM';
+const APP_VERSION = 'v7 · Oct 15';
 const $ = id => document.getElementById(id);
 const LS_KEY = 'ff.guideTarget';
 const state = { me: null, acc: null, gpsHeading: null, compass: null, compassAt: 0, target: null, booths: [], atms: [], results: [] };
@@ -17,13 +17,13 @@ window.__ff = state; // exposed for testing
 const map = L.map('map', { zoomControl: false, maxZoom: 21, minZoom: 14, preferCanvas: true, tap: true }).setView(CENTER, 17);
 const canvas = L.canvas({ padding: 0.5, tolerance: 12 });
 const base = {
-  sat: L.tileLayer(SAT, { maxNativeZoom: 19, maxZoom: 21, attribution: 'Imagery © Esri, Maxar, Earthstar Geographics' }),
-  osm: L.tileLayer(OSM, { maxNativeZoom: 19, maxZoom: 21, attribution: '© OpenStreetMap contributors' }),
+  sat: L.tileLayer(SAT, { maxNativeZoom: 19, maxZoom: 21, attribution: 'Powered by <a href="https://www.esri.com/" target="_blank" rel="noopener">Esri</a> · Imagery: Esri, Maxar, Earthstar Geographics, and the GIS User Community' }),
+  osm: L.tileLayer(OSM, { maxNativeZoom: 19, maxZoom: 21, crossOrigin: true, attribution: '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> contributors · <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener">Report a map issue</a>' }),
 };
-base.sat.addTo(map);
+base.osm.addTo(map); // OSM street map is the default base map
 // The fair publishes its cartoon grounds map as a georeferenced Web Mercator tile cache
 // (512px tiles, level L == Leaflet zoom L+1), so it lines up without manual control points.
-const fair = L.tileLayer(FAIR_TILES, { tileSize: 512, zoomOffset: -1, minNativeZoom: 14, maxNativeZoom: 21, maxZoom: 21, bounds: FAIR_BOUNDS.pad(0.05), opacity: 0.85, attribution: 'Grounds map © NC State Fair / NCDA&CS', className: 'fairTiles' }).addTo(map);
+const fair = L.tileLayer(FAIR_TILES, { tileSize: 512, zoomOffset: -1, minNativeZoom: 14, maxNativeZoom: 21, maxZoom: 21, bounds: FAIR_BOUNDS.pad(0.05), opacity: 0.85, attribution: 'Grounds map © N.C. Department of Agriculture &amp; Consumer Services', className: 'fairTiles' }).addTo(map);
 const boothLayer = L.layerGroup().addTo(map), hitLayer = L.layerGroup().addTo(map);
 const atmLayer = L.layerGroup(), drinkLayer = L.layerGroup();
 const guideLine = L.polyline([], { color: '#e6007e', weight: 6, dashArray: '10 8', opacity: 0.95 }).addTo(map);
@@ -75,6 +75,8 @@ async function share(t) {
 function toast(msg) { const el = $('toast'); el.textContent = msg; el.classList.remove('hidden'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.add('hidden'), 2200); }
 let mvT; map.on('moveend', () => { clearTimeout(mvT); mvT = setTimeout(() => { const c = map.getCenter(); setUrl({ ll: c.lat.toFixed(5) + ',' + c.lng.toFixed(5), z: map.getZoom() }); }, 400); });
 
+// ---------- Legal text (shared with about/) ----------
+const L_ = {"disc_t": "Unofficial guide", "disc": "Fair Finder is an independent, free project. It is not affiliated with, endorsed by, or sponsored by the N.C. State Fair or the N.C. Department of Agriculture &amp; Consumer Services. ‘N.C. State Fair’ is used only to describe the event this guide covers. For official information, see <a href=\"https://www.ncstatefair.org/\" target=\"_blank\" rel=\"noopener\">ncstatefair.org</a>.", "acc": "Booth locations and menus come from the fair’s published data and may change during the fair. ATM locations are approximate. Walking routes come from OpenStreetMap and don’t reflect temporary booths, closures or crowds. Follow posted signs and staff directions; use at your own risk. Provided as-is, with no warranty.", "priv": "Your location is used only on your device to show where you are and guide you. It is never sent to us or stored on a server. No accounts, no analytics, no tracking cookies. The app saves the booth you’re guiding to in your browser so it can resume, and whether the guide panel was open. The site is hosted on GitHub Pages, which logs visitor IP addresses for security. Map images load from OpenStreetMap, Esri and the fair’s ArcGIS server, which see normal web requests.", "cred": "<ul class=\"credits\"><li>Map data <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener\">© OpenStreetMap</a> contributors</li><li>Routes: OpenStreetMap data (ODbL) · <a href=\"https://www.openstreetmap.org/fixthemap\" target=\"_blank\" rel=\"noopener\">Report a map issue</a></li><li>Grounds map © N.C. Department of Agriculture &amp; Consumer Services</li><li>Booth data: N.C. State Fair Food &amp; Ride Finder</li><li>Satellite layer (optional): Powered by Esri · Imagery: Esri, Maxar, Earthstar Geographics, and the GIS User Community</li></ul>"};
 // ---------- Data ----------
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function popupHtml(b) {
@@ -102,7 +104,7 @@ async function loadData() {
   if (ad) {
     state.atms = ad.atms;
     const icon = L.divIcon({ className: '', html: '<div class="atmIcon">$</div>', iconSize: [30, 30] });
-    ad.atms.forEach(a => L.marker([a.lat, a.lon], { icon, keyboard: false }).bindPopup(`<b>ATM</b> <span class="badge approx">approx. location</span><br><small>Position of the ATM icon on the official fair map, so it may be off by 10–30 m.</small><button class="go" data-id="${a.id}">➜ Guide me here</button>`).addTo(atmLayer));
+    ad.atms.forEach(a => L.marker([a.lat, a.lon], { icon, keyboard: false }).bindPopup(`<b>ATM</b> <span class="badge approx">approx. location</span><br><small>Position of the ATM icon on the fair’s published grounds map, so it may be off by 10–30 m.</small><button class="go" data-id="${a.id}">➜ Guide me here</button>`).addTo(atmLayer));
   }
   const nF = state.booths.filter(b => b.food || b.kind === 'newfood').length;
   setStatus(`${nF} food booths loaded`);
@@ -128,12 +130,16 @@ window.addEventListener('popstate', () => applyUrl(false));
 
 function buildAbout(bd, ad) {
   const c = bd.counts;
-  $('aboutBody').innerHTML = `<p><b>${state.booths.length}</b> booths from the fair's official Food &amp; Ride Finder data (${c.vendor} vendors, ${c.newfood} “New Foods 2026” entries, ${c.sponsor} sponsor booths). <b>All booth positions are the fair's own GIS points.</b> Data generated ${esc(bd.generated)}.</p>
-  <p><b>ATMs:</b> ${ad ? ad.atms.length + ' read from the ATM icons on the official grounds map, so their positions are <b>approximate</b>.' : 'not loaded'}</p>
-  <p><b>Drinks:</b> booths whose official menu text mentions drinks (lemonade, tea, soda, water…). The fair publishes no separate drink-station or water-refill layer.</p>
-  <p><b>Walking routes:</b> computed on your phone over OpenStreetMap footways and service roads inside the fairgrounds (© OpenStreetMap contributors, ODbL), with buildings and the pond as obstacles and booth points penalized. OSM shows the permanent grounds, not this year's temporary booth layout, so routes are <b>approximate</b>.</p>
-  <p>Menus and locations can change during the fair. Food/drink tags are keyword matches on the official menu text.</p>
-  <ul>${bd.sources.map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a></li>`).join('')}</ul>`;
+  $('aboutBody').innerHTML = `<p class="disc"><b>${esc(L_.disc_t)}</b></p><p>${L_.disc}</p>
+  <h3>Accuracy</h3><p>${L_.acc}</p>
+  <p><b>${state.booths.length}</b> booths from the fair’s published booth data (Food &amp; Ride Finder: ${c.vendor} vendors, ${c.newfood} “New Foods 2026” entries, ${c.sponsor} sponsor booths). Booth positions are the fair’s published map points. Data generated ${esc(bd.generated)}.</p>
+  <p><b>ATMs:</b> ${ad ? ad.atms.length + ' read from the ATM icons on the fair’s published grounds map, so their positions are <b>approximate</b>.' : 'not loaded'}</p>
+  <p><b>Drinks:</b> booths whose fair listing mentions drinks (lemonade, tea, soda, water…). The fair publishes no separate drink-station or water-refill layer.</p>
+  <p><b>Walking routes:</b> computed on your phone over OpenStreetMap footways and service roads inside the fairgrounds, with buildings and the pond as obstacles. OSM shows the permanent grounds, not this year’s temporary booths, so routes are <b>approximate</b>.</p>
+  <h3>Privacy</h3><p>${L_.priv}</p>
+  <h3>Credits</h3>${L_.cred}
+  <h3>Sources</h3><ul>${bd.sources.map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a></li>`).join('')}</ul>
+  <p><a href="about/">About Fair Finder</a></p>`;
 }
 $('aboutLink').onclick = e => { e.preventDefault(); $('layersPanel').classList.add('hidden'); $('about').classList.remove('hidden'); };
 
@@ -235,7 +241,7 @@ $('resList').onclick = e => { const li = e.target.closest('li'); if (li) startGu
 // ---------- Guide ----------
 function findTarget(id) {
   const b = state.booths.find(x => x.id === id); if (b) return b;
-  const a = state.atms.find(x => x.id === id); if (a) return { id: a.id, name: 'ATM', lat: a.lat, lon: a.lon, location: 'approximate', area: 'From the official map icon', products: '' };
+  const a = state.atms.find(x => x.id === id); if (a) return { id: a.id, name: 'ATM', lat: a.lat, lon: a.lon, location: 'approximate', area: 'From the fair’s published grounds map', products: '' };
 }
 function startGuide(id, resume, fromUrl) {
   const t = findTarget(id); if (!t) return;
@@ -249,10 +255,13 @@ function startGuide(id, resume, fromUrl) {
   requestWake();
   $('guideName').textContent = t.name;
   $('guideMenuBody').textContent = (t.newFood ? 'NEW: ' + t.newFood.name + ': ' + t.newFood.description + ' | ' : '') + (t.products || '(no menu listed)');
-  $('guideMenu').classList.toggle('hidden', !t.products);
-  $('btnCompass').classList.toggle('hidden', !!state.compassOn);
+  $('guideMenu').style.visibility = t.products ? 'visible' : 'hidden';
+  $('guideMenu').scrollTop = 0;
+  compassUi();
+  sheet.show();
+  state.fittedRouteAt = null;
   const pts = [[t.lat, t.lon]]; if (state.me) pts.push(state.me);
-  if (!resume || pts.length > 1) map.fitBounds(L.latLngBounds(pts).pad(0.3), { maxZoom: 19, paddingBottomRight: [0, window.innerHeight * 0.45] });
+  if (!resume || pts.length > 1) fitGuideView(true, pts);
   updateGuide();
 }
 // The ONLY way guide mode ends: the explicit Stop button.
@@ -262,7 +271,7 @@ function stopGuide(fromUrl) {
   document.title = BASE_TITLE;
   state.target = null; state.guide = null; guideLine.setLatLngs([]);
   try { localStorage.removeItem(LS_KEY); } catch (e) {}
-  $('guide').classList.add('hidden'); document.body.classList.remove('guiding');
+  sheet.hide(); document.body.classList.remove('guiding');
   releaseWake();
   if (state.results.length) $('results').classList.remove('hidden');
 }
@@ -281,15 +290,16 @@ function currentHeading() {
 }
 function updateGuide() {
   const t = state.target; if (!t) return;
-  const meta = `${t.area || ''}${t.lot ? ' · ' + t.lot : ''}${t.location !== 'exact' ? ' · approximate location' : ' · official GIS point'}`;
+  const meta = `${t.area || ''}${t.lot ? ' · ' + t.lot : ''}${t.location !== 'exact' ? ' · approximate location' : ' · fair’s published booth data'}`;
+  $('guideMeta2').textContent = meta;
   $('guide').classList.remove('hidden'); document.body.classList.add('guiding'); // guide never hides itself
   $('guide').classList.toggle('noloc', !state.me && !!state.gpsDenied);
   if (!state.me && state.gpsDenied) {
-    $('guideDist').textContent = ''; $('guideHint').textContent = 'Location is off, so here is the booth on the map. Allow location for directions.'; $('guideMeta').textContent = meta; $('guideUpd').textContent = '';
+    $('guideDist').textContent = ''; $('guideHint').textContent = 'Location is off, so here is the booth on the map. Allow location for directions.'; $('guideMeta').textContent = 'Location off'; $('guideUpd').textContent = '';
     if (!state.shownNoLoc) { state.shownNoLoc = true; map.setView([t.lat, t.lon], 19); }
     return;
   }
-  if (!state.me) { $('guideDist').textContent = '—'; $('guideHint').textContent = 'Waiting for your GPS position…'; $('guideMeta').textContent = meta; $('guideUpd').textContent = 'updating…'; return; }
+  if (!state.me) { $('guideDist').textContent = '—'; $('guideHint').textContent = 'Waiting for your GPS position…'; $('guideMeta').textContent = 'GPS: waiting for a fix'; $('guideUpd').textContent = 'updating…'; return; }
   const d = Geo.distanceM(state.me[0], state.me[1], t.lat, t.lon);
   let br = Geo.bearingDeg(state.me[0], state.me[1], t.lat, t.lon);
   const { h, src } = currentHeading();
@@ -297,17 +307,20 @@ function updateGuide() {
   const R = ensureRoute(t);
   let mode = 'straight', remaining = d, turn = null, offRoute = null, look = null;
   if (R && d > 15) {
-    const pr = Route.project(R.points, state.me); offRoute = pr.d;
+    const pr = Route.projectNear(R.points, state.me, R.lastAlong); R.lastAlong = pr.along; offRoute = pr.d;
     mode = 'route'; remaining = Math.max(0, R.lengthM - pr.along) + pr.d;
-    look = Route.pointAt(R.points, pr.along + 18);
-    if (Route.dist(state.me, look) > 2) br = Geo.bearingDeg(state.me[0], state.me[1], look[0], look[1]);
     turn = Route.nextTurn(R.points, pr.along);
     if (turn && turn.inM > R.lengthM - pr.along - 8) turn = null;
+    // Look-ahead point: 18 m along the route, but never past the next corner (+4 m), so the arrow
+    // and the turn hint always describe the same leg of the route.
+    const ahead = turn ? Math.min(18, Math.max(8, turn.inM + 4)) : 18;
+    look = Route.pointAt(R.points, pr.along + ahead);
+    if (Route.dist(state.me, look) > 2) br = Geo.bearingDeg(state.me[0], state.me[1], look[0], look[1]);
   }
   const rot = h == null ? br : Geo.relativeDeg(br, h);
   state.guide = { distanceM: d, bearing: br, heading: h, headingSource: src, arrowRotation: rot, mode, remainingM: remaining, offRouteM: offRoute, lookahead: look, turn, reroutes: state.reroutes || 0 };
-  $('arrow').style.transform = `rotate(${rot}deg)`;
-  $('northTag').classList.toggle('hidden', h != null);
+  $('arrow').style.transform = `rotate(${rot}deg)`; $('miniArrow').style.transform = `rotate(${rot}deg)`;
+  $('northTag').style.visibility = h == null ? 'visible' : 'hidden'; $('miniNorth').style.visibility = h == null ? 'visible' : 'hidden';
   const mins = Math.max(1, Math.round(remaining / 1.1 / 60)); // ~1.1 m/s walking in fair crowds
   $('guideDist').textContent = mode === 'route' ? `${Geo.fmtFeet(remaining)} walk` : Geo.fmtFeet(d);
   $('guideRoute').textContent = mode === 'route' ? `~${mins} min walking · route is approximate (OSM paths, not this year's booth layout)` : (state.graph ? 'Straight-line arrow: no walking route found here' : 'Straight-line arrow (walking routes loading…)');
@@ -315,21 +328,47 @@ function updateGuide() {
   const arrived = d <= 15;
   $('guide').classList.toggle('arrived', arrived);
   let hintTxt = Geo.hint(d, br, h);
-  if (mode === 'route') {
-    const dir = h == null ? 'head ' + Geo.compassWord(br) : Geo.directionHint(Geo.relativeDeg(br, h));
-    hintTxt = turn ? `In ${Geo.fmtFeet(turn.inM)} ${Route.turnWord(turn.turnDeg)} · now ${dir}` : `Continue ${Geo.fmtFeet(remaining)} to the booth · ${dir}`;
-  } else if (state.graph) hintTxt = 'Straight line: ' + hintTxt;
-  $('guideHint').textContent = arrived ? '✅ Arrived: it should be right around you' : hintTxt;
+  if (mode === 'route') hintTxt = routeHint(br, h, turn, remaining);
+  else if (state.graph) hintTxt = 'Straight line: ' + hintTxt;
+  if (arrived) hintTxt = '✅ Arrived: it should be right around you';
+  state.guide.hint = hintTxt;
+  $('guideHint').textContent = hintTxt;
   const gpsAge = Date.now() - (state.meAt || 0), hd = currentHeading();
   const upd = [];
   if (gpsAge > 10000 || state.gpsError) upd.push('GPS updating… (last fix ' + Math.round(gpsAge / 1000) + 's ago)');
   if (hd.stale) upd.push('compass updating…');
-  $('guideUpd').textContent = upd.join(' · ');
   state.guide.arrived = arrived; state.guide.stale = upd.length > 0;
-  $('guideMeta').textContent = meta + ` · heading: ${src === 'compass' ? 'compass' : src === 'gps' ? 'GPS (walking direction)' : 'none, arrow is north-up'} · GPS ±${Math.round(state.acc * 3.28)} ft`;
+  if (src === 'compass' && state.compassAcc != null && state.compassAcc > 30) upd.push('compass inaccurate: wave phone in a figure 8');
+  $('guideUpd').textContent = upd.join(' · ');
+  // Heading source, then the GPS accuracy radius from the current fix (coords.accuracy, metres → ft).
+  const hs = src === 'compass' ? 'compass' + (state.compassAcc != null && state.compassAcc >= 0 ? ` ±${Math.round(state.compassAcc)}°` : '') + (hd.stale ? ' (stale)' : '')
+    : src === 'gps' ? 'GPS walking direction' + (hd.stale ? ' (stale)' : '') : 'none, arrow is north-up';
+  $('guideMeta').textContent = `Heading: ${hs} · GPS ±${Math.round(Geo.feet(state.acc || 0))} ft` + (offRoute != null && offRoute > 6 ? ` · ${Math.round(Geo.feet(offRoute))} ft from route` : '');
+  state.guide.metaText = $('guideMeta').textContent;
   if (mode === 'route') { routeLine.setLatLngs(R.points); routeCasing.setLatLngs(R.points); guideLine.setLatLngs([]); }
   else { routeLine.setLatLngs([]); routeCasing.setLatLngs([]); guideLine.setLatLngs([state.me, [t.lat, t.lon]]); }
-  document.documentElement.style.setProperty('--guideH', $('guide').offsetHeight + 'px');
+  // When collapsed, fit each new route (and you) into the visible map above the bar, once per route.
+  if (mode === 'route' && sheet.state === 'collapsed' && state.fittedRouteAt !== R.at) { state.fittedRouteAt = R.at; fitGuideView(false); }
+}
+// One wording source for the hint, derived from the SAME bearing the arrow shows (br), so they can't disagree.
+function routeHint(br, h, turn, remaining) {
+  const ahead = turn ? (turn.inM < 9 ? cap(Route.turnWord(turn.turnDeg)) + ' now' : `In ${Geo.fmtFeet(turn.inM)}, ${Route.turnWord(turn.turnDeg)}`) : `Straight on for ${Geo.fmtFeet(remaining)}`;
+  if (h == null) return `Head ${Geo.compassWord(br)} · ${ahead.charAt(0).toLowerCase() + ahead.slice(1)}`;
+  const rel = Geo.relativeDeg(br, h), side = rel < 0 ? 'left' : 'right';
+  if (Math.abs(rel) > 120) return 'Turn around: the route is behind you';
+  if (Math.abs(rel) > 50) return `Turn ${side} to face the arrow`;
+  return ahead;
+}
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+let userMovedAt = 0; map.on('dragstart', () => { userMovedAt = Date.now(); });
+// Fit route + you (or given points) into the map area that is actually visible above the sheet.
+function fitGuideView(force, pts) {
+  if (!force && Date.now() - userMovedAt < 20000) return; // don't fight a user who is panning
+  const t = state.target; if (!t) return;
+  const R = state.route && state.route.targetId === t.id ? state.route : null;
+  const all = pts || (R ? R.points.concat(state.me ? [state.me] : []) : [[t.lat, t.lon]].concat(state.me ? [state.me] : []));
+  map.invalidateSize({ pan: false });
+  map.fitBounds(L.latLngBounds(all), { maxZoom: 19, paddingTopLeft: [24, 150], paddingBottomRight: [80, 24] });
 }
 setInterval(updateGuide, 1000);
 // Route cache with automatic reroute when > 25 m off the route (only on a decent GPS fix, at most every 3 s).
@@ -364,7 +403,8 @@ function onOrient(e) {
   if (h == null) return;
   h = (h + screenAngle() + 360) % 360;
   state.compass = h; state.compassAt = Date.now(); state.compassOn = true;
-  $('btnCompass').classList.add('hidden');
+  if (typeof e.webkitCompassAccuracy === 'number') state.compassAcc = e.webkitCompassAccuracy;
+  if (!state._cui) { state._cui = true; compassUi(); }
   if (!state._lastG || Date.now() - state._lastG > 150) { state._lastG = Date.now(); updateGuide(); }
 }
 function startCompass() {
@@ -373,6 +413,11 @@ function startCompass() {
   window.addEventListener('deviceorientation', onOrient);
   state.compassListening = true;
 }
+function compassUi() {
+  const v = state.compassOn ? 'hidden' : 'visible';
+  $('btnCompass').style.visibility = v; $('btnCompassMini').style.visibility = v;
+}
+$('btnCompassMini').onclick = e => { e.stopPropagation(); $('btnCompass').onclick(); };
 $('btnCompass').onclick = async () => {
   try {
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
@@ -386,6 +431,76 @@ $('btnCompass').onclick = async () => {
 // Non-iOS browsers don't need permission, so start listening right away.
 if (!(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function')) startCompass();
 
+// ---------- Guide sheet (non-modal bottom sheet, 2 snap points) ----------
+// Fixed height; only transform changes, so nothing inside reflows when it slides or when the hint text changes.
+const SHEET_KEY = 'ff.sheet';
+const sheet = {
+  el: $('guide'), bar: $('sheetBar'), more: $('guideMore'), visible: false,
+  state: (() => { try { return localStorage.getItem(SHEET_KEY) === 'expanded' ? 'expanded' : 'collapsed'; } catch (e) { return 'collapsed'; } })(),
+  heights() {
+    if (this._sb == null) { const p = document.createElement('div'); p.style.cssText = 'position:fixed;visibility:hidden;height:env(safe-area-inset-bottom,0px)'; document.body.appendChild(p); this._sb = p.offsetHeight || 0; p.remove(); }
+    const mini = 104 + this._sb, full = Math.round(Math.min(480 + this._sb, Math.max(mini + 260, window.innerHeight * 0.7)));
+    return { full, mini };
+  },
+  offset(st) { const { full, mini } = this.heights(); return st === 'expanded' ? 0 : full - mini; },
+  layout(anim) {
+    const { full, mini } = this.heights(), root = document.documentElement.style;
+    root.setProperty('--sheetFull', full + 'px'); root.setProperty('--sheetMini', mini + 'px');
+    root.setProperty('--sheetVis', (this.visible ? (this.state === 'expanded' ? full : mini) : 0) + 'px');
+    this.el.classList.toggle('no-anim', !anim);
+    this.el.style.transform = `translate3d(0,${this.visible ? this.offset(this.state) : full + 20}px,0)`;
+    this.el.dataset.snap = this.state;
+    const exp = this.state === 'expanded';
+    this.bar.setAttribute('aria-expanded', String(exp));
+    this.bar.setAttribute('aria-label', exp ? 'Collapse guide panel' : 'Expand guide panel');
+    if (exp) { this.more.removeAttribute('inert'); this.more.removeAttribute('aria-hidden'); }
+    else { this.more.setAttribute('inert', ''); this.more.setAttribute('aria-hidden', 'true'); }
+    clearTimeout(this._inv); this._inv = setTimeout(() => { map.invalidateSize({ pan: false }); }, 260);
+  },
+  set(st, anim = true) {
+    this.state = st; try { localStorage.setItem(SHEET_KEY, st); } catch (e) {}
+    this.layout(anim);
+    if (st === 'collapsed' && state.target) setTimeout(() => fitGuideView(false), 280);
+  },
+  toggle() { this.set(this.state === 'expanded' ? 'collapsed' : 'expanded'); },
+  show() { const was = this.visible; this.visible = true; this.el.classList.remove('hidden'); if (!was) { this.layout(false); requestAnimationFrame(() => this.layout(true)); } else this.layout(true); },
+  hide() { this.visible = false; this.layout(true); setTimeout(() => { if (!this.visible) this.el.classList.add('hidden'); }, 260); },
+};
+(function sheetDrag() {
+  const bar = sheet.bar; let st = null;
+  bar.addEventListener('pointerdown', e => {
+    if (e.target.closest('button')) return;
+    st = { y: e.clientY, t: performance.now(), base: sheet.offset(sheet.state), moved: false, id: e.pointerId, lastY: e.clientY, lastT: performance.now(), v: 0 };
+    try { bar.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+  bar.addEventListener('pointermove', e => {
+    if (!st || e.pointerId !== st.id) return;
+    const dy = e.clientY - st.y; if (Math.abs(dy) > 6) st.moved = true;
+    if (!st.moved) return;
+    const now = performance.now(); st.v = (e.clientY - st.lastY) / Math.max(1, now - st.lastT); st.lastY = e.clientY; st.lastT = now;
+    const max = sheet.offset('collapsed'), y = Math.max(0, Math.min(max, st.base + dy));
+    sheet.el.classList.add('no-anim'); sheet.el.style.transform = `translate3d(0,${y}px,0)`;
+  });
+  const end = e => {
+    if (!st || e.pointerId !== st.id) return;
+    const s = st; st = null;
+    if (!s.moved) return sheet.toggle();
+    const max = sheet.offset('collapsed'), y = Math.max(0, Math.min(max, s.base + (e.clientY - s.y)));
+    sheet.set(Math.abs(s.v) > 0.4 ? (s.v > 0 ? 'collapsed' : 'expanded') : (y > max / 2 ? 'collapsed' : 'expanded'));
+  };
+  bar.addEventListener('pointerup', end);
+  bar.addEventListener('pointercancel', e => { if (st && e.pointerId === st.id) { st = null; sheet.layout(true); } });
+  bar.addEventListener('keydown', e => {
+    if (e.target !== bar) return;
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); sheet.toggle(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); sheet.set('expanded'); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); sheet.set('collapsed'); }
+  });
+  window.addEventListener('resize', () => { if (sheet.visible) sheet.layout(false); });
+})();
+window.__ffSheet = sheet;
+window.__ffLL = ll => { const q = map.latLngToContainerPoint(ll), r = map.getContainer().getBoundingClientRect(); return [q.x + r.left, q.y + r.top]; };
+
 // ---------- Wake lock & lifecycle ----------
 let wakeLock = null;
 async function requestWake() {
@@ -396,7 +511,7 @@ function onResume() {
   // iOS suspends geolocation/orientation while locked or in another app: re-acquire, keep guide mode as-is.
   startWatch();
   if (state.compassListening || state.compassGranted) startCompass();
-  if (state.target) { requestWake(); $('guide').classList.remove('hidden'); updateGuide(); }
+  if (state.target) { requestWake(); sheet.show(); updateGuide(); }
   state.resumeCount = (state.resumeCount || 0) + 1;
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') onResume(); });
@@ -409,7 +524,7 @@ function tileList() {
   const lonToX = (lon, n) => Math.floor((lon + 180) / 360 * n), latToY = (lat, n) => Math.floor((1 - Math.asinh(Math.tan(lat * Math.PI / 180)) / Math.PI) / 2 * n);
   const b = FAIR_BOUNDS;
   for (let lvl = 14; lvl <= 19; lvl++) { const n = 2 ** lvl; for (let x = lonToX(b.getWest(), n); x <= lonToX(b.getEast(), n); x++) for (let y = latToY(b.getNorth(), n); y <= latToY(b.getSouth(), n); y++) urls.push(FAIR_TILES.replace('{z}', lvl).replace('{y}', y).replace('{x}', x)); }
-  for (let z = 15; z <= 19; z++) { const n = 2 ** z; for (let x = lonToX(b.getWest(), n); x <= lonToX(b.getEast(), n); x++) for (let y = latToY(b.getNorth(), n); y <= latToY(b.getSouth(), n); y++) urls.push(SAT.replace('{z}', z).replace('{y}', y).replace('{x}', x)); }
+  // Only the fair's grounds-map tiles are saved. Esri imagery and OSM tiles are never bulk-downloaded (their terms forbid it).
   return urls;
 }
 $('btnOffline').onclick = async () => {
@@ -423,7 +538,7 @@ $('btnOffline').onclick = async () => {
 };
 $('version').textContent = APP_VERSION;
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js?v=6', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
+  navigator.serviceWorker.register('sw.js?v=7', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
 }
 
 loadData().catch(e => setStatus('Could not load booth data: ' + e.message));

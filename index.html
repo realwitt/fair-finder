@@ -6,18 +6,18 @@
 <meta name="theme-color" content="#0b1f4d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Fair Finder · NC State Fair 2026</title>
-<meta name="description" content="Find food at the 2026 NC State Fair: search booths from the official vendor list and follow a live arrow there.">
+<title>Fair Finder: Unofficial Guide to the 2026 N.C. State Fair</title>
+<meta name="description" content="Unofficial guide to the 2026 N.C. State Fair: search any food in the fair’s published booth data and follow live walking directions there.">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Fair Finder">
-<meta property="og:title" content="Fair Finder · NC State Fair 2026">
-<meta property="og:description" content="Search official fair food booths and follow a live arrow there.">
+<meta property="og:site_name" content="Fair Finder: Unofficial Guide to the 2026 N.C. State Fair">
+<meta property="og:title" content="Fair Finder: Unofficial Guide to the 2026 N.C. State Fair">
+<meta property="og:description" content="Search any food at the fair, get walking directions, find ATMs and share booth links. Independent and unofficial.">
 <meta property="og:image" content="https://realwitt.github.io/fair-finder/icons/icon-512.png">
 <meta name="twitter:card" content="summary">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="stylesheet" href="vendor/leaflet.css?v=6">
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="vendor/leaflet.css?v=7">
+<link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
 <div id="map" aria-label="Map"></div>
@@ -44,6 +44,7 @@
 <div id="status" role="status">Starting GPS…</div>
 <div id="toast" class="hidden" role="status"></div>
 <div id="version" aria-label="App version"></div>
+<a id="aboutPill" href="about/">About</a>
 
 <div id="fab">
   <button id="btnLocate" class="fab" aria-label="Center on me" title="Center on me">◎</button>
@@ -52,19 +53,19 @@
 
 <section id="layersPanel" class="panel hidden" aria-label="Layers">
   <h2>Map layers <button class="close" data-close="layersPanel" aria-label="Close">✕</button></h2>
-  <label class="row"><input type="checkbox" id="tglFair" checked> Official fair map</label>
+  <label class="row"><input type="checkbox" id="tglFair" checked> Fair’s published grounds map</label>
   <label class="row slider">Opacity <input type="range" id="fairOpacity" min="0" max="100" value="85"> <span id="opVal">85%</span></label>
   <div class="row seg">Base:
-    <label><input type="radio" name="base" value="sat" checked> Satellite</label>
-    <label><input type="radio" name="base" value="osm"> Street</label>
+    <label><input type="radio" name="base" value="osm" checked> Street (OpenStreetMap)</label>
+    <label><input type="radio" name="base" value="sat"> Satellite (Esri)</label>
   </div>
-  <label class="row"><input type="checkbox" id="tglFood" checked> Food booths (official GIS)</label>
-  <label class="row"><input type="checkbox" id="tglATM"> 💲 ATMs <small>(from official map icons, approx.)</small></label>
-  <label class="row"><input type="checkbox" id="tglDrinks"> 🥤 Drink booths <small>(booths whose official menu lists drinks)</small></label>
-  <p class="note" id="waterNote">💧 Water refill stations: the fair's official map and site do <b>not</b> publish refill-station locations, so none are shown. A local guide (thisisraleigh.com, unofficial) says there are filling stations across from Casey's Clubhouse and under the trees between Kiddieland and the Scott Building.</p>
-  <button id="btnOffline" class="wide">⬇ Save fair map for offline</button>
+  <label class="row"><input type="checkbox" id="tglFood" checked> Food booths (fair’s published booth data)</label>
+  <label class="row"><input type="checkbox" id="tglATM"> 💲 ATMs <small>(from the fair’s published grounds map, approx.)</small></label>
+  <label class="row"><input type="checkbox" id="tglDrinks"> 🥤 Drink booths <small>(booths whose fair listing mentions drinks)</small></label>
+  <p class="note" id="waterNote">💧 Water refill stations: the fair’s published map and site do <b>not</b> list refill-station locations, so none are shown. A local guide (thisisraleigh.com, unofficial) says there are filling stations across from Casey's Clubhouse and under the trees between Kiddieland and the Scott Building.</p>
+  <button id="btnOffline" class="wide">⬇ Save the grounds map for offline</button>
   <p class="note" id="offlineMsg"></p>
-  <p class="note"><a href="#" id="aboutLink">About the data & sources</a></p>
+  <p class="note"><a href="#" id="aboutLink">About the data & sources</a> · <a href="about/" id="aboutApp">About Fair Finder</a></p>
 </section>
 
 <section id="results" class="sheet hidden" aria-label="Results">
@@ -72,23 +73,31 @@
   <ol id="resList"></ol>
 </section>
 
-<section id="guide" class="hidden" aria-label="Guide">
-  <div id="guideTop">
-    <div id="guideName"></div>
-    <button id="btnShare" class="small" aria-label="Share this booth">Share</button>
-    <button id="btnShowList" class="small" aria-label="Show results list">List</button>
+<section id="guide" class="hidden" aria-label="Walking guide" data-snap="collapsed">
+  <div id="sheetBar" role="button" tabindex="0" aria-controls="guideMore" aria-expanded="false" aria-label="Expand guide panel">
+    <span class="grabber" aria-hidden="true"></span>
+    <div id="miniArrowWrap" aria-hidden="true"><svg id="miniArrow" viewBox="0 0 100 100"><path d="M50 4 L84 80 L50 62 L16 80 Z"/></svg><span id="miniNorth">N↑</span></div>
+    <div id="barText">
+      <div id="guideDist">—</div>
+      <div id="guideHint" aria-live="polite"></div>
+    </div>
+    <button id="btnCompassMini" aria-label="Enable compass">🧭</button>
     <button class="stop" id="closeGuide" aria-label="Stop guiding">Stop ✕</button>
   </div>
-  <div id="arrowWrap"><svg id="arrow" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 L84 80 L50 62 L16 80 Z"/></svg><div id="northTag">N↑</div></div>
-  <div id="guideDist">—</div>
-  <div id="guideHint"></div>
-  <div id="guideRoute"></div>
-  <div id="guideMeta"></div>
-  <div id="guideUpd" aria-live="polite"></div>
-  <div id="guideBtns">
-    <button id="btnCompass" class="wide">🧭 Enable compass</button>
+  <div id="guideMore">
+    <div id="guideTop">
+      <div id="guideName"></div>
+      <button id="btnShare" class="small" aria-label="Share this booth">Share</button>
+      <button id="btnShowList" class="small" aria-label="Show results list">List</button>
+    </div>
+    <div id="arrowWrap"><svg id="arrow" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 L84 80 L50 62 L16 80 Z"/></svg><div id="northTag">N↑</div></div>
+    <div id="guideRoute"></div>
+    <div id="guideMeta"></div>
+    <div id="guideMeta2"></div>
+    <div id="guideUpd" aria-live="polite"></div>
+    <div id="guideBtns"><button id="btnCompass" class="wide">🧭 Enable compass</button></div>
+    <div id="guideMenu" tabindex="0" role="region" aria-label="Menu, from fair listing"><h3>Menu (from fair listing)</h3><div id="guideMenuBody"></div></div>
   </div>
-  <details id="guideMenu"><summary>Menu (official listing)</summary><div id="guideMenuBody"></div></details>
 </section>
 
 <section id="about" class="panel hidden" aria-label="About">
@@ -96,10 +105,10 @@
   <div id="aboutBody">Loading…</div>
 </section>
 
-<script src="vendor/leaflet.js?v=6"></script>
-<script src="geo.js?v=6"></script>
-<script src="search.js?v=6"></script>
-<script src="route.js?v=6"></script>
-<script src="app.js?v=6"></script>
+<script src="vendor/leaflet.js?v=7"></script>
+<script src="geo.js?v=7"></script>
+<script src="search.js?v=7"></script>
+<script src="route.js?v=7"></script>
+<script src="app.js?v=7"></script>
 </body>
 </html>

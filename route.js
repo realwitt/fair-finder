@@ -66,7 +66,9 @@
   Graph.prototype.route = function (fromLL, toLL_, opt = {}) {
     const s = this.snap(fromLL[0], fromLL[1], opt.maxSnap || 80), t = this.snap(toLL_[0], toLL_[1], opt.maxSnap || 80);
     if (!s || !t) return null;
-    const pts = [fromLL, toLL(s.x, s.y)];
+    // v7: the route starts AT the snap point on the walkway, not at the raw GPS fix. The perpendicular hop from a noisy
+    // fix onto the path used to create a fake sharp corner a few metres ahead ("in under 30 ft turn left").
+    const pts = [toLL(s.x, s.y)];
     if (s.ei !== t.ei) {
       const n = this.xy.length, g = new Float64Array(n).fill(Infinity), prev = new Int32Array(n).fill(-1), h = new Heap(), [tx, ty] = [t.x, t.y];
       const H = v => Math.hypot(this.xy[v][0] - tx, this.xy[v][1] - ty);
@@ -85,7 +87,7 @@
     pts.push(toLL(t.x, t.y)); pts.push(toLL_);
     const clean = [pts[0]];
     for (const p of pts.slice(1)) { const q = clean[clean.length - 1]; if (dist(p, q) > 0.5) clean.push(p); }
-    return { points: clean, lengthM: polyLen(clean), snapFrom: s, snapTo: t };
+    return { points: clean, lengthM: polyLen(clean), snapFrom: s, snapTo: t, startOffsetM: s.d };
   };
   function dist(a, b) { const [ax, ay] = toXY(a[0], a[1]), [bx, by] = toXY(b[0], b[1]); return Math.hypot(ax - bx, ay - by); }
   function polyLen(p) { let s = 0; for (let i = 1; i < p.length; i++) s += dist(p[i - 1], p[i]); return s; }
@@ -97,6 +99,21 @@
       const vx = bx - ax, vy = by - ay, L = Math.hypot(vx, vy), t = L ? Math.max(0, Math.min(1, ((px - ax) * vx + (py - ay) * vy) / (L * L))) : 0;
       const d = Math.hypot(px - ax - t * vx, py - ay - t * vy);
       if (d < best.d) best = { d, along: acc + t * L, seg: i - 1 };
+      acc += L;
+    }
+    return best;
+  }
+  // Like project(), but prefers the candidate near the previous along-position (stops the arrow jumping back to an
+  // earlier, nearby leg of the route when the path doubles back). Going back > 12 m costs a 15 m penalty.
+  function projectNear(poly, ll, prevAlong) {
+    if (prevAlong == null) return project(poly, ll);
+    const [px, py] = toXY(ll[0], ll[1]); let best = null, acc = 0;
+    for (let i = 1; i < poly.length; i++) {
+      const [ax, ay] = toXY(poly[i - 1][0], poly[i - 1][1]), [bx, by] = toXY(poly[i][0], poly[i][1]);
+      const vx = bx - ax, vy = by - ay, L = Math.hypot(vx, vy), t = L ? Math.max(0, Math.min(1, ((px - ax) * vx + (py - ay) * vy) / (L * L))) : 0;
+      const d = Math.hypot(px - ax - t * vx, py - ay - t * vy), along = acc + t * L;
+      const score = d + (along < prevAlong - 12 ? 15 : 0);
+      if (!best || score < best.score) best = { d, along, seg: i - 1, score };
       acc += L;
     }
     return best;
@@ -123,6 +140,6 @@
     return null;
   }
   function turnWord(t) { const a = Math.abs(t), side = t > 0 ? 'right' : 'left'; return a < 60 ? 'bear ' + side : a < 135 ? 'turn ' + side : 'make a U-turn'; }
-  const api = { Graph, project, pointAt, polyLen, nextTurn, turnWord, bearing, dist, toXY, toLL };
+  const api = { Graph, project, projectNear, pointAt, polyLen, nextTurn, turnWord, bearing, dist, toXY, toLL };
   if (typeof module !== 'undefined') module.exports = api; else root.Route = api;
 })(this);

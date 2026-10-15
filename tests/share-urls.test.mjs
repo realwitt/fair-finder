@@ -22,7 +22,7 @@ await p.goForward(); await p.waitForTimeout(500);
 ok(await p.locator('#guide').isVisible() && await p.evaluate(() => __ff.target && __ff.target.id) === id, 'Forward re-opens guide');
 // 3. Share: navigator.share stub
 await p.evaluate(() => { window.__shared = null; navigator.share = async d => { window.__shared = d; }; });
-await p.click('#btnShare'); await p.waitForTimeout(300);
+await p.evaluate(() => __ffSheet.set('expanded', false)); await p.waitForTimeout(300); await p.click('#btnShare'); await p.waitForTimeout(300);
 const sh = await p.evaluate(() => window.__shared);
 ok(sh && sh.url.includes('/b/' + id + '.html') && sh.title.includes(await p.evaluate(() => __ff.target.name)), 'navigator.share called: ' + (sh && sh.url));
 // clipboard fallback
@@ -34,7 +34,7 @@ await p.click('#closeGuide'); await p.waitForTimeout(900);
 ok(/ll=35\.\d+,-78\.\d+/.test(p.url()) && /z=\d+/.test(p.url()) && !/booth=/.test(p.url()), 'Stop removes booth, URL keeps center/zoom: ' + p.url().replace(/^.*\?/, '?'));
 // 5. share page redirect + OG
 const page = await (await fetch(URL + 'b/' + id + '.html')).text();
-ok(/og:title" content="[^"]+NC State Fair/.test(page), 'share page has og:title');
+ok(/og:title" content="[^"]+Fair Finder \(unofficial\)/.test(page), 'share page has og:title');
 await p.goto(URL + 'b/' + id + '.html?q=empanada', { waitUntil: 'networkidle' }); await ready(p); await p.waitForTimeout(800);
 ok(new globalThis.URL(p.url()).searchParams.get('booth') === id && await p.locator('#guide').isVisible() && await p.evaluate(() => __ff.guide && __ff.guide.distanceM > 0), 'shared /b/ link -> guide from my location');
 // 6. offline query-string URL via service worker
