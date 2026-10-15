@@ -185,7 +185,12 @@ function updateGuide() {
 setInterval(updateGuide, 1000);
 
 // Compass: iOS needs a user gesture to request permission; Android gives absolute alpha.
-function screenAngle() { return (screen.orientation && screen.orientation.angle) || window.orientation || 0; }
+function screenAngle() {
+  // Portrait is by far the common case. Some engines report a bogus angle, so trust the viewport shape first.
+  if (window.innerHeight >= window.innerWidth) return 0;
+  if (typeof window.orientation === 'number' && window.orientation !== 0) return window.orientation;
+  return (screen.orientation && screen.orientation.angle) || 90;
+}
 function onOrient(e) {
   let h = null;
   if (typeof e.webkitCompassHeading === 'number' && !isNaN(e.webkitCompassHeading)) h = e.webkitCompassHeading; // already corrected for screen on iOS? (relative to device top)
