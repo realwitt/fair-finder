@@ -48,7 +48,7 @@ await ctx.close();
 ctx = await b.newContext({ ...devices['iPhone 14 Pro'] }); p = await ctx.newPage();
 await p.goto(URL + '?booth=' + id, { waitUntil: 'networkidle' }); await ready(p); await p.waitForTimeout(2500);
 const nl = await p.evaluate(() => ({ cls: document.getElementById('guide').className, hint: document.getElementById('guideHint').textContent, me: __ff.me }));
-ok(!nl.me && /noloc/.test(nl.cls) && /Location is off/.test(nl.hint), 'no location permission: shows booth only: ' + nl.hint);
+ok(!nl.me && /noloc/.test(nl.cls) && /Allow location/.test(nl.hint), 'no location permission: shows booth only: ' + nl.hint);
 await p.screenshot({ path: '/workspace/fair-finder-shots/13-shared-link-no-location.png' });
 await b.close();
 console.log(fails.length ? fails.length + ' FAILURES' : 'ALL PASS'); process.exit(fails.length ? 1 : 0);

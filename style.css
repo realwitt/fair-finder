@@ -135,3 +135,45 @@ body.guiding #aboutPill{display:none}
 #aboutBody h3{font-size:16px;margin:12px 0 4px}
 #aboutBody .disc{margin-bottom:2px}
 #aboutBody .credits{padding-left:18px;font-size:14px}
+.leaflet-popup .shareBooth{margin-top:6px;width:100%;min-height:40px}
+
+/* v7: primary Share buttons */
+.ico{width:20px;height:20px;flex:none}
+.shareP,.shareBooth,.rShare{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#1a73e8;color:#fff;border:3px solid #000;border-radius:12px;font-weight:900;font-size:16px;cursor:pointer;padding:0 12px;min-height:44px}
+.shareP:active,.shareBooth:active,.rShare:active{transform:translateY(1px)}
+#guide #btnShare{height:44px;min-width:104px}
+#sheetBar{grid-template-columns:60px minmax(0,1fr) 60px 82px}
+#barSlot{position:relative;width:60px;height:56px}
+#barSlot>button{position:absolute;inset:0;width:60px;height:56px;min-height:0;padding:0}
+#btnShareBar{flex-direction:column;gap:0;font-size:11px;border-radius:12px}
+#btnShareBar .ico{width:22px;height:22px}
+#btnShareBar{visibility:hidden}
+.popBtns{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:stretch;margin-top:8px}
+.leaflet-popup-content .popBtns .go{margin-top:0}
+.leaflet-popup-content .shareBooth{min-height:46px}
+.rShare{min-height:36px;font-size:14px;padding:0 10px;border-width:2px;margin-left:8px;flex:none}
+.rShare .ico{width:16px;height:16px}
+.r-top{display:flex;align-items:center}
+.r-top .r-name{flex:1;min-width:0}
+#btnShareMe.pill{position:fixed;z-index:1000;left:8px;top:calc(var(--safe-t) + 222px);min-height:36px;font-size:13px;padding:0 10px;border-width:2px;border-radius:10px}
+body.guiding #btnShareMe{display:none}
+body.popup #btnShareMe,body.popup #aboutPill,body.popup #version,body.popup #status{visibility:hidden}
+
+/* GPS stale refresh button: outside the sheet, so it never shifts the layout */
+#btnGpsRefresh{position:fixed;z-index:5100;left:50%;bottom:calc(var(--sheetVis,0px) + 12px);transform:translate(-50%,20px);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  background:#a15c00;color:#fff;font-weight:900;font-size:16px;border:3px solid #000;border-radius:14px;padding:0 16px;min-height:48px;white-space:nowrap;box-shadow:0 4px 14px #0007}
+#btnGpsRefresh.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+/* "You" marker (Apple/Google Maps style). transform/opacity only. */
+.meIconWrap{background:none;border:0}
+.me{position:relative;width:120px;height:120px;pointer-events:none}
+.meCore{position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 1px 6px #0009;transition:background-color .4s}
+.mePulse{position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:#1a73e8;opacity:0;transform:scale(1)}
+.mePulse.blip{animation:meBlip 1.6s ease-out 1}
+@keyframes meBlip{0%{opacity:.55;transform:scale(1)}100%{opacity:0;transform:scale(4.2)}}
+.meBeam{position:absolute;left:0;top:0;width:120px;height:120px;opacity:0;transition:transform .3s ease-out,opacity .3s;
+  background:conic-gradient(from -36deg at 50% 50%,rgba(26,115,232,0) 0deg,rgba(26,115,232,.6) 36deg,rgba(26,115,232,0) 72deg,transparent 72deg 360deg);
+  -webkit-mask:radial-gradient(circle at 50% 50%,#000 0,#000 20%,transparent 50%);mask:radial-gradient(circle at 50% 50%,#000 0,#000 20%,transparent 50%)}
+.me.stale .meCore{background:#8a8f98}
+.me.stale .mePulse{animation:none;opacity:0}
+.me.stale .meBeam{filter:grayscale(1)}
+@media (prefers-reduced-motion:reduce){.mePulse.blip{animation:none}.meBeam,#btnGpsRefresh,#miniArrow,#arrow,#guide{transition:none}}

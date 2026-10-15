@@ -7,7 +7,7 @@ const OSM = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 // Fair's published grounds-map tile layer full extent (EPSG:3857) converted to lat/lon
 const FAIR_BOUNDS = L.latLngBounds([35.79119, -78.72134], [35.79952, -78.70469]);
 const CENTER = [35.7948, -78.7115];
-const APP_VERSION = 'v7 · Oct 15';
+const APP_VERSION = 'v7.1 · Oct 15';
 const $ = id => document.getElementById(id);
 const LS_KEY = 'ff.guideTarget';
 const state = { me: null, acc: null, gpsHeading: null, compass: null, compassAt: 0, target: null, booths: [], atms: [], results: [] };
@@ -46,6 +46,7 @@ $('tglDrinks').onchange = e => e.target.checked ? drinkLayer.addTo(map) : map.re
 // ---------- URL state (shareable links) ----------
 // ?q=<search>  ?new=1  ?booth=<id>  &ll=<lat>,<lon>&z=<zoom>. Booth ids are the fair GIS object ids (e.g. L0-1314).
 const BASE_TITLE = document.title;
+const SHARE_ICO = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v7h14v-7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function urlParams() { return new URLSearchParams(location.search); }
 function buildUrl(over) {
   const p = urlParams();
@@ -59,6 +60,7 @@ function setUrl(over, push) {
   try { history[push ? 'pushState' : 'replaceState']({ ff: over.booth ? 'booth' : 'view' }, '', u); } catch (e) {}
 }
 function shareUrlFor(t) {
+  if (t && /^meet_/.test(t.id)) return location.origin + location.pathname.replace(/[^/]*$/, '') + '?booth=' + t.id;
   // /b/<id>.html carries Open Graph tags with the booth name and redirects to ?booth=<id>
   const root = location.origin + location.pathname.replace(/[^/]*$/, '');
   const q = urlParams().get('q');
@@ -67,7 +69,7 @@ function shareUrlFor(t) {
 }
 async function share(t) {
   const url = shareUrlFor(t), title = t ? `${t.name} · NC State Fair` : BASE_TITLE;
-  const text = t ? `${t.name}${t.area ? ' (' + t.area + ')' : ''}: find it at the fair with Fair Finder` : 'Fair Finder';
+  const text = t && t.meet ? 'I’m here at the fair. Open this to walk to me with Fair Finder' : t ? `${t.name}${t.area ? ' (' + t.area + ')' : ''}: find it at the fair with Fair Finder` : 'Fair Finder';
   try { if (navigator.share) { await navigator.share({ title, text, url }); return 'shared'; } } catch (e) { if (e && e.name === 'AbortError') return 'cancelled'; }
   try { await navigator.clipboard.writeText(url); toast('Link copied'); return 'copied'; } catch (e) {}
   window.prompt('Copy this link', url); return 'prompt';
@@ -84,15 +86,25 @@ function popupHtml(b) {
   <small>${esc(b.area)}${b.lot ? ' · ' + esc(b.lot) : ''}</small>
   ${b.newFood ? `<div><b>New:</b> ${esc(b.newFood.name)}: ${esc(b.newFood.description)}</div>` : ''}
   <div style="max-height:9em;overflow:auto">${esc(b.products || '(no menu listed)')}</div>
-  <button class="go" data-id="${esc(b.id)}">➜ Guide me here</button>`;
+  <div class="popBtns"><button class="go" data-id="${esc(b.id)}">➜ Guide me here</button><button class="shareBooth" type="button" aria-label="Share ${esc(b.name)}">${SHARE_ICO}<span>Share</span></button></div>`;
 }
 function boothMarker(b, cls) {
   const color = cls === 'hit' ? '#e6007e' : b.kind === 'newfood' ? '#ffd400' : (b.drinks && !b.food ? '#00b3ff' : '#ff5a00');
   const m = L.circleMarker([b.lat, b.lon], { renderer: canvas, radius: cls === 'hit' ? 11 : 7, color: '#000', weight: cls === 'hit' ? 3 : 2, fillColor: color, fillOpacity: 1 });
-  m.bindPopup(() => popupHtml(b), { maxWidth: 300 });
+  m.bindPopup(() => popupHtml(b), { maxWidth: 300, autoPanPaddingTopLeft: [10, 170], autoPanPaddingBottomRight: [10, 20] });
   return m;
 }
-map.on('popupopen', e => { const btn = e.popup.getElement().querySelector('.go'); if (btn) btn.onclick = () => { map.closePopup(); startGuide(btn.dataset.id); }; });
+map.on('popupopen', e => {
+  document.body.classList.add('popup');
+  const el = e.popup.getElement(), btn = el.querySelector('.go'), sh = el.querySelector('.shareBooth'); if (!btn) return;
+  const id = btn.dataset.id; e.popup._ffId = id;
+  btn.onclick = () => { map.closePopup(); startGuide(id); };
+  if (sh) sh.onclick = () => share(findTarget(id));
+  // v7 share-link fix: an open booth card is part of the URL, so the browser's own Share / copied address bar
+  // carries the booth (previously only ll/z were in the URL and the recipient got no booth).
+  if (!state.target) setUrl({ booth: id });
+});
+map.on('popupclose', e => { document.body.classList.remove('popup'); if (e.popup._ffId && !state.target && urlBoothId() === e.popup._ffId) setUrl({ booth: null }); });
 
 async function loadData() {
   const [bd, ad] = await Promise.all([fetch('data/booths.json').then(r => r.json()), fetch('data/atms.json').then(r => r.json()).catch(() => null)]);
@@ -104,7 +116,7 @@ async function loadData() {
   if (ad) {
     state.atms = ad.atms;
     const icon = L.divIcon({ className: '', html: '<div class="atmIcon">$</div>', iconSize: [30, 30] });
-    ad.atms.forEach(a => L.marker([a.lat, a.lon], { icon, keyboard: false }).bindPopup(`<b>ATM</b> <span class="badge approx">approx. location</span><br><small>Position of the ATM icon on the fair’s published grounds map, so it may be off by 10–30 m.</small><button class="go" data-id="${a.id}">➜ Guide me here</button>`).addTo(atmLayer));
+    ad.atms.forEach(a => L.marker([a.lat, a.lon], { icon, keyboard: false }).bindPopup(`<b>ATM</b> <span class="badge approx">approx. location</span><br><small>Position of the ATM icon on the fair’s published grounds map, so it may be off by 10–30 m.</small><div class="popBtns"><button class="go" data-id="${a.id}">➜ Guide me here</button><button class="shareBooth" type="button" aria-label="Share this ATM">${SHARE_ICO}<span>Share</span></button></div>`).addTo(atmLayer));
   }
   const nF = state.booths.filter(b => b.food || b.kind === 'newfood').length;
   setStatus(`${nF} food booths loaded`);
@@ -117,8 +129,14 @@ function applyUrl(initial) {
   if (p.get('new') === '1') runSearch(true, true);
   else if (q) { $('q').value = q; runSearch(false, true); }
   else if (!initial) { $('q').value = ''; clearResults(); }
-  const id = booth && (booth.match(/(L\d-\d+|atm\d+)$/) || [])[1];
-  if (id && findTarget(id)) { state.fromLink = initial; startGuide(id, false, true); }
+  const id = parseBoothId(booth);
+  if (id && booth !== id) setUrl({ booth: id }); // tidy links mangled by chat apps (trailing '.', ')', spaces, case)
+  if (id && findTarget(id)) {
+    let saved = null; try { saved = localStorage.getItem(LS_KEY); } catch (e) {}
+    const nav = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0] || {}).type;
+    state.fromLink = initial && saved !== id && nav !== 'reload' && nav !== 'back_forward'; // a link someone sent, not our own resume
+    startGuide(id, false, true);
+  }
   else if (!initial && state.target) stopGuide(true);
   else if (initial) {
     let saved = null; try { saved = localStorage.getItem(LS_KEY); } catch (e) {}
@@ -127,6 +145,14 @@ function applyUrl(initial) {
   }
 }
 window.addEventListener('popstate', () => applyUrl(false));
+// Booth ids are L<layer>-<objectid> or atm<n>. Accept them anywhere in the value so 'L0-1387.', 'L0-1387)', 'l0-1387 ' still work.
+function parseBoothId(v) {
+  if (!v) return null;
+  const mm = String(v).match(/meet_(-?\d{1,3}\.\d{3,7})_(-?\d{1,3}\.\d{3,7})/); if (mm) return 'meet_' + mm[1] + '_' + mm[2];
+  const m = String(v).match(/\b(L\d-\d+|atm\d+)/i); if (!m) return null;
+  return /^l/i.test(m[1]) ? 'L' + m[1].slice(1) : m[1].toLowerCase();
+}
+function urlBoothId() { return parseBoothId(urlParams().get('booth')); }
 
 function buildAbout(bd, ad) {
   const c = bd.counts;
@@ -145,33 +171,75 @@ $('aboutLink').onclick = e => { e.preventDefault(); $('layersPanel').classList.a
 
 // ---------- Location ----------
 function setStatus(t) { $('status').textContent = t; }
+// Light 2-D Kalman-style smoothing: every fix is USED (no accuracy cut-off; 50–150 ft is normal at the fair),
+// a poor fix just moves the estimate less. Position uncertainty grows with time at walking speed.
+function fuse(lat, lon, acc) {
+  const now = Date.now(), f = state.fused;
+  if (!f || now - f.t > 15000 || acc < 8) { state.fused = { lat, lon, v: acc * acc, t: now }; return [lat, lon]; }
+  const dt = (now - f.t) / 1000, vPrev = f.v + (2.5 * dt) ** 2, k = vPrev / (vPrev + acc * acc);
+  f.lat += k * (lat - f.lat); f.lon += k * (lon - f.lon); f.v = (1 - k) * vPrev; f.t = now;
+  return [f.lat, f.lon];
+}
 function onPos(p) {
   const { latitude: lat, longitude: lon, accuracy, heading, speed } = p.coords;
-  state.me = [lat, lon]; state.acc = accuracy;
+  state.raw = [lat, lon]; state.me = fuse(lat, lon, accuracy); state.acc = accuracy;
+  state.fixCount = (state.fixCount || 0) + 1; state.lastFixAt = Date.now(); state.watchRestartsSinceFix = 0;
   if (heading != null && !isNaN(heading) && speed != null && speed > 0.7) { state.gpsHeading = heading; state.gpsHeadingAt = Date.now(); }
   if (!meMarker) {
-    meMarker = L.marker(state.me, { icon: L.divIcon({ className: '', html: '<div class="youDot"></div>', iconSize: [22, 22] }), interactive: false, zIndexOffset: 1000 }).addTo(map);
-    accCircle = L.circle(state.me, { radius: accuracy, color: '#1a73e8', weight: 2, fillColor: '#1a73e8', fillOpacity: 0.15, interactive: false }).addTo(map);
-    if (FAIR_BOUNDS.pad(0.5).contains(state.me)) map.setView(state.me, 18);
+    meMarker = L.marker(state.me, { icon: L.divIcon({ className: 'meIconWrap', html: '<div class="me" id="meDot"><div class="meBeam" id="meBeam"></div><div class="mePulse" id="mePulse"></div><div class="meCore"></div></div>', iconSize: [120, 120], iconAnchor: [60, 60] }), interactive: false, keyboard: false, zIndexOffset: 1000 }).addTo(map);
+    accCircle = L.circle(state.me, { radius: accuracy, color: '#1a73e8', weight: 1.5, opacity: 0.5, fillColor: '#1a73e8', fillOpacity: 0.12, interactive: false }).addTo(map);
+    if (FAIR_BOUNDS.pad(0.5).contains(state.me) && !state.target) map.setView(state.me, 18);
   } else { meMarker.setLatLng(state.me); accCircle.setLatLng(state.me).setRadius(accuracy); }
+  blip();
   state.meAt = Date.now(); state.gpsError = null; refreshWalk();
   setStatus(`GPS ±${Math.round(accuracy * 3.28084)} ft`);
   // Refresh distances in the list WITHOUT touching guide visibility or the map view.
   if (state.results.length) renderResults(false, true);
-  updateGuide();
+  updateGuide(); meStyle();
+}
+// Map "you" marker: blue dot, pulse ring that blips on each fix, compass beam, grey when stale.
+function blip() { const el = document.getElementById('mePulse'); if (!el) return; el.classList.remove('blip'); void el.offsetWidth; el.classList.add('blip'); }
+function meStyle() {
+  const d = document.getElementById('meDot'); if (!d) return;
+  const stale = Date.now() - (state.lastFixAt || 0) > 20000; d.classList.toggle('stale', stale);
+  const hd = currentHeading(), beam = document.getElementById('meBeam');
+  if (hd.h == null || hd.src === 'north') { beam.style.opacity = '0'; return; }
+  // unwrap so the CSS transition always takes the short way round
+  const prev = state._beamDeg == null ? hd.h : state._beamDeg, delta = ((hd.h - (prev % 360) + 540) % 360) - 180;
+  state._beamDeg = prev + delta; beam.style.transform = `rotate(${state._beamDeg}deg)`; beam.style.opacity = stale || hd.stale ? '0.35' : '1';
 }
 function onPosErr(e) {
-  state.gpsError = e.message || String(e.code); state.gpsDenied = e.code === 1;
-  updateGuide(); setStatus(e.code === 1 ? 'Location blocked: allow it in Settings › Safari › Location' : 'Waiting for GPS… (' + e.message + ')'); }
-let watchId = null;
-function startWatch() {
-  if (!('geolocation' in navigator)) return setStatus('This browser has no geolocation');
-  if (watchId != null) navigator.geolocation.clearWatch(watchId);
-  // A timeout error does not stop watchPosition, and guide state is never cleared by GPS problems.
-  watchId = navigator.geolocation.watchPosition(onPos, onPosErr, { enableHighAccuracy: true, maximumAge: 2000, timeout: 20000 });
+  state.gpsError = e.message || String(e.code); state.gpsDenied = e.code === 1; state.lastErrAt = Date.now(); state.errCount = (state.errCount || 0) + 1;
+  updateGuide(); setStatus(e.code === 1 ? 'Location blocked: allow it in Settings › Safari › Location' : 'Waiting for GPS… (' + e.message + ')');
+  // iOS Safari often stops delivering after an error/timeout: restart the watch (not for a permission denial).
+  if (e.code !== 1) restartSoon('error ' + e.code);
 }
+let watchId = null, restartT = null;
+function restartSoon(why) { clearTimeout(restartT); restartT = setTimeout(() => startWatch(why), 1000); }
+function startWatch(why) {
+  if (!('geolocation' in navigator)) return setStatus('This browser has no geolocation');
+  const g = navigator.geolocation;
+  if (watchId != null) { try { g.clearWatch(watchId); } catch (e) {} watchId = null; }
+  state.watchStarts = (state.watchStarts || 0) + 1; state.watchStartedAt = Date.now(); state.lastRestartWhy = why || 'start';
+  // maximumAge small so we never get a cached fix; timeout bounds each attempt, and an error restarts the watch.
+  watchId = g.watchPosition(onPos, onPosErr, { enableHighAccuracy: true, maximumAge: 1000, timeout: 15000 });
+  // Kick: a one-shot request often wakes a stalled iOS location stream.
+  if (why && why !== 'start') { state.kicks = (state.kicks || 0) + 1; try { g.getCurrentPosition(onPos, () => {}, { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }); } catch (e) {} }
+}
+function stopWatch() { if (watchId != null) { try { navigator.geolocation.clearWatch(watchId); } catch (e) {} watchId = null; } }
+// Watchdog: no fix for > 12 s while visible -> restart + kick (backs off to every 30 s after repeated tries).
+setInterval(() => {
+  meStyle();
+  if (document.visibilityState !== 'visible' || state.gpsDenied) return;
+  const now = Date.now(), last = Math.max(state.lastFixAt || 0, state.watchStartedAt || 0);
+  const wait = (state.watchRestartsSinceFix || 0) >= 4 ? 30000 : 12000;
+  if (now - last > wait) { state.watchRestartsSinceFix = (state.watchRestartsSinceFix || 0) + 1; startWatch('watchdog'); }
+}, 2000);
+$('btnGpsRefresh').onclick = () => { state.gpsDenied = false; state.watchRestartsSinceFix = 0; startWatch('user'); toast('Refreshing location…'); };
 startWatch();
-$('btnLocate').onclick = () => state.me ? map.setView(state.me, Math.max(map.getZoom(), 18)) : setStatus('No GPS fix yet');
+// If location was denied and later allowed (Settings, or the permission prompt answered late), pick it up without a reload.
+try { navigator.permissions && navigator.permissions.query({ name: 'geolocation' }).then(st => { st.onchange = () => { if (st.state !== 'denied') { state.gpsDenied = false; startWatch(); } }; }).catch(() => {}); } catch (e) {}
+$('btnLocate').onclick = () => { if (state.me) return map.setView(state.me, Math.max(map.getZoom(), 18)); setStatus(state.gpsDenied ? 'Asking for location again…' : 'No GPS fix yet'); startWatch(); };
 
 // ---------- Search ----------
 let tmr;
@@ -225,7 +293,7 @@ function renderResults(fit, quiet) {
   $('resList').innerHTML = rs.slice(0, 80).map((r, i) => {
     const b = r.booth, items = (r.matched.length ? r.matched : (b.items || [])).slice(0, 4);
     return `<li data-id="${esc(b.id)}" data-i="${i}">
-      <div class="r-top"><span class="r-name">${esc(b.name)}</span><span class="r-dist">${r.d != null ? (r.walk ? '🚶 ' : '') + Geo.fmtFeet(r.d) : ''}</span></div>
+      <div class="r-top"><span class="r-name">${esc(b.name)}</span><span class="r-dist">${r.d != null ? (r.walk ? '🚶 ' : '') + Geo.fmtFeet(r.d) : ''}</span><button class="rShare" type="button" data-share="${esc(b.id)}" aria-label="Share ${esc(b.name)}">${SHARE_ICO}<span>Share</span></button></div>
       <div class="r-items">${items.map(it => r.matched.length ? `<mark>${hl(it)}</mark>` : hl(it)).join(', ')}</div>
       <div class="r-meta">${b.kind === 'newfood' ? '<span class="badge new">NEW 2026</span>' : ''}${r.tier ? '<span class="badge">related</span>' : ''}${b.location !== 'exact' ? '<span class="badge approx">approx.</span>' : ''}${esc(b.area)}${b.lot ? ' · ' + esc(b.lot) : ''}</div></li>`;
   }).join('');
@@ -236,10 +304,15 @@ function renderResults(fit, quiet) {
     map.fitBounds(L.latLngBounds(pts).pad(0.2), { maxZoom: 19, paddingBottomRight: [0, window.innerHeight * 0.45] });
   }
 }
-$('resList').onclick = e => { const li = e.target.closest('li'); if (li) startGuide(li.dataset.id); };
+$('resList').onclick = e => { const sb = e.target.closest('[data-share]'); if (sb) { e.stopPropagation(); share(findTarget(sb.dataset.share)); return; } const li = e.target.closest('li'); if (li) startGuide(li.dataset.id); };
+// Share where I am: a link that guides a friend to my current GPS position.
+function myspotId() { return state.me ? `meet_${state.me[0].toFixed(5)}_${state.me[1].toFixed(5)}` : null; }
+$('btnShareMe').onclick = () => { const id = myspotId(); if (!id) { toast(state.gpsDenied ? 'Allow location first' : 'Waiting for GPS…'); return; } share(findTarget(id)); };
 
 // ---------- Guide ----------
 function findTarget(id) {
+  const mt = /^meet_(-?\d+\.\d+)_(-?\d+\.\d+)$/.exec(id || '');
+  if (mt) { const lat = +mt[1], lon = +mt[2]; if (Math.abs(lat) <= 90 && Math.abs(lon) <= 180) return { id, meet: true, name: '📍 Shared spot', lat, lon, location: 'approximate', area: 'A friend’s shared GPS position', products: '' }; }
   const b = state.booths.find(x => x.id === id); if (b) return b;
   const a = state.atms.find(x => x.id === id); if (a) return { id: a.id, name: 'ATM', lat: a.lat, lon: a.lon, location: 'approximate', area: 'From the fair’s published grounds map', products: '' };
 }
@@ -258,6 +331,8 @@ function startGuide(id, resume, fromUrl) {
   $('guideMenu').style.visibility = t.products ? 'visible' : 'hidden';
   $('guideMenu').scrollTop = 0;
   compassUi();
+  // Opened from a shared link: show the full booth card once (name, menu, Share) without changing the saved preference.
+  if (fromUrl && state.fromLink) { state.fromLink = false; sheet.state = 'expanded'; }
   sheet.show();
   state.fittedRouteAt = null;
   const pts = [[t.lat, t.lon]]; if (state.me) pts.push(state.me);
@@ -266,7 +341,7 @@ function startGuide(id, resume, fromUrl) {
 }
 // The ONLY way guide mode ends: the explicit Stop button.
 function stopGuide(fromUrl) {
-  routeLine.setLatLngs([]); routeCasing.setLatLngs([]); state.route = null;
+  routeLine.setLatLngs([]); routeCasing.setLatLngs([]); state.route = null; state._drawn = null;
   if (!fromUrl) setUrl({ booth: null });
   document.title = BASE_TITLE;
   state.target = null; state.guide = null; guideLine.setLatLngs([]);
@@ -277,6 +352,7 @@ function stopGuide(fromUrl) {
 }
 $('closeGuide').onclick = () => stopGuide();
 $('btnShare').onclick = () => share(state.target);
+$('btnShareBar').onclick = e => { e.stopPropagation(); share(state.target); };
 $('btnShareList').onclick = () => share(null);
 $('btnShowList').onclick = () => { if (state.results.length) $('results').classList.toggle('hidden'); else $('q').focus(); };
 function currentHeading() {
@@ -295,7 +371,7 @@ function updateGuide() {
   $('guide').classList.remove('hidden'); document.body.classList.add('guiding'); // guide never hides itself
   $('guide').classList.toggle('noloc', !state.me && !!state.gpsDenied);
   if (!state.me && state.gpsDenied) {
-    $('guideDist').textContent = ''; $('guideHint').textContent = 'Location is off, so here is the booth on the map. Allow location for directions.'; $('guideMeta').textContent = 'Location off'; $('guideUpd').textContent = '';
+    $('guideDist').textContent = 'Location off'; $('guideHint').textContent = 'Here is the booth on the map. Allow location (tap ◎) for directions.'; $('guideMeta').textContent = 'Location off'; $('guideUpd').textContent = '';
     if (!state.shownNoLoc) { state.shownNoLoc = true; map.setView([t.lat, t.lon], 19); }
     return;
   }
@@ -335,7 +411,10 @@ function updateGuide() {
   $('guideHint').textContent = hintTxt;
   const gpsAge = Date.now() - (state.meAt || 0), hd = currentHeading();
   const upd = [];
-  if (gpsAge > 10000 || state.gpsError) upd.push('GPS updating… (last fix ' + Math.round(gpsAge / 1000) + 's ago)');
+  const paused = state.meAt && gpsAge > 20000;
+  if (paused) upd.push('Location paused (last fix ' + Math.round(gpsAge / 1000) + 's ago)');
+  else if (gpsAge > 10000 || state.gpsError) upd.push('GPS updating… (last fix ' + Math.round(gpsAge / 1000) + 's ago)');
+  $('btnGpsRefresh').classList.toggle('show', !!paused); state.guide.paused = !!paused;
   if (hd.stale) upd.push('compass updating…');
   state.guide.arrived = arrived; state.guide.stale = upd.length > 0;
   if (src === 'compass' && state.compassAcc != null && state.compassAcc > 30) upd.push('compass inaccurate: wave phone in a figure 8');
@@ -345,8 +424,12 @@ function updateGuide() {
     : src === 'gps' ? 'GPS walking direction' + (hd.stale ? ' (stale)' : '') : 'none, arrow is north-up';
   $('guideMeta').textContent = `Heading: ${hs} · GPS ±${Math.round(Geo.feet(state.acc || 0))} ft` + (offRoute != null && offRoute > 6 ? ` · ${Math.round(Geo.feet(offRoute))} ft from route` : '');
   state.guide.metaText = $('guideMeta').textContent;
-  if (mode === 'route') { routeLine.setLatLngs(R.points); routeCasing.setLatLngs(R.points); guideLine.setLatLngs([]); }
-  else { routeLine.setLatLngs([]); routeCasing.setLatLngs([]); guideLine.setLatLngs([state.me, [t.lat, t.lon]]); }
+  const drawKey = mode === 'route' ? 'r' + R.at : 's' + state.me.join(',') + t.id;
+  if (state._drawn !== drawKey) {
+    state._drawn = drawKey;
+    if (mode === 'route') { routeLine.setLatLngs(R.points); routeCasing.setLatLngs(R.points); guideLine.setLatLngs([]); }
+    else { routeLine.setLatLngs([]); routeCasing.setLatLngs([]); guideLine.setLatLngs([state.me, [t.lat, t.lon]]); }
+  }
   // When collapsed, fit each new route (and you) into the visible map above the bar, once per route.
   if (mode === 'route' && sheet.state === 'collapsed' && state.fittedRouteAt !== R.at) { state.fittedRouteAt = R.at; fitGuideView(false); }
 }
@@ -405,7 +488,7 @@ function onOrient(e) {
   state.compass = h; state.compassAt = Date.now(); state.compassOn = true;
   if (typeof e.webkitCompassAccuracy === 'number') state.compassAcc = e.webkitCompassAccuracy;
   if (!state._cui) { state._cui = true; compassUi(); }
-  if (!state._lastG || Date.now() - state._lastG > 150) { state._lastG = Date.now(); updateGuide(); }
+  if (!state._lastG || Date.now() - state._lastG > 150) { state._lastG = Date.now(); updateGuide(); meStyle(); }
 }
 function startCompass() {
   window.removeEventListener('deviceorientationabsolute', onOrient); window.removeEventListener('deviceorientation', onOrient);
@@ -416,6 +499,7 @@ function startCompass() {
 function compassUi() {
   const v = state.compassOn ? 'hidden' : 'visible';
   $('btnCompass').style.visibility = v; $('btnCompassMini').style.visibility = v;
+  $('btnShareBar').style.visibility = state.compassOn ? 'visible' : 'hidden'; // same slot: compass until enabled, then Share
 }
 $('btnCompassMini').onclick = e => { e.stopPropagation(); $('btnCompass').onclick(); };
 $('btnCompass').onclick = async () => {
@@ -507,16 +591,18 @@ async function requestWake() {
   try { if ('wakeLock' in navigator && !wakeLock && document.visibilityState === 'visible') { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { wakeLock = null; }); } } catch (e) { wakeLock = null; }
 }
 function releaseWake() { try { wakeLock && wakeLock.release(); } catch (e) {} wakeLock = null; }
-function onResume() {
+function onResume(why) {
   // iOS suspends geolocation/orientation while locked or in another app: re-acquire, keep guide mode as-is.
-  startWatch();
+  startWatch(why || 'resume');
   if (state.compassListening || state.compassGranted) startCompass();
   if (state.target) { requestWake(); sheet.show(); updateGuide(); }
   state.resumeCount = (state.resumeCount || 0) + 1;
 }
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') onResume(); });
-window.addEventListener('pageshow', e => { if (e.persisted) onResume(); });
-window.addEventListener('focus', () => { if (state.target && !wakeLock) requestWake(); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') onResume('visible'); else stopWatch(); });
+window.addEventListener('pageshow', e => { if (e.persisted) onResume('pageshow'); });
+window.addEventListener('pagehide', () => stopWatch());
+window.addEventListener('focus', () => { if (state.target && !wakeLock) requestWake(); if (Date.now() - (state.lastFixAt || 0) > 5000) startWatch('focus'); });
+window.addEventListener('online', () => startWatch('online'));
 
 // ---------- Offline ----------
 function tileList() {
@@ -538,7 +624,7 @@ $('btnOffline').onclick = async () => {
 };
 $('version').textContent = APP_VERSION;
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js?v=7', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
+  navigator.serviceWorker.register('sw.js?v=71', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
 }
 
 loadData().catch(e => setStatus('Could not load booth data: ' + e.message));

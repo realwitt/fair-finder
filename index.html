@@ -16,8 +16,8 @@
 <meta name="twitter:card" content="summary">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="stylesheet" href="vendor/leaflet.css?v=7">
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="vendor/leaflet.css?v=71">
+<link rel="stylesheet" href="style.css?v=71">
 </head>
 <body>
 <div id="map" aria-label="Map"></div>
@@ -43,8 +43,10 @@
 
 <div id="status" role="status">Starting GPS…</div>
 <div id="toast" class="hidden" role="status"></div>
+<button id="btnGpsRefresh" type="button" aria-label="Location paused, tap to refresh">📍 Location paused · tap to refresh</button>
 <div id="version" aria-label="App version"></div>
 <a id="aboutPill" href="about/">About</a>
+<button id="btnShareMe" class="shareP pill" aria-label="Share where I am">📍<span>Share my spot</span></button>
 
 <div id="fab">
   <button id="btnLocate" class="fab" aria-label="Center on me" title="Center on me">◎</button>
@@ -81,13 +83,13 @@
       <div id="guideDist">—</div>
       <div id="guideHint" aria-live="polite"></div>
     </div>
-    <button id="btnCompassMini" aria-label="Enable compass">🧭</button>
+    <span id="barSlot"><button id="btnCompassMini" aria-label="Enable compass">🧭</button><button id="btnShareBar" class="shareP" aria-label="Share this booth"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v7h14v-7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Share</span></button></span>
     <button class="stop" id="closeGuide" aria-label="Stop guiding">Stop ✕</button>
   </div>
   <div id="guideMore">
     <div id="guideTop">
       <div id="guideName"></div>
-      <button id="btnShare" class="small" aria-label="Share this booth">Share</button>
+      <button id="btnShare" class="shareP" aria-label="Share this booth"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v7h14v-7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Share</span></button>
       <button id="btnShowList" class="small" aria-label="Show results list">List</button>
     </div>
     <div id="arrowWrap"><svg id="arrow" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 L84 80 L50 62 L16 80 Z"/></svg><div id="northTag">N↑</div></div>
@@ -105,10 +107,10 @@
   <div id="aboutBody">Loading…</div>
 </section>
 
-<script src="vendor/leaflet.js?v=7"></script>
-<script src="geo.js?v=7"></script>
-<script src="search.js?v=7"></script>
-<script src="route.js?v=7"></script>
-<script src="app.js?v=7"></script>
+<script src="vendor/leaflet.js?v=71"></script>
+<script src="geo.js?v=71"></script>
+<script src="search.js?v=71"></script>
+<script src="route.js?v=71"></script>
+<script src="app.js?v=71"></script>
 </body>
 </html>

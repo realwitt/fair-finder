@@ -15,7 +15,7 @@ await page.waitForTimeout(2500);
 await page.screenshot({ path: `${SHOTS}/01-start-overlay.png` });
 const st = await page.evaluate(() => ({ n: __ff.booths.length, me: __ff.me, atms: __ff.atms.length }));
 ok(st.n > 400, `booths loaded: ${st.n}`); ok(Math.abs(st.me[0] - ME.latitude) < 1e-6, 'mock geolocation received');
-ok(await page.locator('.youDot').count() === 1, 'blue dot shown');
+ok(await page.locator('.meCore').count() === 1, 'blue dot shown');
 ok(await page.locator('.fairTiles img').count() > 0, 'official fair tiles rendered: ' + await page.locator('.fairTiles img').count());
 
 // Search

@@ -19,7 +19,10 @@ const box = sel => p.evaluate(s => { const r = document.querySelector(s).getBoun
 const snap = () => p.evaluate(() => ({ st: __ffSheet.state, exp: document.getElementById('sheetBar').getAttribute('aria-expanded'), inert: document.getElementById('guideMore').hasAttribute('inert'), top: document.getElementById('guide').getBoundingClientRect().top, mapH: document.getElementById('map').getBoundingClientRect().height }));
 // 1. default collapsed, bar ~104 px
 let s = await snap();
-ok(s.st === 'collapsed' && s.exp === 'false' && s.inert, 'guide opens collapsed by default (aria-expanded=false, expanded part inert)');
+ok(s.st === 'expanded' && (await p.textContent('#guideName')) === 'Piche Concessions' && await p.isVisible('#btnShare'), 'opened from a shared link: booth card shown expanded (name, menu, Share)');
+await p.click('#sheetBar', { position: { x: 196, y: 8 } }); await p.waitForTimeout(450);
+s = await snap();
+ok(s.st === 'collapsed' && s.exp === 'false' && s.inert, 'tap collapses to the bar (aria-expanded=false, expanded part inert)');
 ok(Math.abs((vh - s.top) - 104) < 1.5, `collapsed bar visible height ${Math.round(vh - s.top)} px (target 90–110)`);
 ok(Math.abs(s.mapH - (vh - 104)) < 1.5, `map sized to visible area above the bar (${Math.round(s.mapH)} px)`);
 ok(await p.isVisible('#closeGuide') && (await p.textContent('#guideDist')).includes('walk') && (await p.textContent('#guideHint')).length > 5, 'bar shows distance, next-turn hint and Stop: "' + await p.textContent('#guideDist') + ' / ' + await p.textContent('#guideHint') + '"');
@@ -114,5 +117,10 @@ const ogimg = await lp.evaluate(async () => (await fetch(document.querySelector(
 ok(ogimg === 200, 'og:image reachable');
 await lp.screenshot({ path: `${SH}/20-v7-landing.png`, fullPage: true });
 await lp.screenshot({ path: `${SH}/20-v7-landing-top.png` });
+// default snap for a guide started in-app (fresh storage) is collapsed
+{ const c2 = await b.newContext({ ...devices['iPhone 14 Pro'], geolocation: ME, permissions: ['geolocation'] }); const q = await c2.newPage();
+  await q.goto(URL, { waitUntil: 'networkidle' }); await q.waitForFunction(() => window.__ff && __ff.dj, null, { timeout: 20000 });
+  await q.fill('#q', 'turkey leg'); await q.waitForTimeout(700); await q.click('#resList li'); await q.waitForTimeout(600);
+  ok(await q.evaluate(() => __ffSheet.state === 'collapsed' && document.getElementById('sheetBar').getAttribute('aria-expanded') === 'false'), 'guide started from the list opens collapsed by default'); await c2.close(); }
 await b.close();
 console.log(fails.length ? fails.length + ' FAILURES' : 'ALL PASS'); process.exit(fails.length ? 1 : 0);
