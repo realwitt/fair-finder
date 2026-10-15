@@ -10,3 +10,6 @@ A mobile-first static web app for finding food at the 2026 N.C. State Fair (Oct 
 
 ## Dev
 `python3 -m http.server` then open http://localhost:8000 (geolocation works on localhost; the deployed site needs HTTPS).
+
+## Walking routes
+`data/walkways.json` is built by `tools/build_walkways.py` from OpenStreetMap (ODbL): footways, service roads and paths inside the fairgrounds polygon (OSM way 267485236), densified to 12 m. Straight connectors (≤30 m) are added across open ground where they don't cross buildings or water, and segments near booth points cost more. The fair's ArcGIS org publishes no walkway layer (checked: only the Food & Ride Finder layers). Routing runs on the phone with A* for the route and one Dijkstra pass for walking-distance sorting. Routes are approximate because OSM doesn't show this year's temporary booth layout.

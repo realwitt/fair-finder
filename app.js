@@ -7,7 +7,7 @@ const OSM = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 // Official fair tile layer full extent (EPSG:3857) converted to lat/lon
 const FAIR_BOUNDS = L.latLngBounds([35.79119, -78.72134], [35.79952, -78.70469]);
 const CENTER = [35.7948, -78.7115];
-const APP_VERSION = 'v5 · Oct 15 5:25 PM';
+const APP_VERSION = 'v6 · Oct 15 6:00 PM';
 const $ = id => document.getElementById(id);
 const LS_KEY = 'ff.guideTarget';
 const state = { me: null, acc: null, gpsHeading: null, compass: null, compassAt: 0, target: null, booths: [], atms: [], results: [] };
@@ -27,6 +27,8 @@ const fair = L.tileLayer(FAIR_TILES, { tileSize: 512, zoomOffset: -1, minNativeZ
 const boothLayer = L.layerGroup().addTo(map), hitLayer = L.layerGroup().addTo(map);
 const atmLayer = L.layerGroup(), drinkLayer = L.layerGroup();
 const guideLine = L.polyline([], { color: '#e6007e', weight: 6, dashArray: '10 8', opacity: 0.95 }).addTo(map);
+const routeLine = L.polyline([], { color: '#e6007e', weight: 8, opacity: 0.9, lineJoin: 'round' }).addTo(map);
+const routeCasing = L.polyline([], { color: '#000', weight: 12, opacity: 0.6 }).addTo(map); routeCasing.bringToBack();
 let meMarker = null, accCircle = null;
 
 // ---------- Layers panel ----------
@@ -93,6 +95,7 @@ map.on('popupopen', e => { const btn = e.popup.getElement().querySelector('.go')
 async function loadData() {
   const [bd, ad] = await Promise.all([fetch('data/booths.json').then(r => r.json()), fetch('data/atms.json').then(r => r.json()).catch(() => null)]);
   state.meta = bd;
+  fetch('data/walkways.json').then(r => r.json()).then(g => { state.graph = new Route.Graph(g); state.graphMeta = g; refreshWalk(true); if (state.target) { state.route = null; updateGuide(); } }).catch(e => { state.graphError = e.message; });
   state.booths = bd.booths.filter(b => b.lat != null).map(FoodSearch.prepare);
   state.booths.filter(b => b.food || b.kind === 'newfood').forEach(b => boothMarker(b).addTo(boothLayer));
   state.booths.filter(b => b.drinks).forEach(b => L.circleMarker([b.lat, b.lon], { renderer: canvas, radius: 8, color: '#000', weight: 2, fillColor: '#00b3ff', fillOpacity: 1 }).bindPopup(() => popupHtml(b)).addTo(drinkLayer));
@@ -128,6 +131,7 @@ function buildAbout(bd, ad) {
   $('aboutBody').innerHTML = `<p><b>${state.booths.length}</b> booths from the fair's official Food &amp; Ride Finder data (${c.vendor} vendors, ${c.newfood} “New Foods 2026” entries, ${c.sponsor} sponsor booths). <b>All booth positions are the fair's own GIS points.</b> Data generated ${esc(bd.generated)}.</p>
   <p><b>ATMs:</b> ${ad ? ad.atms.length + ' read from the ATM icons on the official grounds map, so their positions are <b>approximate</b>.' : 'not loaded'}</p>
   <p><b>Drinks:</b> booths whose official menu text mentions drinks (lemonade, tea, soda, water…). The fair publishes no separate drink-station or water-refill layer.</p>
+  <p><b>Walking routes:</b> computed on your phone over OpenStreetMap footways and service roads inside the fairgrounds (© OpenStreetMap contributors, ODbL), with buildings and the pond as obstacles and booth points penalized. OSM shows the permanent grounds, not this year's temporary booth layout, so routes are <b>approximate</b>.</p>
   <p>Menus and locations can change during the fair. Food/drink tags are keyword matches on the official menu text.</p>
   <ul>${bd.sources.map(s => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a></li>`).join('')}</ul>`;
 }
@@ -144,7 +148,7 @@ function onPos(p) {
     accCircle = L.circle(state.me, { radius: accuracy, color: '#1a73e8', weight: 2, fillColor: '#1a73e8', fillOpacity: 0.15, interactive: false }).addTo(map);
     if (FAIR_BOUNDS.pad(0.5).contains(state.me)) map.setView(state.me, 18);
   } else { meMarker.setLatLng(state.me); accCircle.setLatLng(state.me).setRadius(accuracy); }
-  state.meAt = Date.now(); state.gpsError = null;
+  state.meAt = Date.now(); state.gpsError = null; refreshWalk();
   setStatus(`GPS ±${Math.round(accuracy * 3.28084)} ft`);
   // Refresh distances in the list WITHOUT touching guide visibility or the map view.
   if (state.results.length) renderResults(false, true);
@@ -173,7 +177,27 @@ $('closeResults').onclick = clearResults;
 function clearResults() { state.results = []; hitLayer.clearLayers(); $('results').classList.add('hidden'); setUrl({ q: null, new: null }); }
 $('q').addEventListener('focus', () => document.body.classList.add('typing'));
 $('q').addEventListener('blur', () => document.body.classList.remove('typing'));
-function dist(b) { return state.me ? Geo.distanceM(state.me[0], state.me[1], b.lat, b.lon) : null; }
+function dist(b) {
+  if (!state.me) return null;
+  const w = walkDist(b); if (w != null) return w;
+  return Geo.distanceM(state.me[0], state.me[1], b.lat, b.lon);
+}
+// Walking distance via one Dijkstra from the user's snapped position (recomputed when the user moves > 8 m).
+function refreshWalk(force) {
+  const g = state.graph; if (!g || !state.me) return;
+  if (!force && state.walkFrom && Geo.distanceM(state.walkFrom[0], state.walkFrom[1], state.me[0], state.me[1]) < 8) return;
+  const s = g.snap(state.me[0], state.me[1], 80);
+  state.walkFrom = state.me.slice();
+  if (!s) { state.dj = null; state.snapMe = null; return; }
+  state.snapMe = s; state.dj = g.dijkstra(s);
+}
+function walkDist(b) {
+  const g = state.graph; if (!g || !state.dj) return null;
+  if (b._snap === undefined) b._snap = g.snap(b.lat, b.lon, 80);
+  if (!b._snap) return null;
+  const w = g.walkLen(state.dj, state.snapMe, b._snap);
+  return isFinite(w) ? w : null;
+}
 function runSearch(newOnly, fromUrl) {
   const q = $('q').value.trim();
   if (!fromUrl) setUrl(newOnly === true ? { q: null, new: '1' } : { q: q.length >= 2 ? q : null, new: null });
@@ -185,16 +209,17 @@ function runSearch(newOnly, fromUrl) {
 }
 function renderResults(fit, quiet) {
   const rs = state.results;
-  rs.forEach(r => { r.d = dist(r.booth); r.tier = r.score >= 0.85 ? 0 : 1; });
+  refreshWalk();
+  rs.forEach(r => { r.d = dist(r.booth); r.walk = state.dj && r.d != null && walkDist(r.booth) != null; r.tier = r.score >= 0.85 ? 0 : 1; });
   rs.sort((a, b) => a.tier - b.tier || (a.d != null && b.d != null ? a.d - b.d : b.score - a.score));
   hitLayer.clearLayers();
   rs.forEach(r => boothMarker(r.booth, 'hit').addTo(hitLayer));
-  $('resCount').textContent = rs.length ? `${rs.length} for “${state.query}”${state.me ? ', nearest first' : ''}` : `No booths list “${state.query}”`;
+  $('resCount').textContent = rs.length ? `${rs.length} for “${state.query}”${state.me ? (state.dj ? ', nearest walk first' : ', nearest first') : ''}` : `No booths list “${state.query}”`;
   const hl = (s) => esc(s);
   $('resList').innerHTML = rs.slice(0, 80).map((r, i) => {
     const b = r.booth, items = (r.matched.length ? r.matched : (b.items || [])).slice(0, 4);
     return `<li data-id="${esc(b.id)}" data-i="${i}">
-      <div class="r-top"><span class="r-name">${esc(b.name)}</span><span class="r-dist">${r.d != null ? Geo.fmtFeet(r.d) : ''}</span></div>
+      <div class="r-top"><span class="r-name">${esc(b.name)}</span><span class="r-dist">${r.d != null ? (r.walk ? '🚶 ' : '') + Geo.fmtFeet(r.d) : ''}</span></div>
       <div class="r-items">${items.map(it => r.matched.length ? `<mark>${hl(it)}</mark>` : hl(it)).join(', ')}</div>
       <div class="r-meta">${b.kind === 'newfood' ? '<span class="badge new">NEW 2026</span>' : ''}${r.tier ? '<span class="badge">related</span>' : ''}${b.location !== 'exact' ? '<span class="badge approx">approx.</span>' : ''}${esc(b.area)}${b.lot ? ' · ' + esc(b.lot) : ''}</div></li>`;
   }).join('');
@@ -215,7 +240,7 @@ function findTarget(id) {
 function startGuide(id, resume, fromUrl) {
   const t = findTarget(id); if (!t) return;
   const prev = state.target && state.target.id;
-  state.target = t; state.arrivedShown = false;
+  state.target = t; state.arrivedShown = false; if (prev !== id) state.route = null;
   if (!fromUrl && prev !== id) setUrl({ booth: id }, true); // pushState so Back returns to the list/map
   document.title = `${t.name} · Fair Finder`;
   try { localStorage.setItem(LS_KEY, id); } catch (e) {}
@@ -232,6 +257,7 @@ function startGuide(id, resume, fromUrl) {
 }
 // The ONLY way guide mode ends: the explicit Stop button.
 function stopGuide(fromUrl) {
+  routeLine.setLatLngs([]); routeCasing.setLatLngs([]); state.route = null;
   if (!fromUrl) setUrl({ booth: null });
   document.title = BASE_TITLE;
   state.target = null; state.guide = null; guideLine.setLatLngs([]);
@@ -264,16 +290,36 @@ function updateGuide() {
     return;
   }
   if (!state.me) { $('guideDist').textContent = '—'; $('guideHint').textContent = 'Waiting for your GPS position…'; $('guideMeta').textContent = meta; $('guideUpd').textContent = 'updating…'; return; }
-  const d = Geo.distanceM(state.me[0], state.me[1], t.lat, t.lon), br = Geo.bearingDeg(state.me[0], state.me[1], t.lat, t.lon);
+  const d = Geo.distanceM(state.me[0], state.me[1], t.lat, t.lon);
+  let br = Geo.bearingDeg(state.me[0], state.me[1], t.lat, t.lon);
   const { h, src } = currentHeading();
+  // ---- walking route ----
+  const R = ensureRoute(t);
+  let mode = 'straight', remaining = d, turn = null, offRoute = null, look = null;
+  if (R && d > 15) {
+    const pr = Route.project(R.points, state.me); offRoute = pr.d;
+    mode = 'route'; remaining = Math.max(0, R.lengthM - pr.along) + pr.d;
+    look = Route.pointAt(R.points, pr.along + 18);
+    if (Route.dist(state.me, look) > 2) br = Geo.bearingDeg(state.me[0], state.me[1], look[0], look[1]);
+    turn = Route.nextTurn(R.points, pr.along);
+    if (turn && turn.inM > R.lengthM - pr.along - 8) turn = null;
+  }
   const rot = h == null ? br : Geo.relativeDeg(br, h);
-  state.guide = { distanceM: d, bearing: br, heading: h, headingSource: src, arrowRotation: rot };
+  state.guide = { distanceM: d, bearing: br, heading: h, headingSource: src, arrowRotation: rot, mode, remainingM: remaining, offRouteM: offRoute, lookahead: look, turn, reroutes: state.reroutes || 0 };
   $('arrow').style.transform = `rotate(${rot}deg)`;
   $('northTag').classList.toggle('hidden', h != null);
-  $('guideDist').textContent = Geo.fmtFeet(d);
+  const mins = Math.max(1, Math.round(remaining / 1.1 / 60)); // ~1.1 m/s walking in fair crowds
+  $('guideDist').textContent = mode === 'route' ? `${Geo.fmtFeet(remaining)} walk` : Geo.fmtFeet(d);
+  $('guideRoute').textContent = mode === 'route' ? `~${mins} min walking · route is approximate (OSM paths, not this year's booth layout)` : (state.graph ? 'Straight-line arrow: no walking route found here' : 'Straight-line arrow (walking routes loading…)');
+  $('guideRoute').className = mode === 'route' ? 'route' : 'straight';
   const arrived = d <= 15;
   $('guide').classList.toggle('arrived', arrived);
-  $('guideHint').textContent = arrived ? '✅ Arrived: it should be right around you' : Geo.hint(d, br, h);
+  let hintTxt = Geo.hint(d, br, h);
+  if (mode === 'route') {
+    const dir = h == null ? 'head ' + Geo.compassWord(br) : Geo.directionHint(Geo.relativeDeg(br, h));
+    hintTxt = turn ? `In ${Geo.fmtFeet(turn.inM)} ${Route.turnWord(turn.turnDeg)} · now ${dir}` : `Continue ${Geo.fmtFeet(remaining)} to the booth · ${dir}`;
+  } else if (state.graph) hintTxt = 'Straight line: ' + hintTxt;
+  $('guideHint').textContent = arrived ? '✅ Arrived: it should be right around you' : hintTxt;
   const gpsAge = Date.now() - (state.meAt || 0), hd = currentHeading();
   const upd = [];
   if (gpsAge > 10000 || state.gpsError) upd.push('GPS updating… (last fix ' + Math.round(gpsAge / 1000) + 's ago)');
@@ -281,10 +327,28 @@ function updateGuide() {
   $('guideUpd').textContent = upd.join(' · ');
   state.guide.arrived = arrived; state.guide.stale = upd.length > 0;
   $('guideMeta').textContent = meta + ` · heading: ${src === 'compass' ? 'compass' : src === 'gps' ? 'GPS (walking direction)' : 'none, arrow is north-up'} · GPS ±${Math.round(state.acc * 3.28)} ft`;
-  guideLine.setLatLngs([state.me, [t.lat, t.lon]]);
+  if (mode === 'route') { routeLine.setLatLngs(R.points); routeCasing.setLatLngs(R.points); guideLine.setLatLngs([]); }
+  else { routeLine.setLatLngs([]); routeCasing.setLatLngs([]); guideLine.setLatLngs([state.me, [t.lat, t.lon]]); }
   document.documentElement.style.setProperty('--guideH', $('guide').offsetHeight + 'px');
 }
 setInterval(updateGuide, 1000);
+// Route cache with automatic reroute when > 25 m off the route (only on a decent GPS fix, at most every 3 s).
+function ensureRoute(t) {
+  const g = state.graph; if (!g || !state.me) return null;
+  const now = Date.now();
+  let R = state.route && state.route.targetId === t.id ? state.route : null;
+  if (R) {
+    const off = Route.project(R.points, state.me).d;
+    if (off > 25 && (state.acc || 0) < 40 && now - R.at > 3000) { R = null; state.reroutes = (state.reroutes || 0) + 1; }
+  }
+  if (!R) {
+    if (state.routeFailAt && state.routeFailFor === t.id && now - state.routeFailAt < 5000) return null;
+    const r = g.route(state.me, [t.lat, t.lon], { maxSnap: 80 });
+    if (!r) { state.route = null; state.routeFailAt = now; state.routeFailFor = t.id; return null; }
+    R = state.route = { ...r, targetId: t.id, at: now };
+  }
+  return R;
+}
 
 // Compass: iOS needs a user gesture to request permission; Android gives absolute alpha.
 function screenAngle() {
@@ -359,7 +423,7 @@ $('btnOffline').onclick = async () => {
 };
 $('version').textContent = APP_VERSION;
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js?v=5', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
+  navigator.serviceWorker.register('sw.js?v=6', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
 }
 
 loadData().catch(e => setStatus('Could not load booth data: ' + e.message));

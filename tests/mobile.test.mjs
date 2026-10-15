@@ -38,9 +38,10 @@ const t = await page.evaluate(() => ({ lat: __ff.target.lat, lon: __ff.target.lo
 // independent bearing check (flat-earth approximation is fine at this scale)
 const dy = (t.lat - ME.latitude) * 111320, dx = (t.lon - ME.longitude) * 111320 * Math.cos(ME.latitude * Math.PI / 180);
 const approxBr = (Math.atan2(dx, dy) * 180 / Math.PI + 360) % 360, approxD = Math.hypot(dx, dy);
-ok(Math.abs(((g.bearing - approxBr + 540) % 360) - 180) < 1, `bearing ${g.bearing.toFixed(1)}° vs independent ${approxBr.toFixed(1)}° to ${t.name}`);
+const unitBr = await page.evaluate(([a, b, c, d]) => Geo.bearingDeg(a, b, c, d), [ME.latitude, ME.longitude, t.lat, t.lon]);
+ok(Math.abs(((unitBr - approxBr + 540) % 360) - 180) < 1, `straight bearing ${unitBr.toFixed(1)}° vs independent ${approxBr.toFixed(1)}° to ${t.name}`);
 ok(Math.abs(g.distanceM - approxD) / approxD < 0.01, `distance ${g.distanceM.toFixed(1)} m vs ${approxD.toFixed(1)} m`);
-ok(g.headingSource === 'north' && Math.abs(g.arrowRotation - g.bearing) < 0.01, 'no compass: north-up arrow = bearing');
+ok(g.headingSource === 'north' && Math.abs(g.arrowRotation - g.bearing) < 0.01, `no compass: north-up arrow = bearing (${g.mode})`);
 ok(await page.locator('#guide').isVisible(), 'guide visible: ' + await page.textContent('#guideHint'));
 await page.screenshot({ path: `${SHOTS}/04-guide-northup.png` });
 

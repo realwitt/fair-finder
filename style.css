@@ -85,3 +85,7 @@ body.guiding.typing #guide{opacity:.96}
 #guide.noloc #arrowWrap{display:none}
 #toast{position:fixed;z-index:7000;left:50%;top:40%;transform:translateX(-50%);background:#000;color:#fff;font-weight:800;padding:12px 18px;border-radius:12px}
 .sheet-head{gap:8px}.sheet-head #resCount{flex:1}
+
+#guideRoute{font-size:13px;font-weight:800;margin-top:4px;padding:3px 8px;border-radius:8px;display:inline-block}
+#guideRoute.route{background:#fde7f3;color:#8a0050}
+#guideRoute.straight{background:#fff2c2;color:#6b4e00}

@@ -10,7 +10,7 @@ let ctx = await b.newContext({ ...devices['iPhone 14 Pro'], geolocation: ME, per
 let p = await ctx.newPage(); p.on('pageerror', e => fails.push('pageerror ' + e.message));
 await p.goto(URL + '?q=empanada', { waitUntil: 'networkidle' }); await ready(p); await p.waitForTimeout(800);
 ok(await p.inputValue('#q') === 'empanada' && await p.locator('#resList li').count() === 3 && await p.locator('#results').isVisible(), '?q=empanada restores search (3 results)');
-ok(/v5/.test(await p.textContent('#version')), 'version ' + await p.textContent('#version'));
+ok(/v\d+/.test(await p.textContent('#version')), 'version ' + await p.textContent('#version'));
 // 2. select result -> pushState booth, Back/Forward
 await p.locator('#resList li').first().click(); await p.waitForTimeout(500);
 const id = await p.evaluate(() => __ff.target.id);

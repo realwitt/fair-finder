@@ -1,5 +1,5 @@
-const V = 'ff-shell-v5';
-const SHELL = ['./', 'index.html', 'style.css?v=5', 'app.js?v=5', 'geo.js?v=5', 'search.js?v=5', 'vendor/leaflet.js?v=5', 'vendor/leaflet.css?v=5', 'data/booths.json', 'data/atms.json', 'manifest.webmanifest', 'icons/icon-192.png'];
+const V = 'ff-shell-v6';
+const SHELL = ['./', 'index.html', 'style.css?v=6', 'app.js?v=6', 'geo.js?v=6', 'search.js?v=6', 'route.js?v=6', 'vendor/leaflet.js?v=6', 'vendor/leaflet.css?v=6', 'data/booths.json', 'data/atms.json', 'data/walkways.json', 'manifest.webmanifest', 'icons/icon-192.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('ff-shell-') && k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 const isTile = u => /\/tile\/\d+\/\d+\/\d+|tile\.openstreetmap\.org/.test(u);
