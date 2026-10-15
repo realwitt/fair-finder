@@ -171,8 +171,8 @@ body.popup #btnShareMe,body.popup #aboutPill,body.popup #version,body.popup #sta
 .mePulse.blip{animation:meBlip 1.6s ease-out 1}
 @keyframes meBlip{0%{opacity:.55;transform:scale(1)}100%{opacity:0;transform:scale(4.2)}}
 .meBeam{position:absolute;left:0;top:0;width:120px;height:120px;opacity:0;transition:transform .3s ease-out,opacity .3s;
-  background:conic-gradient(from -36deg at 50% 50%,rgba(26,115,232,0) 0deg,rgba(26,115,232,.6) 36deg,rgba(26,115,232,0) 72deg,transparent 72deg 360deg);
-  -webkit-mask:radial-gradient(circle at 50% 50%,#000 0,#000 20%,transparent 50%);mask:radial-gradient(circle at 50% 50%,#000 0,#000 20%,transparent 50%)}
+  background:conic-gradient(from -36deg at 50% 50%,rgba(26,115,232,0) 0deg,rgba(26,115,232,.85) 36deg,rgba(26,115,232,0) 72deg,transparent 72deg 360deg);
+  -webkit-mask:radial-gradient(circle at 50% 50%,#000 0,#000 28%,transparent 50%);mask:radial-gradient(circle at 50% 50%,#000 0,#000 28%,transparent 50%)}
 .me.stale .meCore{background:#8a8f98}
 .me.stale .mePulse{animation:none;opacity:0}
 .me.stale .meBeam{filter:grayscale(1)}

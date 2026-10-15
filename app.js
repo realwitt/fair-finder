@@ -7,7 +7,7 @@ const OSM = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 // Fair's published grounds-map tile layer full extent (EPSG:3857) converted to lat/lon
 const FAIR_BOUNDS = L.latLngBounds([35.79119, -78.72134], [35.79952, -78.70469]);
 const CENTER = [35.7948, -78.7115];
-const APP_VERSION = 'v7.1 · Oct 15';
+const APP_VERSION = 'v7.2 · Oct 15';
 const $ = id => document.getElementById(id);
 const LS_KEY = 'ff.guideTarget';
 const state = { me: null, acc: null, gpsHeading: null, compass: null, compassAt: 0, target: null, booths: [], atms: [], results: [] };
@@ -239,7 +239,8 @@ $('btnGpsRefresh').onclick = () => { state.gpsDenied = false; state.watchRestart
 startWatch();
 // If location was denied and later allowed (Settings, or the permission prompt answered late), pick it up without a reload.
 try { navigator.permissions && navigator.permissions.query({ name: 'geolocation' }).then(st => { st.onchange = () => { if (st.state !== 'denied') { state.gpsDenied = false; startWatch(); } }; }).catch(() => {}); } catch (e) {}
-$('btnLocate').onclick = () => { if (state.me) return map.setView(state.me, Math.max(map.getZoom(), 18)); setStatus(state.gpsDenied ? 'Asking for location again…' : 'No GPS fix yet'); startWatch(); };
+$('btnLocate').onclick = () => { if (!state.compassOn && !state.compassGranted) $('btnCompass').onclick(); // tap also enables the compass beam (iOS needs a tap)
+  if (state.me) return map.setView(state.me, Math.max(map.getZoom(), 18)); setStatus(state.gpsDenied ? 'Asking for location again…' : 'No GPS fix yet'); startWatch(); };
 
 // ---------- Search ----------
 let tmr;
@@ -624,7 +625,7 @@ $('btnOffline').onclick = async () => {
 };
 $('version').textContent = APP_VERSION;
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js?v=71', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
+  navigator.serviceWorker.register('sw.js?v=72', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
 }
 
 loadData().catch(e => setStatus('Could not load booth data: ' + e.message));
