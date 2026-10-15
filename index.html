@@ -9,8 +9,8 @@
 <title>Fair Finder · NC State Fair 2026</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="stylesheet" href="vendor/leaflet.css">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="vendor/leaflet.css?v=4">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 <div id="map" aria-label="Map"></div>
@@ -35,6 +35,7 @@
 </header>
 
 <div id="status" role="status">Starting GPS…</div>
+<div id="version" aria-label="App version"></div>
 
 <div id="fab">
   <button id="btnLocate" class="fab" aria-label="Center on me" title="Center on me">◎</button>
@@ -66,12 +67,14 @@
 <section id="guide" class="hidden" aria-label="Guide">
   <div id="guideTop">
     <div id="guideName"></div>
-    <button class="close" id="closeGuide" aria-label="Stop guiding">✕</button>
+    <button id="btnShowList" class="small" aria-label="Show results list">List</button>
+    <button class="stop" id="closeGuide" aria-label="Stop guiding">Stop ✕</button>
   </div>
   <div id="arrowWrap"><svg id="arrow" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 L84 80 L50 62 L16 80 Z"/></svg><div id="northTag">N↑</div></div>
   <div id="guideDist">—</div>
   <div id="guideHint"></div>
   <div id="guideMeta"></div>
+  <div id="guideUpd" aria-live="polite"></div>
   <div id="guideBtns">
     <button id="btnCompass" class="wide">🧭 Enable compass</button>
   </div>
@@ -83,9 +86,9 @@
   <div id="aboutBody">Loading…</div>
 </section>
 
-<script src="vendor/leaflet.js"></script>
-<script src="geo.js"></script>
-<script src="search.js"></script>
-<script src="app.js"></script>
+<script src="vendor/leaflet.js?v=4"></script>
+<script src="geo.js?v=4"></script>
+<script src="search.js?v=4"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>

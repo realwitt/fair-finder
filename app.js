@@ -7,7 +7,9 @@ const OSM = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 // Official fair tile layer full extent (EPSG:3857) converted to lat/lon
 const FAIR_BOUNDS = L.latLngBounds([35.79119, -78.72134], [35.79952, -78.70469]);
 const CENTER = [35.7948, -78.7115];
+const APP_VERSION = 'v4 · Oct 15 5:15 PM';
 const $ = id => document.getElementById(id);
+const LS_KEY = 'ff.guideTarget';
 const state = { me: null, acc: null, gpsHeading: null, compass: null, compassAt: 0, target: null, booths: [], atms: [], results: [] };
 window.__ff = state; // exposed for testing
 
@@ -71,6 +73,8 @@ async function loadData() {
   setStatus(`${nF} food booths loaded`);
   buildAbout(bd, ad);
   const q = new URLSearchParams(location.search).get('q'); if (q) { $('q').value = q; runSearch(); }
+  let saved = null; try { saved = localStorage.getItem(LS_KEY); } catch (e) {}
+  if (saved && findTarget(saved)) startGuide(saved, true);
 }
 
 function buildAbout(bd, ad) {
@@ -94,13 +98,21 @@ function onPos(p) {
     accCircle = L.circle(state.me, { radius: accuracy, color: '#1a73e8', weight: 2, fillColor: '#1a73e8', fillOpacity: 0.15, interactive: false }).addTo(map);
     if (FAIR_BOUNDS.pad(0.5).contains(state.me)) map.setView(state.me, 18);
   } else { meMarker.setLatLng(state.me); accCircle.setLatLng(state.me).setRadius(accuracy); }
+  state.meAt = Date.now(); state.gpsError = null;
   setStatus(`GPS ±${Math.round(accuracy * 3.28084)} ft`);
-  if (state.results.length) renderResults();
+  // Refresh distances in the list WITHOUT touching guide visibility or the map view.
+  if (state.results.length) renderResults(false, true);
   updateGuide();
 }
-function onPosErr(e) { setStatus(e.code === 1 ? 'Location blocked: allow it in Settings › Safari › Location' : 'Waiting for GPS… (' + e.message + ')'); }
-if ('geolocation' in navigator) navigator.geolocation.watchPosition(onPos, onPosErr, { enableHighAccuracy: true, maximumAge: 2000, timeout: 20000 });
-else setStatus('This browser has no geolocation');
+function onPosErr(e) { state.gpsError = e.message || String(e.code); updateGuide(); setStatus(e.code === 1 ? 'Location blocked: allow it in Settings › Safari › Location' : 'Waiting for GPS… (' + e.message + ')'); }
+let watchId = null;
+function startWatch() {
+  if (!('geolocation' in navigator)) return setStatus('This browser has no geolocation');
+  if (watchId != null) navigator.geolocation.clearWatch(watchId);
+  // A timeout error does not stop watchPosition, and guide state is never cleared by GPS problems.
+  watchId = navigator.geolocation.watchPosition(onPos, onPosErr, { enableHighAccuracy: true, maximumAge: 2000, timeout: 20000 });
+}
+startWatch();
 $('btnLocate').onclick = () => state.me ? map.setView(state.me, Math.max(map.getZoom(), 18)) : setStatus('No GPS fix yet');
 
 // ---------- Search ----------
@@ -111,6 +123,8 @@ $('clearQ').onclick = () => { $('q').value = ''; clearResults(); };
 document.querySelectorAll('.chip').forEach(c => c.onclick = () => { $('q').value = c.dataset.q === 'new' ? '' : c.dataset.q; runSearch(c.dataset.q === 'new'); });
 $('closeResults').onclick = clearResults;
 function clearResults() { state.results = []; hitLayer.clearLayers(); $('results').classList.add('hidden'); }
+$('q').addEventListener('focus', () => document.body.classList.add('typing'));
+$('q').addEventListener('blur', () => document.body.classList.remove('typing'));
 function dist(b) { return state.me ? Geo.distanceM(state.me[0], state.me[1], b.lat, b.lon) : null; }
 function runSearch(newOnly) {
   const q = $('q').value.trim();
@@ -120,7 +134,7 @@ function runSearch(newOnly) {
   state.query = newOnly === true ? 'New foods 2026' : q;
   renderResults(true);
 }
-function renderResults(fit) {
+function renderResults(fit, quiet) {
   const rs = state.results;
   rs.forEach(r => { r.d = dist(r.booth); r.tier = r.score >= 0.85 ? 0 : 1; });
   rs.sort((a, b) => a.tier - b.tier || (a.d != null && b.d != null ? a.d - b.d : b.score - a.score));
@@ -135,7 +149,8 @@ function renderResults(fit) {
       <div class="r-items">${items.map(it => r.matched.length ? `<mark>${hl(it)}</mark>` : hl(it)).join(', ')}</div>
       <div class="r-meta">${b.kind === 'newfood' ? '<span class="badge new">NEW 2026</span>' : ''}${r.tier ? '<span class="badge">related</span>' : ''}${b.location !== 'exact' ? '<span class="badge approx">approx.</span>' : ''}${esc(b.area)}${b.lot ? ' · ' + esc(b.lot) : ''}</div></li>`;
   }).join('');
-  $('results').classList.remove('hidden'); $('guide').classList.add('hidden');
+  if (!quiet) $('results').classList.remove('hidden'); // guide stays up: it sits on top of the results sheet
+  document.body.classList.toggle('guiding', !!state.target);
   if (fit && rs.length) {
     const pts = rs.slice(0, 5).map(r => [r.booth.lat, r.booth.lon]); if (state.me) pts.push(state.me);
     map.fitBounds(L.latLngBounds(pts).pad(0.2), { maxZoom: 19, paddingBottomRight: [0, window.innerHeight * 0.45] });
@@ -148,29 +163,45 @@ function findTarget(id) {
   const b = state.booths.find(x => x.id === id); if (b) return b;
   const a = state.atms.find(x => x.id === id); if (a) return { id: a.id, name: 'ATM', lat: a.lat, lon: a.lon, location: 'approximate', area: 'From the official map icon', products: '' };
 }
-function startGuide(id) {
+function startGuide(id, resume) {
   const t = findTarget(id); if (!t) return;
-  state.target = t;
+  state.target = t; state.arrivedShown = false;
+  try { localStorage.setItem(LS_KEY, id); } catch (e) {}
   $('results').classList.add('hidden'); $('guide').classList.remove('hidden');
+  document.body.classList.add('guiding');
+  requestWake();
   $('guideName').textContent = t.name;
   $('guideMenuBody').textContent = (t.newFood ? 'NEW: ' + t.newFood.name + ': ' + t.newFood.description + ' | ' : '') + (t.products || '(no menu listed)');
   $('guideMenu').classList.toggle('hidden', !t.products);
   $('btnCompass').classList.toggle('hidden', !!state.compassOn);
   const pts = [[t.lat, t.lon]]; if (state.me) pts.push(state.me);
-  map.fitBounds(L.latLngBounds(pts).pad(0.3), { maxZoom: 19, paddingBottomRight: [0, window.innerHeight * 0.5] });
+  if (!resume || pts.length > 1) map.fitBounds(L.latLngBounds(pts).pad(0.3), { maxZoom: 19, paddingBottomRight: [0, window.innerHeight * 0.45] });
   updateGuide();
 }
-$('closeGuide').onclick = () => { state.target = null; guideLine.setLatLngs([]); $('guide').classList.add('hidden'); if (state.results.length) $('results').classList.remove('hidden'); };
+// The ONLY way guide mode ends: the explicit Stop button.
+function stopGuide() {
+  state.target = null; state.guide = null; guideLine.setLatLngs([]);
+  try { localStorage.removeItem(LS_KEY); } catch (e) {}
+  $('guide').classList.add('hidden'); document.body.classList.remove('guiding');
+  releaseWake();
+  if (state.results.length) $('results').classList.remove('hidden');
+}
+$('closeGuide').onclick = stopGuide;
+$('btnShowList').onclick = () => { if (state.results.length) $('results').classList.toggle('hidden'); else $('q').focus(); };
 function currentHeading() {
   const now = Date.now();
   if (state.compass != null && now - state.compassAt < 3000) return { h: state.compass, src: 'compass' };
   if (state.gpsHeading != null && now - state.gpsHeadingAt < 8000) return { h: state.gpsHeading, src: 'gps' };
+  // Stalled: keep the last heading we had (up to 2 min) rather than flipping the arrow to north-up.
+  if (state.compass != null && now - state.compassAt < 120000) return { h: state.compass, src: 'compass', stale: true };
+  if (state.gpsHeading != null && now - state.gpsHeadingAt < 120000) return { h: state.gpsHeading, src: 'gps', stale: true };
   return { h: null, src: 'north' };
 }
 function updateGuide() {
   const t = state.target; if (!t) return;
   const meta = `${t.area || ''}${t.lot ? ' · ' + t.lot : ''}${t.location !== 'exact' ? ' · approximate location' : ' · official GIS point'}`;
-  if (!state.me) { $('guideDist').textContent = '—'; $('guideHint').textContent = 'Waiting for your GPS position…'; $('guideMeta').textContent = meta; return; }
+  $('guide').classList.remove('hidden'); document.body.classList.add('guiding'); // guide never hides itself
+  if (!state.me) { $('guideDist').textContent = '—'; $('guideHint').textContent = 'Waiting for your GPS position…'; $('guideMeta').textContent = meta; $('guideUpd').textContent = 'updating…'; return; }
   const d = Geo.distanceM(state.me[0], state.me[1], t.lat, t.lon), br = Geo.bearingDeg(state.me[0], state.me[1], t.lat, t.lon);
   const { h, src } = currentHeading();
   const rot = h == null ? br : Geo.relativeDeg(br, h);
@@ -178,9 +209,18 @@ function updateGuide() {
   $('arrow').style.transform = `rotate(${rot}deg)`;
   $('northTag').classList.toggle('hidden', h != null);
   $('guideDist').textContent = Geo.fmtFeet(d);
-  $('guideHint').textContent = d < 12 ? "You're there (within GPS accuracy)" : Geo.hint(d, br, h);
+  const arrived = d <= 15;
+  $('guide').classList.toggle('arrived', arrived);
+  $('guideHint').textContent = arrived ? '✅ Arrived: it should be right around you' : Geo.hint(d, br, h);
+  const gpsAge = Date.now() - (state.meAt || 0), hd = currentHeading();
+  const upd = [];
+  if (gpsAge > 10000 || state.gpsError) upd.push('GPS updating… (last fix ' + Math.round(gpsAge / 1000) + 's ago)');
+  if (hd.stale) upd.push('compass updating…');
+  $('guideUpd').textContent = upd.join(' · ');
+  state.guide.arrived = arrived; state.guide.stale = upd.length > 0;
   $('guideMeta').textContent = meta + ` · heading: ${src === 'compass' ? 'compass' : src === 'gps' ? 'GPS (walking direction)' : 'none, arrow is north-up'} · GPS ±${Math.round(state.acc * 3.28)} ft`;
   guideLine.setLatLngs([state.me, [t.lat, t.lon]]);
+  document.documentElement.style.setProperty('--guideH', $('guide').offsetHeight + 'px');
 }
 setInterval(updateGuide, 1000);
 
@@ -202,8 +242,10 @@ function onOrient(e) {
   if (!state._lastG || Date.now() - state._lastG > 150) { state._lastG = Date.now(); updateGuide(); }
 }
 function startCompass() {
+  window.removeEventListener('deviceorientationabsolute', onOrient); window.removeEventListener('deviceorientation', onOrient);
   if ('ondeviceorientationabsolute' in window) window.addEventListener('deviceorientationabsolute', onOrient);
   window.addEventListener('deviceorientation', onOrient);
+  state.compassListening = true;
 }
 $('btnCompass').onclick = async () => {
   try {
@@ -211,12 +253,29 @@ $('btnCompass').onclick = async () => {
       const r = await DeviceOrientationEvent.requestPermission();
       if (r !== 'granted') { $('guideHint').textContent = 'Compass permission denied. Using walking direction or a north-up arrow.'; return; }
     }
-    startCompass();
+    startCompass(); state.compassGranted = true;
     setTimeout(() => { if (!state.compassOn) $('guideMeta').textContent = 'No compass data from this device. Walk a few steps for a GPS heading, or use the north-up arrow.'; }, 2500);
   } catch (err) { $('guideHint').textContent = 'Compass unavailable: ' + err.message; }
 };
 // Non-iOS browsers don't need permission, so start listening right away.
 if (!(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function')) startCompass();
+
+// ---------- Wake lock & lifecycle ----------
+let wakeLock = null;
+async function requestWake() {
+  try { if ('wakeLock' in navigator && !wakeLock && document.visibilityState === 'visible') { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { wakeLock = null; }); } } catch (e) { wakeLock = null; }
+}
+function releaseWake() { try { wakeLock && wakeLock.release(); } catch (e) {} wakeLock = null; }
+function onResume() {
+  // iOS suspends geolocation/orientation while locked or in another app: re-acquire, keep guide mode as-is.
+  startWatch();
+  if (state.compassListening || state.compassGranted) startCompass();
+  if (state.target) { requestWake(); $('guide').classList.remove('hidden'); updateGuide(); }
+  state.resumeCount = (state.resumeCount || 0) + 1;
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') onResume(); });
+window.addEventListener('pageshow', e => { if (e.persisted) onResume(); });
+window.addEventListener('focus', () => { if (state.target && !wakeLock) requestWake(); });
 
 // ---------- Offline ----------
 function tileList() {
@@ -236,7 +295,10 @@ $('btnOffline').onclick = async () => {
   await Promise.all(Array.from({ length: 6 }, worker));
   msg.textContent = `Saved ${done - fail}/${urls.length} map tiles for offline use.`;
 };
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+$('version').textContent = APP_VERSION;
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js?v=4', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
+}
 
 loadData().catch(e => setStatus('Could not load booth data: ' + e.message));
 })();

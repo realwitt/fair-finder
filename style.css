@@ -64,3 +64,20 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;display
 #arrowWrap,#arrow{width:112px;height:112px}
 #guideDist{font-size:36px}#guideHint{font-size:19px}
 @media (max-height:700px){#arrowWrap,#arrow{width:88px;height:88px}}
+
+/* v4: guide is a fixed, always-on-top overlay */
+#guide{position:fixed;z-index:5000;max-height:none;overflow:visible;padding-top:8px}
+#guideTop{gap:6px}#guideName{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stop{min-width:96px;height:52px;border-radius:12px;border:3px solid #000;background:#d00;color:#fff;font-weight:900;font-size:18px}
+.small{height:52px;padding:0 12px;border-radius:12px;border:2px solid #000;background:#eee;font-weight:800}
+#arrowWrap,#arrow{width:130px;height:130px}
+@media (max-height:700px){#arrowWrap,#arrow{width:104px;height:104px}}
+#guideUpd{font-size:14px;font-weight:800;color:#a15c00;min-height:0}
+#guide.arrived{background:#e7ffe9f5;border-top-color:#0a8a2a}
+#guide.arrived #arrow path{fill:#0a8a2a}
+#guide.arrived #guideHint{font-size:24px;color:#0a6a20}
+#guideMenu{max-height:22vh;overflow:auto}
+body.guiding #results{bottom:var(--guideH,330px);max-height:calc(100% - var(--guideH,330px) - 140px);z-index:4000;border-radius:18px;border:3px solid #000}
+body.guiding.typing #guide{opacity:.96}
+#version{position:fixed;z-index:1000;left:8px;top:calc(var(--safe-t) + 168px);font-size:11px;font-weight:700;color:#fff;background:#0009;padding:2px 6px;border-radius:6px;pointer-events:none}
+.panel{z-index:6000}
