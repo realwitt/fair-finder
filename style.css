@@ -81,3 +81,7 @@ body.guiding #results{bottom:var(--guideH,330px);max-height:calc(100% - var(--gu
 body.guiding.typing #guide{opacity:.96}
 #version{position:fixed;z-index:1000;left:8px;top:calc(var(--safe-t) + 168px);font-size:11px;font-weight:700;color:#fff;background:#0009;padding:2px 6px;border-radius:6px;pointer-events:none}
 .panel{z-index:6000}
+
+#guide.noloc #arrowWrap{display:none}
+#toast{position:fixed;z-index:7000;left:50%;top:40%;transform:translateX(-50%);background:#000;color:#fff;font-weight:800;padding:12px 18px;border-radius:12px}
+.sheet-head{gap:8px}.sheet-head #resCount{flex:1}

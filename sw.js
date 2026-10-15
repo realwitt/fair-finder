@@ -1,5 +1,5 @@
-const V = 'ff-shell-v4';
-const SHELL = ['./', 'index.html', 'style.css?v=4', 'app.js?v=4', 'geo.js?v=4', 'search.js?v=4', 'vendor/leaflet.js?v=4', 'vendor/leaflet.css?v=4', 'data/booths.json', 'data/atms.json', 'manifest.webmanifest', 'icons/icon-192.png'];
+const V = 'ff-shell-v5';
+const SHELL = ['./', 'index.html', 'style.css?v=5', 'app.js?v=5', 'geo.js?v=5', 'search.js?v=5', 'vendor/leaflet.js?v=5', 'vendor/leaflet.css?v=5', 'data/booths.json', 'data/atms.json', 'manifest.webmanifest', 'icons/icon-192.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('ff-shell-') && k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 const isTile = u => /\/tile\/\d+\/\d+\/\d+|tile\.openstreetmap\.org/.test(u);
@@ -17,6 +17,14 @@ self.addEventListener('fetch', e => {
     try {
       const r = await Promise.race([fetch(req.mode === 'navigate' ? req.url : req, { cache: 'no-cache' }), new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 4000))]);
       if (r.ok) c.put(req, r.clone()); return r;
-    } catch (err) { return (await c.match(req, { ignoreSearch: true })) || (await c.match('index.html')) || Response.error(); }
+    } catch (err) {
+      if (req.mode === 'navigate') {
+        // Offline share links: /b/<id>.html -> app with ?booth=<id>; any ?query URL -> cached index.html
+        const m = new URL(url).pathname.match(/\/b\/([^/]+)\.html$/);
+        if (m) return Response.redirect(new URL('../?booth=' + m[1], url).href, 302);
+        return (await c.match('index.html')) || (await c.match('./')) || Response.error();
+      }
+      return (await c.match(req)) || (await c.match(req, { ignoreSearch: true })) || Response.error();
+    }
   })());
 });

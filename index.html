@@ -7,10 +7,17 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Fair Finder · NC State Fair 2026</title>
+<meta name="description" content="Find food at the 2026 NC State Fair: search booths from the official vendor list and follow a live arrow there.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fair Finder">
+<meta property="og:title" content="Fair Finder · NC State Fair 2026">
+<meta property="og:description" content="Search official fair food booths and follow a live arrow there.">
+<meta property="og:image" content="https://realwitt.github.io/fair-finder/icons/icon-512.png">
+<meta name="twitter:card" content="summary">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="stylesheet" href="vendor/leaflet.css?v=4">
-<link rel="stylesheet" href="style.css?v=4">
+<link rel="stylesheet" href="vendor/leaflet.css?v=5">
+<link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 <div id="map" aria-label="Map"></div>
@@ -35,6 +42,7 @@
 </header>
 
 <div id="status" role="status">Starting GPS…</div>
+<div id="toast" class="hidden" role="status"></div>
 <div id="version" aria-label="App version"></div>
 
 <div id="fab">
@@ -60,13 +68,14 @@
 </section>
 
 <section id="results" class="sheet hidden" aria-label="Results">
-  <div class="sheet-head"><span id="resCount"></span><button class="close" id="closeResults" aria-label="Close">✕</button></div>
+  <div class="sheet-head"><span id="resCount"></span><button id="btnShareList" class="small" aria-label="Share this search">Share</button><button class="close" id="closeResults" aria-label="Close">✕</button></div>
   <ol id="resList"></ol>
 </section>
 
 <section id="guide" class="hidden" aria-label="Guide">
   <div id="guideTop">
     <div id="guideName"></div>
+    <button id="btnShare" class="small" aria-label="Share this booth">Share</button>
     <button id="btnShowList" class="small" aria-label="Show results list">List</button>
     <button class="stop" id="closeGuide" aria-label="Stop guiding">Stop ✕</button>
   </div>
@@ -86,9 +95,9 @@
   <div id="aboutBody">Loading…</div>
 </section>
 
-<script src="vendor/leaflet.js?v=4"></script>
-<script src="geo.js?v=4"></script>
-<script src="search.js?v=4"></script>
-<script src="app.js?v=4"></script>
+<script src="vendor/leaflet.js?v=5"></script>
+<script src="geo.js?v=5"></script>
+<script src="search.js?v=5"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>

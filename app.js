@@ -7,7 +7,7 @@ const OSM = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 // Official fair tile layer full extent (EPSG:3857) converted to lat/lon
 const FAIR_BOUNDS = L.latLngBounds([35.79119, -78.72134], [35.79952, -78.70469]);
 const CENTER = [35.7948, -78.7115];
-const APP_VERSION = 'v4 · Oct 15 5:15 PM';
+const APP_VERSION = 'v5 · Oct 15 5:25 PM';
 const $ = id => document.getElementById(id);
 const LS_KEY = 'ff.guideTarget';
 const state = { me: null, acc: null, gpsHeading: null, compass: null, compassAt: 0, target: null, booths: [], atms: [], results: [] };
@@ -41,6 +41,38 @@ $('tglFood').onchange = e => e.target.checked ? boothLayer.addTo(map) : map.remo
 $('tglATM').onchange = e => e.target.checked ? atmLayer.addTo(map) : map.removeLayer(atmLayer);
 $('tglDrinks').onchange = e => e.target.checked ? drinkLayer.addTo(map) : map.removeLayer(drinkLayer);
 
+// ---------- URL state (shareable links) ----------
+// ?q=<search>  ?new=1  ?booth=<id>  &ll=<lat>,<lon>&z=<zoom>. Booth ids are the fair GIS object ids (e.g. L0-1314).
+const BASE_TITLE = document.title;
+function urlParams() { return new URLSearchParams(location.search); }
+function buildUrl(over) {
+  const p = urlParams();
+  for (const [k, v] of Object.entries(over)) { if (v == null || v === '') p.delete(k); else p.set(k, v); }
+  const qs = p.toString().replace(/%2C/g, ',');
+  return location.pathname + (qs ? '?' + qs : '') + location.hash;
+}
+function setUrl(over, push) {
+  const u = buildUrl(over);
+  if (u === location.pathname + location.search + location.hash) return;
+  try { history[push ? 'pushState' : 'replaceState']({ ff: over.booth ? 'booth' : 'view' }, '', u); } catch (e) {}
+}
+function shareUrlFor(t) {
+  // /b/<id>.html carries Open Graph tags with the booth name and redirects to ?booth=<id>
+  const root = location.origin + location.pathname.replace(/[^/]*$/, '');
+  const q = urlParams().get('q');
+  if (t) return root + 'b/' + encodeURIComponent(t.id) + '.html' + (q ? '?q=' + encodeURIComponent(q) : '');
+  return location.href;
+}
+async function share(t) {
+  const url = shareUrlFor(t), title = t ? `${t.name} · NC State Fair` : BASE_TITLE;
+  const text = t ? `${t.name}${t.area ? ' (' + t.area + ')' : ''}: find it at the fair with Fair Finder` : 'Fair Finder';
+  try { if (navigator.share) { await navigator.share({ title, text, url }); return 'shared'; } } catch (e) { if (e && e.name === 'AbortError') return 'cancelled'; }
+  try { await navigator.clipboard.writeText(url); toast('Link copied'); return 'copied'; } catch (e) {}
+  window.prompt('Copy this link', url); return 'prompt';
+}
+function toast(msg) { const el = $('toast'); el.textContent = msg; el.classList.remove('hidden'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.add('hidden'), 2200); }
+let mvT; map.on('moveend', () => { clearTimeout(mvT); mvT = setTimeout(() => { const c = map.getCenter(); setUrl({ ll: c.lat.toFixed(5) + ',' + c.lng.toFixed(5), z: map.getZoom() }); }, 400); });
+
 // ---------- Data ----------
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function popupHtml(b) {
@@ -72,10 +104,24 @@ async function loadData() {
   const nF = state.booths.filter(b => b.food || b.kind === 'newfood').length;
   setStatus(`${nF} food booths loaded`);
   buildAbout(bd, ad);
-  const q = new URLSearchParams(location.search).get('q'); if (q) { $('q').value = q; runSearch(); }
-  let saved = null; try { saved = localStorage.getItem(LS_KEY); } catch (e) {}
-  if (saved && findTarget(saved)) startGuide(saved, true);
+  applyUrl(true);
 }
+function applyUrl(initial) {
+  const p = urlParams();
+  const q = p.get('q'), booth = p.get('booth'), ll = p.get('ll'), z = +p.get('z');
+  if (p.get('new') === '1') runSearch(true, true);
+  else if (q) { $('q').value = q; runSearch(false, true); }
+  else if (!initial) { $('q').value = ''; clearResults(); }
+  const id = booth && (booth.match(/(L\d-\d+|atm\d+)$/) || [])[1];
+  if (id && findTarget(id)) { state.fromLink = initial; startGuide(id, false, true); }
+  else if (!initial && state.target) stopGuide(true);
+  else if (initial) {
+    let saved = null; try { saved = localStorage.getItem(LS_KEY); } catch (e) {}
+    if (saved && findTarget(saved)) { startGuide(saved, true, true); setUrl({ booth: saved }); }
+    else if (ll && z) { const [a, b] = ll.split(',').map(Number); if (!isNaN(a) && !isNaN(b)) map.setView([a, b], Math.min(21, Math.max(14, z))); }
+  }
+}
+window.addEventListener('popstate', () => applyUrl(false));
 
 function buildAbout(bd, ad) {
   const c = bd.counts;
@@ -104,7 +150,9 @@ function onPos(p) {
   if (state.results.length) renderResults(false, true);
   updateGuide();
 }
-function onPosErr(e) { state.gpsError = e.message || String(e.code); updateGuide(); setStatus(e.code === 1 ? 'Location blocked: allow it in Settings › Safari › Location' : 'Waiting for GPS… (' + e.message + ')'); }
+function onPosErr(e) {
+  state.gpsError = e.message || String(e.code); state.gpsDenied = e.code === 1;
+  updateGuide(); setStatus(e.code === 1 ? 'Location blocked: allow it in Settings › Safari › Location' : 'Waiting for GPS… (' + e.message + ')'); }
 let watchId = null;
 function startWatch() {
   if (!('geolocation' in navigator)) return setStatus('This browser has no geolocation');
@@ -122,12 +170,13 @@ $('searchForm').onsubmit = e => { e.preventDefault(); runSearch(); $('q').blur()
 $('clearQ').onclick = () => { $('q').value = ''; clearResults(); };
 document.querySelectorAll('.chip').forEach(c => c.onclick = () => { $('q').value = c.dataset.q === 'new' ? '' : c.dataset.q; runSearch(c.dataset.q === 'new'); });
 $('closeResults').onclick = clearResults;
-function clearResults() { state.results = []; hitLayer.clearLayers(); $('results').classList.add('hidden'); }
+function clearResults() { state.results = []; hitLayer.clearLayers(); $('results').classList.add('hidden'); setUrl({ q: null, new: null }); }
 $('q').addEventListener('focus', () => document.body.classList.add('typing'));
 $('q').addEventListener('blur', () => document.body.classList.remove('typing'));
 function dist(b) { return state.me ? Geo.distanceM(state.me[0], state.me[1], b.lat, b.lon) : null; }
-function runSearch(newOnly) {
+function runSearch(newOnly, fromUrl) {
   const q = $('q').value.trim();
+  if (!fromUrl) setUrl(newOnly === true ? { q: null, new: '1' } : { q: q.length >= 2 ? q : null, new: null });
   if (newOnly === true) state.results = state.booths.filter(b => b.kind === 'newfood').map(b => ({ booth: b, score: 1, matched: b.newFood ? [b.newFood.name] : [] }));
   else if (q.length < 2) return clearResults();
   else state.results = FoodSearch.search(state.booths, q);
@@ -163,9 +212,12 @@ function findTarget(id) {
   const b = state.booths.find(x => x.id === id); if (b) return b;
   const a = state.atms.find(x => x.id === id); if (a) return { id: a.id, name: 'ATM', lat: a.lat, lon: a.lon, location: 'approximate', area: 'From the official map icon', products: '' };
 }
-function startGuide(id, resume) {
+function startGuide(id, resume, fromUrl) {
   const t = findTarget(id); if (!t) return;
+  const prev = state.target && state.target.id;
   state.target = t; state.arrivedShown = false;
+  if (!fromUrl && prev !== id) setUrl({ booth: id }, true); // pushState so Back returns to the list/map
+  document.title = `${t.name} · Fair Finder`;
   try { localStorage.setItem(LS_KEY, id); } catch (e) {}
   $('results').classList.add('hidden'); $('guide').classList.remove('hidden');
   document.body.classList.add('guiding');
@@ -179,14 +231,18 @@ function startGuide(id, resume) {
   updateGuide();
 }
 // The ONLY way guide mode ends: the explicit Stop button.
-function stopGuide() {
+function stopGuide(fromUrl) {
+  if (!fromUrl) setUrl({ booth: null });
+  document.title = BASE_TITLE;
   state.target = null; state.guide = null; guideLine.setLatLngs([]);
   try { localStorage.removeItem(LS_KEY); } catch (e) {}
   $('guide').classList.add('hidden'); document.body.classList.remove('guiding');
   releaseWake();
   if (state.results.length) $('results').classList.remove('hidden');
 }
-$('closeGuide').onclick = stopGuide;
+$('closeGuide').onclick = () => stopGuide();
+$('btnShare').onclick = () => share(state.target);
+$('btnShareList').onclick = () => share(null);
 $('btnShowList').onclick = () => { if (state.results.length) $('results').classList.toggle('hidden'); else $('q').focus(); };
 function currentHeading() {
   const now = Date.now();
@@ -201,6 +257,12 @@ function updateGuide() {
   const t = state.target; if (!t) return;
   const meta = `${t.area || ''}${t.lot ? ' · ' + t.lot : ''}${t.location !== 'exact' ? ' · approximate location' : ' · official GIS point'}`;
   $('guide').classList.remove('hidden'); document.body.classList.add('guiding'); // guide never hides itself
+  $('guide').classList.toggle('noloc', !state.me && !!state.gpsDenied);
+  if (!state.me && state.gpsDenied) {
+    $('guideDist').textContent = ''; $('guideHint').textContent = 'Location is off, so here is the booth on the map. Allow location for directions.'; $('guideMeta').textContent = meta; $('guideUpd').textContent = '';
+    if (!state.shownNoLoc) { state.shownNoLoc = true; map.setView([t.lat, t.lon], 19); }
+    return;
+  }
   if (!state.me) { $('guideDist').textContent = '—'; $('guideHint').textContent = 'Waiting for your GPS position…'; $('guideMeta').textContent = meta; $('guideUpd').textContent = 'updating…'; return; }
   const d = Geo.distanceM(state.me[0], state.me[1], t.lat, t.lon), br = Geo.bearingDeg(state.me[0], state.me[1], t.lat, t.lon);
   const { h, src } = currentHeading();
@@ -297,7 +359,7 @@ $('btnOffline').onclick = async () => {
 };
 $('version').textContent = APP_VERSION;
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js?v=4', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
+  navigator.serviceWorker.register('sw.js?v=5', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
 }
 
 loadData().catch(e => setStatus('Could not load booth data: ' + e.message));

@@ -9,13 +9,13 @@ const ctx = await b.newContext({ ...devices['iPhone 14 Pro'], geolocation: START
 const p = await ctx.newPage(); p.on('pageerror', e => fails.push('pageerror ' + e.message));
 await p.goto(URL, { waitUntil: 'networkidle' });
 await p.waitForFunction(() => window.__ff && window.__ff.booths.length > 100 && window.__ff.me);
-const ver = await p.textContent('#version'); ok(/v4/.test(ver), 'version label: ' + ver); console.log('version label:', ver);
+const ver = await p.textContent('#version'); ok(/v\d+/.test(ver), 'version label: ' + ver); console.log('version label:', ver);
 await p.fill('#q', 'turkey leg'); await p.waitForTimeout(500);
 await p.locator('#resList li').nth(2).click(); await p.waitForTimeout(500);
 const T = await p.evaluate(() => ({ id: __ff.target.id, lat: __ff.target.lat, lon: __ff.target.lon, name: __ff.target.name }));
 console.log('target', T.name);
 try { await p.click('#btnCompass', { timeout: 2000 }); } catch (e) {}
-const visible = async (tag) => { const v = await p.locator('#guide').isVisible(); const id = await p.evaluate(() => __ff.target && __ff.target.id); ok(v && id === T.id, `guide visible + same target after: ${tag}`); return v; };
+const visible = async (tag) => { const v = await p.locator('#guide').isVisible(); const id = await p.evaluate(() => __ff.target && __ff.target.id); ok(v && id === T.id, `guide visible + same target after: ${tag} [visible=${v} target=${id}]`); return v; };
 const compass = h => p.evaluate(h => { const e = new Event('deviceorientation'); e.webkitCompassHeading = h; window.dispatchEvent(e); }, h);
 const t0 = Date.now(); let i = 0, lastD = null, dChanged = 0;
 const N = Number(process.env.STEPS || 62); // 62 steps x 2 s ≈ 124 s
@@ -24,7 +24,7 @@ while (i < N) {
   await ctx.setGeolocation({ latitude: START.latitude + (T.lat - START.latitude) * f + (i % 3) * 1e-6, longitude: START.longitude + (T.lon - START.longitude) * f, accuracy: i % 10 === 5 ? 60 : 6 });
   await compass((i * 7) % 360);
   if (i % 8 === 1) { const m = p.locator('#map'); const bb = await m.boundingBox(); await p.mouse.move(bb.x + 200, bb.y + 250); await p.mouse.down(); await p.mouse.move(bb.x + 120, bb.y + 200, { steps: 5 }); await p.mouse.up(); }
-  if (i % 8 === 3) await p.mouse.click(60, 300); // tap on map
+  if (i % 8 === 3) { if (await p.locator('#results').isVisible()) await p.click('#closeResults'); await p.mouse.click(60, 300); } // tap on bare map
   if (i % 8 === 5) { await p.fill('#q', ['lemonade', 'hot dog', 'pizza'][i % 3]); await p.waitForTimeout(300); }
   if (i % 8 === 6) await p.locator('.chip').nth(i % 5).click();
   if (i % 10 === 7) await p.evaluate(() => { Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true }); document.dispatchEvent(new Event('visibilitychange')); Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true }); document.dispatchEvent(new Event('visibilitychange')); });
