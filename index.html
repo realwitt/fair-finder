@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#0b1f4d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Fair Finder · NC State Fair 2026</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="map" aria-label="Map"></div>
+
+<header id="top">
+  <form id="searchForm" role="search" autocomplete="off">
+    <input id="q" type="search" inputmode="search" enterkeyhint="search" placeholder="Search food: empanada, turkey leg…" aria-label="Search food">
+    <button type="button" id="clearQ" aria-label="Clear">✕</button>
+  </form>
+  <div id="chips">
+    <button class="chip" data-q="hot dog">Hot dog</button>
+    <button class="chip" data-q="corn dog">Corn dog</button>
+    <button class="chip" data-q="turkey leg">Turkey leg</button>
+    <button class="chip" data-q="funnel cake">Funnel cake</button>
+    <button class="chip" data-q="fried cheeseburger">Fried cheeseburger</button>
+    <button class="chip" data-q="empanada">Empanada</button>
+    <button class="chip" data-q="lemonade">Lemonade</button>
+    <button class="chip" data-q="ice cream">Ice cream</button>
+    <button class="chip" data-q="bbq">BBQ</button>
+    <button class="chip" data-q="new">⭐ New 2026</button>
+  </div>
+</header>
+
+<div id="status" role="status">Starting GPS…</div>
+
+<div id="fab">
+  <button id="btnLocate" class="fab" aria-label="Center on me" title="Center on me">◎</button>
+  <button id="btnLayers" class="fab" aria-label="Layers" title="Layers">☰</button>
+</div>
+
+<section id="layersPanel" class="panel hidden" aria-label="Layers">
+  <h2>Map layers <button class="close" data-close="layersPanel" aria-label="Close">✕</button></h2>
+  <label class="row"><input type="checkbox" id="tglFair" checked> Official fair map</label>
+  <label class="row slider">Opacity <input type="range" id="fairOpacity" min="0" max="100" value="85"> <span id="opVal">85%</span></label>
+  <div class="row seg">Base:
+    <label><input type="radio" name="base" value="sat" checked> Satellite</label>
+    <label><input type="radio" name="base" value="osm"> Street</label>
+  </div>
+  <label class="row"><input type="checkbox" id="tglFood" checked> Food booths (official GIS)</label>
+  <label class="row"><input type="checkbox" id="tglATM"> 💲 ATMs <small>(from official map icons, approx.)</small></label>
+  <label class="row"><input type="checkbox" id="tglDrinks"> 🥤 Drink booths <small>(booths whose official menu lists drinks)</small></label>
+  <p class="note" id="waterNote">💧 Water refill stations: the fair's official map and site do <b>not</b> publish refill-station locations, so none are shown. A local guide (thisisraleigh.com, unofficial) says there are filling stations across from Casey's Clubhouse and under the trees between Kiddieland and the Scott Building.</p>
+  <button id="btnOffline" class="wide">⬇ Save fair map for offline</button>
+  <p class="note" id="offlineMsg"></p>
+  <p class="note"><a href="#" id="aboutLink">About the data & sources</a></p>
+</section>
+
+<section id="results" class="sheet hidden" aria-label="Results">
+  <div class="sheet-head"><span id="resCount"></span><button class="close" id="closeResults" aria-label="Close">✕</button></div>
+  <ol id="resList"></ol>
+</section>
+
+<section id="guide" class="hidden" aria-label="Guide">
+  <div id="guideTop">
+    <div id="guideName"></div>
+    <button class="close" id="closeGuide" aria-label="Stop guiding">✕</button>
+  </div>
+  <div id="arrowWrap"><svg id="arrow" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 L84 80 L50 62 L16 80 Z"/></svg><div id="northTag">N↑</div></div>
+  <div id="guideDist">—</div>
+  <div id="guideHint"></div>
+  <div id="guideMeta"></div>
+  <div id="guideBtns">
+    <button id="btnCompass" class="wide">🧭 Enable compass</button>
+  </div>
+  <details id="guideMenu"><summary>Menu (official listing)</summary><div id="guideMenuBody"></div></details>
+</section>
+
+<section id="about" class="panel hidden" aria-label="About">
+  <h2>About <button class="close" data-close="about" aria-label="Close">✕</button></h2>
+  <div id="aboutBody">Loading…</div>
+</section>
+
+<script src="vendor/leaflet.js"></script>
+<script src="geo.js"></script>
+<script src="search.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

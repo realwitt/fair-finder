@@ -1,0 +1,106 @@
+{
+ "generated": "2026-10-15T19:54:53+00:00",
+ "source": "ATM ($) icons on the official 2026 NC State Fair grounds map tile layer (Graphic_2026_WTL1, georeferenced by the fair: https://tiles.arcgis.com/tiles/3Sj1fiIDvQtFfbvg/arcgis/rest/services/Graphic_2026_WTL1/MapServer). Same icons as the official map PDF legend 'ATM'.",
+ "method": "Template-matched the ATM icon on level-17 tiles (0.6 m/px) and converted icon centers to lat/lon. The position is the icon center on the cartoon map, so it is approximate (cartoon icons are placed near, not exactly on, the machine; expect ~10-30 m).",
+ "location": "approximate",
+ "atms": [
+  {
+   "id": "atm1",
+   "lat": 35.794444,
+   "lon": -78.710561,
+   "location": "approximate",
+   "matchScore": 1.0
+  },
+  {
+   "id": "atm2",
+   "lat": 35.796285,
+   "lon": -78.714665,
+   "location": "approximate",
+   "matchScore": 0.883
+  },
+  {
+   "id": "atm3",
+   "lat": 35.795175,
+   "lon": -78.71165,
+   "location": "approximate",
+   "matchScore": 0.882
+  },
+  {
+   "id": "atm4",
+   "lat": 35.796998,
+   "lon": -78.711607,
+   "location": "approximate",
+   "matchScore": 0.855
+  },
+  {
+   "id": "atm5",
+   "lat": 35.795053,
+   "lon": -78.70768,
+   "location": "approximate",
+   "matchScore": 0.843
+  },
+  {
+   "id": "atm6",
+   "lat": 35.794683,
+   "lon": -78.712959,
+   "location": "approximate",
+   "matchScore": 0.816
+  },
+  {
+   "id": "atm7",
+   "lat": 35.793543,
+   "lon": -78.712057,
+   "location": "approximate",
+   "matchScore": 0.804
+  },
+  {
+   "id": "atm8",
+   "lat": 35.795406,
+   "lon": -78.708276,
+   "location": "approximate",
+   "matchScore": 0.803
+  },
+  {
+   "id": "atm9",
+   "lat": 35.796328,
+   "lon": -78.711167,
+   "location": "approximate",
+   "matchScore": 0.794
+  },
+  {
+   "id": "atm10",
+   "lat": 35.79729,
+   "lon": -78.71128,
+   "location": "approximate",
+   "matchScore": 0.771
+  },
+  {
+   "id": "atm11",
+   "lat": 35.796306,
+   "lon": -78.707964,
+   "location": "approximate",
+   "matchScore": 0.767
+  },
+  {
+   "id": "atm12",
+   "lat": 35.795776,
+   "lon": -78.713576,
+   "location": "approximate",
+   "matchScore": 0.757
+  },
+  {
+   "id": "atm13",
+   "lat": 35.794409,
+   "lon": -78.709778,
+   "location": "approximate",
+   "matchScore": 0.68
+  },
+  {
+   "id": "atm14",
+   "lat": 35.793948,
+   "lon": -78.711693,
+   "location": "approximate",
+   "matchScore": 0.609
+  }
+ ]
+}
