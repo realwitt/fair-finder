@@ -2125,11 +2125,8 @@ function fallbackToken(tokens) {
 }
 
 function partialNote(tokens, chosen) {
-  const set = new Set(tokens);
-  if (set.has('cherry') && set.has('slush')) {
-    return 'No listing mentions both "cherry" and "slush"; these sell slush/frozen drinks; ask for flavors.';
-  }
-  return 'No listing mentions all of the words; showing matches for "' + chosen + '".';
+  const others = tokens.filter(t => t !== chosen).map(t => '"' + t + '"').join(' or ');
+  return 'Partial match: the listing has "' + chosen + '" (or a close synonym) but does not mention ' + (others || 'the other words') + '. Ask at the booth.';
 }
 
 function link(id) { return 'https://realwitt.github.io/fair-finder/?booth=' + id; }
@@ -2630,16 +2627,20 @@ function empty(status, extra) {
   return new Response(null, { status, headers: cors(extra) });
 }
 
+const MEM = { minute: 0, counts: new Map(), salt: '' };
+// Per-client limit: 60 requests/minute. Key = SHA-256(secret salt + IP); the raw IP is never stored or logged.
 async function rateLimit(request, env) {
-  if (!env || !env.RL || typeof env.RL.limit !== 'function') return null;
-  const material = String(env.SALT || '') + ':' + String(request.headers.get('CF-Connecting-IP') || '');
+  const material = String((env && env.SALT) || MEM.salt || (MEM.salt = crypto.randomUUID())) + ':' + String(request.headers.get('CF-Connecting-IP') || '');
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(material));
-  const hex = [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('');
-  const key = hex.slice(0, 32);
-  const { success } = await env.RL.limit({ key });
-  if (!success) {
-    return json(429, rpcErr(null, -32000, 'Rate limit exceeded: 60 requests per minute per client. Please slow down.'), { 'Retry-After': '60' });
-  }
+  const key = [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
+  let success = true;
+  if (env && env.RL && typeof env.RL.limit === 'function') { try { ({ success } = await env.RL.limit({ key })); } catch (e) { success = true; } }
+  // Backstop inside this isolate (memory only, reset every minute): the binding is per-location and eventually consistent.
+  const minute = Math.floor(Date.now() / 60000);
+  if (MEM.minute !== minute) { MEM.minute = minute; MEM.counts = new Map(); }
+  const n = (MEM.counts.get(key) || 0) + 1; MEM.counts.set(key, n);
+  if (n > 60) success = false;
+  if (!success) return json(429, rpcErr(null, -32000, 'Rate limit exceeded: 60 requests per minute per client. Please slow down.'), { 'Retry-After': '60' });
   return null;
 }
 
@@ -2670,8 +2671,9 @@ async function handlePost(request, env) {
   return json(200, r.body);
 }
 
-function health() {
+function health(env) {
   return {
+    rate_limit: { per_client: '60 requests per minute', binding: !!(env && env.RL) },
     name: 'fair-finder-mcp',
     version: VERSION,
     endpoint: '/mcp',
@@ -2699,7 +2701,7 @@ async function handle(request, env) {
   }
   if (method === 'GET' && path === '/mcp') return empty(405, { Allow: 'POST, OPTIONS' });
   if (method === 'DELETE' && path === '/mcp') return empty(405, { Allow: 'POST, OPTIONS' });
-  if (method === 'GET' && (path === '/' || path === '/health')) return json(200, health());
+  if (method === 'GET' && (path === '/' || path === '/health')) return json(200, health(env));
   if (method === 'POST' && (path === '/mcp' || path === '/')) return handlePost(request, env);
   return json(404, { error: 'Not found' });
 }
