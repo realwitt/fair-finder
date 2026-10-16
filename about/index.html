@@ -76,11 +76,12 @@
   <div class="wrap">
     <h2>Use with your AI</h2>
     <p>Fair Finder also runs a small, read-only <b>MCP server</b>, so AI assistants that support remote MCP connectors can search the same booth, food and ride data in a chat (for example “where can I get a cherry slush?” or “where’s the Tilt-A-Whirl?”). Every answer includes a Fair Finder link that opens walking directions on your phone. It is unofficial, like the app.</p>
-    <p class="endpoint">Server URL: <code>https://fair-finder-mcp.lively-shape-f373.workers.dev/mcp</code></p>
+    <p class="endpoint">Server URL: <code>https://mcp.fairfinder.birbol.com/mcp</code></p>
+    <p class="endpoint-alt">If your client already uses <code>https://fair-finder-mcp.lively-shape-f373.workers.dev/mcp</code>, that address still works.</p>
     <ol class="steps">
       <li><b>Claude</b>Settings › Connectors › Add custom connector. Paste the server URL and choose “No sign in”.</li>
       <li><b>ChatGPT</b>Turn on developer mode (Settings › Apps &amp; Connectors › Advanced), then create an app or connector with the server URL and “No Authentication”.</li>
-      <li><b>Other MCP clients</b>Add a remote (streamable HTTP) MCP server with the URL above. No API key or account is needed. Tools: search, get_details, nearby.</li>
+      <li><b>Other MCP clients</b>Add a remote (streamable HTTP) MCP server with the URL above. No API key or account is needed. Tools: search, get_details, nearby, popular_now.</li>
     </ol>
   </div>
 </section>

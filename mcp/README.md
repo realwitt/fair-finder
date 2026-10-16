@@ -8,7 +8,9 @@ The map and walking directions live in the Fair Finder app: https://fairfinder.b
 
 ## Endpoint
 
-`https://fair-finder-mcp.lively-shape-f373.workers.dev/mcp`
+`https://mcp.fairfinder.birbol.com/mcp`
+
+The original address `https://fair-finder-mcp.lively-shape-f373.workers.dev/mcp` is the same Worker and keeps working.
 
 Stateless streamable HTTP. POST a JSON-RPC body and receive one JSON response. There is no SSE stream and no session id. `GET /mcp` returns 405. `GET /` returns a short health document. `POST /` is the same RPC endpoint as `POST /mcp`.
 
