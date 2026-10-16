@@ -16,17 +16,18 @@
 <meta name="twitter:card" content="summary">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="stylesheet" href="vendor/leaflet.css?v=72">
-<link rel="stylesheet" href="style.css?v=72">
+<link rel="stylesheet" href="vendor/leaflet.css?v=73">
+<link rel="stylesheet" href="style.css?v=73">
 </head>
 <body>
 <div id="map" aria-label="Map"></div>
 
 <header id="top">
   <form id="searchForm" role="search" autocomplete="off">
-    <input id="q" type="search" inputmode="search" enterkeyhint="search" placeholder="Search food: empanada, turkey leg…" aria-label="Search food">
+    <input id="q" type="search" inputmode="search" enterkeyhint="search" placeholder="Search food, booths, rides…" aria-label="Search food, booths and rides" role="combobox" aria-autocomplete="list" aria-controls="suggest" aria-expanded="false" autocomplete="off">
     <button type="button" id="clearQ" aria-label="Clear">✕</button>
   </form>
+  <ul id="suggest" role="listbox" class="hidden" aria-label="Suggestions"></ul>
   <div id="chips">
     <button class="chip" data-q="hot dog">Hot dog</button>
     <button class="chip" data-q="corn dog">Corn dog</button>
@@ -38,6 +39,7 @@
     <button class="chip" data-q="ice cream">Ice cream</button>
     <button class="chip" data-q="bbq">BBQ</button>
     <button class="chip" data-q="new">⭐ New 2026</button>
+    <button class="chip" data-q="rides">🎡 Rides</button>
   </div>
 </header>
 
@@ -62,6 +64,7 @@
     <label><input type="radio" name="base" value="sat"> Satellite (Esri)</label>
   </div>
   <label class="row"><input type="checkbox" id="tglFood" checked> Food booths (fair’s published booth data)</label>
+  <label class="row"><input type="checkbox" id="tglRides" checked> 🎡 Rides <small>(fair’s published ride points)</small></label>
   <label class="row"><input type="checkbox" id="tglATM"> 💲 ATMs <small>(from the fair’s published grounds map, approx.)</small></label>
   <label class="row"><input type="checkbox" id="tglDrinks"> 🥤 Drink booths <small>(booths whose fair listing mentions drinks)</small></label>
   <p class="note" id="waterNote">💧 Water refill stations: the fair’s published map and site do <b>not</b> list refill-station locations, so none are shown. A local guide (thisisraleigh.com, unofficial) says there are filling stations across from Casey's Clubhouse and under the trees between Kiddieland and the Scott Building.</p>
@@ -71,7 +74,14 @@
 </section>
 
 <section id="results" class="sheet hidden" aria-label="Results">
-  <div class="sheet-head"><span id="resCount"></span><button id="btnShareList" class="small" aria-label="Share this search">Share</button><button class="close" id="closeResults" aria-label="Close">✕</button></div>
+  <div class="sheet-head"><span id="resCount"></span><button id="btnShareList" class="small" aria-label="Share this search">Share</button><button class="close" id="closeResults" aria-label="Close">✕</button>
+    <div id="rideSubs" class="rideSubs hidden" role="group" aria-label="Ride type">
+      <button type="button" class="rideSub on" data-sub="all">All</button>
+      <button type="button" class="rideSub" data-sub="kiddie">Kiddie</button>
+      <button type="button" class="rideSub" data-sub="family">Family</button>
+      <button type="button" class="rideSub" data-sub="thrill">Thrill</button>
+    </div>
+  </div>
   <ol id="resList"></ol>
 </section>
 
@@ -107,10 +117,12 @@
   <div id="aboutBody">Loading…</div>
 </section>
 
-<script src="vendor/leaflet.js?v=72"></script>
-<script src="geo.js?v=72"></script>
-<script src="search.js?v=72"></script>
-<script src="route.js?v=72"></script>
-<script src="app.js?v=72"></script>
+<script src="vendor/leaflet.js?v=73"></script>
+<script src="geo.js?v=73"></script>
+<script src="search.js?v=73"></script>
+<script src="rides.js?v=73"></script>
+<script src="suggest.js?v=73"></script>
+<script src="route.js?v=73"></script>
+<script src="app.js?v=73"></script>
 </body>
 </html>

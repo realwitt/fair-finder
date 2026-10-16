@@ -22,3 +22,7 @@ A mobile-first static web app for finding food at the 2026 N.C. State Fair (Oct 
 
 ## Unofficial
 Fair Finder is an independent, free project. It is not affiliated with, endorsed by, or sponsored by the N.C. State Fair or the N.C. Department of Agriculture & Consumer Services. For official information, see https://www.ncstatefair.org/.
+
+## v7.3: rides + autocomplete
+- **Rides** (`data/rides.json`, bundled like booths; rebuild with `python3 tools/build_rides.py`): the fair's Food & Ride Finder layer 0, `FEATURETYPE='Rides'` (99) plus OBJECTID 1335 "Super Slide". Names are `FoodRideAppName` (what the fair's app shows); lot/contract labels are search aliases. Tickets come from the fair's `TICKETS` field (-1 = "Cash Only"). Heights/categories in `tools/ride_details.json` come from the midway operator's (Powers Great American Midways) published lists and are shown as approximate, "per midway operator". Ride ids use the same `L0-<objectid>` scheme, so `?booth=` and `/b/<id>.html` share links work for rides.
+- **Autocomplete** (`suggest.js`): booths, rides and foods as you type; normalized for case/spacing/hyphens/punctuation, prefix + token matching, light typo tolerance, aliases ranked below public names ("aka …").

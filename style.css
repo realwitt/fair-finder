@@ -177,3 +177,19 @@ body.popup #btnShareMe,body.popup #aboutPill,body.popup #version,body.popup #sta
 .me.stale .mePulse{animation:none;opacity:0}
 .me.stale .meBeam{filter:grayscale(1)}
 @media (prefers-reduced-motion:reduce){.mePulse.blip{animation:none}.meBeam,#btnGpsRefresh,#miniArrow,#arrow,#guide{transition:none}}
+
+/* Rides + autocomplete */
+#suggest{position:absolute;z-index:6000;left:8px;right:8px;top:100%;margin:0;padding:0;list-style:none;background:#fff;border:3px solid #000;border-radius:12px;max-height:50vh;overflow:auto;-webkit-overflow-scrolling:touch}
+#suggest li{min-height:48px;padding:8px 12px;font-size:17px;border-bottom:1px solid #ddd;display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+#suggest li.active,#suggest li:hover{background:#ffe8f4}
+.sgTag{display:inline-block;font-size:12px;font-weight:800;border-radius:999px;padding:2px 8px;background:#f3e8ff;border:1px solid #000;line-height:1.3}
+body.ac #top{z-index:6000}
+body.ac:not(.guiding) #results{z-index:6100}
+.rideIcon{width:26px;height:26px;box-sizing:border-box;border-radius:50%;background:#fff;border:2px solid #000;display:flex;align-items:center;justify-content:center;font-size:16px;line-height:1}
+.rideIcon.hit{width:34px;height:34px;border:3px solid #e6007e;background:#fff0f8;font-size:18px}
+.badge.ride{background:#7b2ff7;color:#fff}
+.sheet-head{flex-wrap:wrap}
+#rideSubs{flex:1 0 100%;display:flex;gap:6px;padding:2px 0 4px}
+.rideSub{height:34px;padding:0 12px;border-radius:17px;border:2px solid #000;background:#fff;font-weight:800;font-size:14px}
+.rideSub.on{background:#7b2ff7;color:#fff}
+#guideMenuBody{white-space:pre-line}

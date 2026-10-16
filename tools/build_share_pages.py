@@ -5,6 +5,10 @@ BASE = "https://realwitt.github.io/fair-finder/"
 os.makedirs("b", exist_ok=True)
 d = json.load(open("data/booths.json")); a = json.load(open("data/atms.json"))
 items = [(b["id"], b["name"], (b["newFood"]["name"] + ". " if b.get("newFood") else "") + (b.get("products") or ""), b.get("area") or "") for b in d["booths"]]
+rd = json.load(open("data/rides.json"))["rides"] if os.path.exists("data/rides.json") else []
+rids = {r["id"] for r in rd}
+items = [i for i in items if i[0] not in rids]
+items += [(r["id"], r["name"], "Ride · " + ("Cash Only" if r.get("cashOnly") else (f'{r["tickets"]} tickets' if r.get("tickets") else "")), r.get("area") or "") for r in rd]
 items += [(x["id"], "ATM", "ATM location from the fair’s published grounds map (approximate)", "") for x in a["atms"]]
 for id_, name, desc, area in items:
     t = html.escape(f"{name} · Fair Finder (unofficial)"); ds = html.escape((f"{area}: " if area else "") + (desc[:150] or "Find it with Fair Finder")) + " · Unofficial guide, not affiliated with the N.C. State Fair."

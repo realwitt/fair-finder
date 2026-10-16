@@ -1,0 +1,413 @@
+{
+"1157": {
+"area": "A Lot"
+},
+"1335": {
+"area": "A Lot"
+},
+"1185": {
+"area": "Coleman Hill"
+},
+"1119": {
+"area": "Coleman Hill",
+"category": "thrill",
+"heightText": "Riders must be 48\" to ride"
+},
+"1183": {
+"area": "Coleman Hill"
+},
+"1162": {
+"area": "Coleman Hill"
+},
+"1140": {
+"area": "Coleman Hill"
+},
+"1139": {
+"area": "Coleman Hill"
+},
+"1182": {
+"area": "Coleman Hill",
+"category": "thrill",
+"heightText": "Riders must be 48\" to ride"
+},
+"1184": {
+"area": "Coleman Hill"
+},
+"1117": {
+"area": "Coleman Hill",
+"category": "thrill",
+"heightText": "Riders must be 52\" to ride"
+},
+"1154": {
+"area": "Coleman Hill",
+"category": "thrill",
+"heightText": "Riders must be 48\" to ride"
+},
+"1153": {
+"area": "Dorton/Hillsborough",
+"category": "family"
+},
+"1155": {
+"area": "Kiddieland East",
+"category": "kiddie",
+"heightText": "Riders must be 36\" to ride with paying adult"
+},
+"1174": {
+"area": "Kiddieland East",
+"category": "kiddie"
+},
+"1107": {
+"area": "Kiddieland East",
+"category": "kiddie"
+},
+"1172": {
+"area": "Kiddieland East",
+"category": "kiddie"
+},
+"1132": {
+"area": "Kiddieland East",
+"category": "kiddie"
+},
+"1175": {
+"area": "Kiddieland East",
+"category": "kiddie"
+},
+"1133": {
+"area": "Kiddieland East",
+"category": "kiddie",
+"heightText": "Riders must be 42\" to ride alone and 52\"max"
+},
+"1105": {
+"area": "Kiddieland East",
+"category": "kiddie"
+},
+"1123": {
+"area": "Kiddieland East",
+"category": "kiddie",
+"heightText": "Riders must be 42\" to ride alone 36\" to ride with a adult"
+},
+"1104": {
+"area": "Kiddieland East",
+"category": "family",
+"heightText": "Riders must be 36\" to ride"
+},
+"1101": {
+"area": "Kiddieland East",
+"category": "kiddie"
+},
+"1102": {
+"area": "Kiddieland East",
+"category": "family",
+"heightText": "Riders must be 42\" to ride alone 36\" to ride with a adult"
+},
+"1103": {
+"area": "Kiddieland East",
+"category": "kiddie",
+"heightText": "Riders must be 36\" to ride with paying adult"
+},
+"1130": {
+"area": "Kiddieland East",
+"category": "family",
+"heightText": "Riders must be 47\" to ride alone"
+},
+"1106": {
+"area": "Kiddieland West",
+"category": "kiddie",
+"heightText": "Riders must be 36\" to ride alone and 54\"max"
+},
+"1129": {
+"area": "Kiddieland West",
+"category": "kiddie"
+},
+"1168": {
+"area": "Kiddieland West",
+"category": "kiddie",
+"heightText": "Riders must be 36\" to ride with paying adult"
+},
+"1112": {
+"area": "Kiddieland West",
+"category": "kiddie"
+},
+"1121": {
+"area": "Kiddieland West",
+"category": "family",
+"heightText": "Riders must be 42\" to ride with paying adult"
+},
+"1156": {
+"area": "Kiddieland West",
+"category": "kiddie",
+"heightText": "Riders must be 36\" to ride alone and 52\"max"
+},
+"1128": {
+"area": "Kiddieland West",
+"category": "kiddie",
+"heightText": "Riders must be 42\" to ride alone 36\" to ride with a adult"
+},
+"1171": {
+"area": "Kiddieland West",
+"category": "family",
+"heightText": "Riders must be 36\" to ride"
+},
+"1113": {
+"area": "Kiddieland West",
+"category": "kiddie"
+},
+"1122": {
+"area": "Kiddieland West",
+"category": "kiddie"
+},
+"1131": {
+"area": "Kiddieland West",
+"category": "kiddie"
+},
+"1149": {
+"area": "Midway"
+},
+"1163": {
+"area": "Midway",
+"category": "family",
+"heightText": "Riders must be 42\" to ride"
+},
+"1095": {
+"area": "Midway"
+},
+"1137": {
+"area": "Midway",
+"category": "family",
+"heightText": "Riders must be 36\" to ride"
+},
+"1136": {
+"area": "Midway",
+"category": "thrill",
+"heightText": "Riders must be 55\" to ride 48\" with paying adult"
+},
+"1094": {
+"area": "Midway",
+"category": "family",
+"heightText": "Riders must be 48\" to ride alone 42\" to ride with a adult"
+},
+"1169": {
+"area": "Midway",
+"category": "thrill",
+"heightText": "Riders must be 46\" to ride"
+},
+"1134": {
+"area": "Midway",
+"category": "thrill",
+"heightText": "Riders must be 55\" to ride and 77\" max"
+},
+"1120": {
+"area": "Midway"
+},
+"1151": {
+"area": "Midway",
+"category": "family",
+"heightText": "Riders must be 42\" to ride"
+},
+"1093": {
+"area": "Midway",
+"category": "family",
+"heightText": "Riders must be 48\" to ride alone 42\" to ride with a adult"
+},
+"1150": {
+"area": "Midway",
+"category": "thrill",
+"heightText": "Riders must be 48\" to ride"
+},
+"1135": {
+"area": "Midway",
+"category": "thrill",
+"heightText": "Riders must be 55\" to ride"
+},
+"1098": {
+"area": "Midway",
+"category": "family",
+"heightText": "Riders must be 50\" to ride with paying adult"
+},
+"1164": {
+"area": "Midway",
+"category": "thrill",
+"heightText": "Riders must be 48\" to ride"
+},
+"1173": {
+"area": "Midway"
+},
+"1096": {
+"area": "Midway"
+},
+"1110": {
+"area": "Midway"
+},
+"1116": {
+"area": "Midway"
+},
+"1100": {
+"area": "Midway"
+},
+"1167": {
+"area": "Midway"
+},
+"1108": {
+"area": "Midway",
+"category": "thrill",
+"heightText": "Riders must be 52\" to ride alone 42\" with paying adult"
+},
+"1144": {
+"area": "Midway"
+},
+"1097": {
+"area": "Midway"
+},
+"1178": {
+"area": "Midway"
+},
+"1145": {
+"area": "Midway"
+},
+"1176": {
+"area": "Midway",
+"category": "thrill",
+"heightText": "Riders must be 48\" to ride alone 42\" with paying adult"
+},
+"1127": {
+"area": "Midway"
+},
+"1099": {
+"area": "Midway"
+},
+"1109": {
+"area": "Midway",
+"category": "thrill",
+"heightText": "Riders must be 48\" to ride"
+},
+"1126": {
+"area": "Midway",
+"category": "thrill",
+"heightText": "Riders must be 42\" to ride"
+},
+"1177": {
+"area": "Midway"
+},
+"1148": {
+"area": "Old Midway"
+},
+"1165": {
+"area": "Old Midway",
+"category": "thrill",
+"heightText": "Riders must be 46\" to ride"
+},
+"1152": {
+"area": "Old Midway",
+"category": "thrill",
+"heightText": "Riders must be 42\" to ride"
+},
+"1166": {
+"area": "Old Midway",
+"category": "family",
+"heightText": "Riders must be 42\" to ride 36\" with paying adult"
+},
+"1125": {
+"area": "Old Midway",
+"category": "thrill",
+"heightText": "Riders must be 48\" to ride alone 42\" to ride with a adult"
+},
+"1142": {
+"area": "Old Midway",
+"category": "family",
+"heightText": "Riders must be 42\" to ride alone 36\" to ride with a adult"
+},
+"1181": {
+"area": "Old Midway"
+},
+"1179": {
+"area": "Old Midway",
+"category": "thrill",
+"heightText": "Riders must be 48\" to ride"
+},
+"1141": {
+"area": "Old Midway",
+"category": "family",
+"heightText": "Riders must be 42\" to ride alone 36\" to ride with a adult"
+},
+"1191": {
+"area": "Scott North"
+},
+"1124": {
+"area": "Scott North",
+"category": "family",
+"heightText": "Riders must be 48\" to ride alone 42\" to ride with a adult"
+},
+"1115": {
+"area": "Scott North",
+"category": "family",
+"heightText": "Riders must be 42\" to ride with paying adult"
+},
+"1146": {
+"area": "Scott North"
+},
+"1170": {
+"area": "Scott North",
+"category": "family",
+"heightText": "Riders must be 48\" to ride alone 38\" to ride with a adult"
+},
+"1186": {
+"area": "Scott North",
+"category": "kiddie",
+"heightText": "Riders must be 42\" to ride alone 36\" to ride with a adult"
+},
+"1118": {
+"area": "Scott North"
+},
+"1187": {
+"area": "Scott North"
+},
+"1147": {
+"area": "Scott North",
+"category": "family",
+"heightText": "Riders must be 42\" to ride alone 36\" to ride with a adult"
+},
+"1160": {
+"area": "Scott South"
+},
+"1188": {
+"area": "Scott South",
+"category": "family",
+"heightText": "Riders must be 40\" to ride"
+},
+"1138": {
+"area": "Scott South"
+},
+"1189": {
+"area": "Scott South",
+"category": "family",
+"heightText": "Riders must be 49\" to ride alone 36\" to ride with a adult"
+},
+"1114": {
+"area": "Scott South",
+"category": "kiddie",
+"heightText": "Riders must be 36\" to ride alone and 52\"max"
+},
+"1143": {
+"area": "Scott South"
+},
+"1092": {
+"area": "Scott South",
+"category": "kiddie",
+"heightText": "Riders must be 36\" to ride alone and 54\"max"
+},
+"1161": {
+"area": "Scott South"
+},
+"1696": {
+"area": null
+},
+"1694": {
+"area": null
+},
+"1158": {
+"area": null
+},
+"1159": {
+"area": null
+}
+}
