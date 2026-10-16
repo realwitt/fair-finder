@@ -24,7 +24,7 @@ while (i < N) {
   await ctx.setGeolocation({ latitude: START.latitude + (T.lat - START.latitude) * f + (i % 3) * 1e-6, longitude: START.longitude + (T.lon - START.longitude) * f, accuracy: i % 10 === 5 ? 60 : 6 });
   await compass((i * 7) % 360);
   if (i % 8 === 1) { const m = p.locator('#map'); const bb = await m.boundingBox(); await p.mouse.move(bb.x + 200, bb.y + 250); await p.mouse.down(); await p.mouse.move(bb.x + 120, bb.y + 200, { steps: 5 }); await p.mouse.up(); }
-  if (i % 8 === 3) { if (await p.locator('#results').isVisible()) await p.click('#closeResults'); await p.mouse.click(60, 300); } // tap on bare map
+  if (i % 8 === 3) { if (await p.locator('#results').isVisible()) await p.click('#closeResults'); for (const c of ['#closeNear', '#closeFav']) if (await p.locator(c).isVisible()) await p.click(c); /* v7.6: Near me is a full sheet now, so close it before the bare-map tap */ await p.mouse.click(60, 300); } // tap on bare map
   if (i % 8 === 5) { await p.fill('#q', ['lemonade', 'hot dog', 'pizza'][i % 3]); await p.waitForTimeout(300); }
   if (i % 8 === 6) await p.locator('.chip').nth(i % 5).click();
   if (i % 10 === 7) await p.evaluate(() => { Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true }); document.dispatchEvent(new Event('visibilitychange')); Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true }); document.dispatchEvent(new Event('visibilitychange')); });
