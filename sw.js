@@ -48,7 +48,19 @@ self.addEventListener('fetch', e => {
   e.respondWith((async () => {
     const c = await caches.open(V);
     try {
-      const r = await Promise.race([fetch(req.mode === 'navigate' ? req.url : req, { cache: 'no-cache' }), new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 4000))]);
+      const nav = req.mode === 'navigate';
+      // Navigations use redirect:'manual' so a server redirect (e.g. the Pages custom-domain 301 to another origin)
+      // goes back to the browser as an opaque redirect it follows itself. A *followed* redirect handed to a navigation
+      // is a network error in Chrome, and a cross-origin follow without CORS would fall back to a stale cached shell.
+      const r = await Promise.race([fetch(nav ? req.url : req, nav ? { cache: 'no-cache', redirect: 'manual' } : { cache: 'no-cache' }), new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 4000))]);
+      if (r.type === 'opaqueredirect') {
+        // The app's own start page redirects: the site has moved. Step aside (unregister + drop our caches) so this
+        // origin is no longer served from a stale shell; the browser follows the redirect to the new home.
+        if (new URL(url).pathname === new URL(self.registration.scope).pathname)
+          e.waitUntil(self.registration.unregister().then(() => caches.keys()).then(ks => Promise.all(ks.filter(k => k.startsWith('ff-')).map(k => caches.delete(k)))));
+        return r;
+      }
+      if (r.redirected) return nav ? Response.redirect(r.url, 302) : r; // never cache or hand a followed redirect to a navigation
       if (r.ok) c.put(req, r.clone()); return r;
     } catch (err) {
       if (req.mode === 'navigate') {
