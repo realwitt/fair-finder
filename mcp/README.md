@@ -23,7 +23,7 @@ No account and no API key.
 - `type: "ride"` matches public ride names and lot-label aliases.
 - `type: "any"` (default) mixes them.
 
-Each hit is `tier: "direct"` or `tier: "likely"`. Direct hits are exact or strong name and lot-label matches, plus menu matches on the user's own words (light typos, plurals, and spacing). Likely hits are matches that needed a synonym or concept expansion, or partial matches. `direct` is filled before `likely`. `limit` caps the two lists together (default 10, max 25). `results` is `direct` then `likely`.
+Each hit is `tier: "direct"` or `tier: "likely"`. Direct hits are exact or strong name and lot-label matches, plus menu matches on the user's own words (light typos, plurals, and spacing). Likely hits are matches that needed a synonym or concept expansion, or partial matches. `direct` is filled before `likely`. `limit` caps the two lists together (default 10, max 25).
 
 `get_details` returns the full record for one id such as `L0-1099`. Matching is case-insensitive and ignores trailing punctuation.
 
@@ -37,7 +37,7 @@ Menus and ticket counts come from the fair's published Food & Ride Finder and ca
 
 ## Privacy
 
-No accounts. The worker does not log IPs, rate-limit keys, or query text. The client IP is combined with a secret salt and SHA-256-hashed only to form a rate-limit key. The limit is 60 requests per minute per client.
+No accounts. The worker does not log IPs, rate-limit keys, or query text. The client IP is combined with a secret salt and SHA-256-hashed only to form a rate-limit key. The limit is 60 requests per minute per client (IPv6 clients are counted per /64), enforced by the Workers rate-limiting binding plus an in-memory per-isolate backstop. Workers observability/logs are off for this script.
 
 Set the salt before deploy:
 
@@ -56,7 +56,7 @@ node build.mjs
 node test/local.test.mjs
 ```
 
-`build.mjs` writes one self-contained file, `dist/worker.js`, plus `dist/meta.json`. If `../data/synonyms.json` exists, it is inlined and used as the concept map. Deploy is a later step, not part of the local build:
+`build.mjs` writes one self-contained file, `dist/worker.js`, plus `dist/meta.json`. If `../data/synonyms.json` exists, it is inlined and used as the concept map. Deploy with wrangler (or, as done for v7.4, by uploading `dist/worker.js` through the Cloudflare API with the `RL` ratelimit binding and a random `SALT` secret_text binding):
 
 ```bash
 npx wrangler deploy
