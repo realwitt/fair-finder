@@ -126,6 +126,8 @@ async function handleWrite(request, env, origin, kind) {
   if (!env || !env.SALT_SECRET) return json(500, { ok: false }, origin);
   const now = nowMs(env);
   if (await rateLimit(env, request, now)) return json(429, { ok: false }, origin);
+  const cl = Number(request.headers.get('Content-Length') || 0);
+  if (cl > 512) return json(413, { ok: false }, origin);
   const buf = await request.arrayBuffer();
   if (buf.byteLength > 512) return json(413, { ok: false }, origin);
   const ct = request.headers.get('Content-Type') || '';
