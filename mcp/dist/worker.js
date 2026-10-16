@@ -2630,7 +2630,13 @@ function empty(status, extra) {
 const MEM = { minute: 0, counts: new Map(), salt: '' };
 // Per-client limit: 60 requests/minute. Key = SHA-256(secret salt + IP); the raw IP is never stored or logged.
 async function rateLimit(request, env) {
-  const material = String((env && env.SALT) || MEM.salt || (MEM.salt = crypto.randomUUID())) + ':' + String(request.headers.get('CF-Connecting-IP') || '');
+  let ip = String(request.headers.get('CF-Connecting-IP') || '');
+  if (ip.includes(':')) { // IPv6: limit per /64, since one client can rotate through a whole /64
+    const [head, tail] = ip.split('::'); const h = head.split(':'); const t = tail == null ? [] : tail.split(':');
+    const full = h.concat(Array(Math.max(0, 8 - h.length - t.length)).fill('0'), t);
+    ip = full.slice(0, 4).map(x => (x || '0').toLowerCase()).join(':') + '::/64';
+  }
+  const material = String((env && env.SALT) || MEM.salt || (MEM.salt = crypto.randomUUID())) + ':' + ip;
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(material));
   const key = [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
   let success = true;
