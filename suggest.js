@@ -120,8 +120,13 @@
       entries.push(entry('booth', b.id, b.name, b.name, { sub: sub }));
     }
     const best = new Map();
+    const FS = getFS();
     function considerFood(raw) {
       if (!raw || typeof raw !== 'string') return;
+      if (FS && FS.stripNegations) {
+        raw = FS.stripNegations(raw).replace(/\(\s*\)/g, ' ').replace(/\s+/g, ' ').trim();
+        if (!raw || !/[a-z0-9]/i.test(raw)) return;
+      }
       const n = norm(raw);
       const c = compactFromNorm(n);
       if (!c) return;
@@ -142,7 +147,6 @@
       entries.push(entry('food', foods[i], foods[i], foods[i]));
       kept.add(compact(foods[i]));
     }
-    const FS = getFS();
     const syn = FS && FS.SYN;
     if (syn) {
       for (let i = 0; i < syn.length; i++) {

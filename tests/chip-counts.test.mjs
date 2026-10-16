@@ -23,8 +23,8 @@ function direct(q) {
 // Floors are the v7.3.1 counts minus booths that only matched by edit distance or by
 // joining words from different dishes. Ceilings are the v7.3.1 counts.
 const RANGE = {
-  'hot dog': [55, 63], // dropped: Borgil, Leaf Massage x2, SBI x2, Prince Group, Royer's (sausage~massage / arson dog), OMC churro dog
-  'corn dog': [43, 49], // dropped: SBI x2 (arson dog), Spiffy Duds x2 (bandanas), Veronica's dog treats, OMC churro dog + corn bowl
+  'hot dog': [53, 63], // also dropped false hits: Demitiri’s Original "(No Hot Dogs/Sausage)", Lee, Dennis "Coffee.(No Hot Dogs or Burgers)"
+  'corn dog': [33, 49], // also dropped hot-dog-only related rows: Brinkley, Clark Lorene, Demitiri’s Original, Exchange Club Of New Hope/Wilders, Granny's Country Kitchen, Lee Dennis, Santillo Sausage, Steve's Dog House, Tim's Ole Time Hot Dogs, Zell's Italian Sausage
   'funnel cake': [19, 19],
   'ice cream': [19, 22], // dropped: Hot Chix (whipped cream), Pretzel Lady (mustard pretzels), Pickle Bun (ice pop + cream cheese)
   'bbq': [34, 36], // dropped: Serenity (baskets~barbecue), Kreyol Flavor (oxtail "pulled", not a barbecue stand)
@@ -55,5 +55,21 @@ const split = FoodSearch.prepare({
 });
 ok(!FoodSearch.match(split, 'corn dog', { allowFuzzy: false, synonymExpand: true }), 'corn and dog in different items do not match');
 ok(!cornNames.includes('OMC! Oh My Churro') && !direct('corn dog').some(h => /Party In A Pita/.test(h.booth.name) && h.matched.every(m => /taco/i.test(m))), 'corn dog does not keep a taco-only hit');
+const negName = n => /Demitiri/.test(n) || /Lee, Dennis/.test(n);
+const hotNames = direct('hot dog').map(h => h.booth.name);
+ok(!hotNames.some(negName), 'negation booths excluded from hot dog');
+ok(!cornNames.some(negName), 'negation booths excluded from corn dog');
+// Related rows are score < 0.85 (the old hot-dog expansion). Slash menus like "Corn/hot Dogs" stay: they are real corn dogs.
+const hotDogOnly = direct('corn dog').filter(h => h.score < 0.85);
+ok(hotDogOnly.length === 0, 'corn dog has no hot-dog-only related rows ' + hotDogOnly.map(h => h.booth.name + ' ' + (h.matched || []).join('/')).join(' | '));
+ok(FoodSearch.negationItems('(No Hot Dogs/Sausage)').join(',') === 'hot dog,sausage', 'slash negation parses hot dog and sausage');
+ok(FoodSearch.negationItems('Coffee.(No Hot Dogs or Burgers)').join(',') === 'hot dog,burger', 'or negation parses hot dog and burger');
+ok(FoodSearch.negationItems('no hot dog').join(',') === 'hot dog', 'lowercase no hot dog');
+ok(FoodSearch.negationItems('No Hot Dogs').join(',') === 'hot dog', 'No Hot Dogs');
+const coffeeLine = FoodSearch.prepare({ id: 'fake-c', name: 'C', products: '', items: ['Coffee.(No Hot Dogs or Burgers)'] });
+ok(FoodSearch.match(coffeeLine, 'coffee', { allowFuzzy: false, synonymExpand: true }) && !FoodSearch.match(coffeeLine, 'hot dog', { allowFuzzy: false, synonymExpand: true }) && !FoodSearch.match(coffeeLine, 'burger', { allowFuzzy: false, synonymExpand: true }), 'negated phrase is not a match; the rest of the line still is');
+const saidBoth = FoodSearch.prepare({ id: 'fake-both', name: 'Both', products: 'Hot dogs. (No Hot Dogs)', items: ['Hot dogs', '(No Hot Dogs)'] });
+ok(!FoodSearch.match(saidBoth, 'hot dog', { allowFuzzy: false, synonymExpand: true }), 'a No hot dogs line excludes the booth from hot dog');
+ok(direct('gyro').some(h => /Demitiri/.test(h.booth.name)) && direct('coffee').some(h => /Lee, Dennis/.test(h.booth.name)), 'negation booths stay in the foods they do sell');
 console.log(fails.length ? fails.length + ' FAILURES\n' + fails.join('\n') : 'ALL PASS');
 process.exit(fails.length ? 1 : 0);
