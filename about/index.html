@@ -18,7 +18,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="../icons/icon-192.png">
 <link rel="apple-touch-icon" href="../icons/icon-192.png">
-<link rel="stylesheet" href="about.css?v=75">
+<link rel="stylesheet" href="about.css?v=76">
 </head>
 <body>
 <header class="hero">
@@ -57,6 +57,7 @@
         <div><h3>Share a booth link</h3><p>Found the good corn dogs? Tap Share to send a link. Your friend opens it and gets walking directions to that booth from wherever they are.</p></div>
       </div>
     </div>
+    <p>Popular booths show under the search box when several devices have walked up to them or tapped the same food. Counts are anonymous, and a booth or food appears only after at least 5 different devices. Turn sharing off in the app’s Layers panel.</p>
   </div>
 </section>
 
@@ -95,7 +96,7 @@
     <h3>Accuracy</h3>
     <p>Booth locations and menus come from the fair’s published data and may change during the fair. ATM locations are approximate. Walking routes come from OpenStreetMap and don’t reflect temporary booths, closures or crowds. Follow posted signs and staff directions; use at your own risk. Provided as-is, with no warranty.</p>
     <h3>Privacy</h3>
-    <p>Your location is used only on your device to show where you are and guide you. It is never sent to us or stored on a server. No accounts, no analytics, no tracking cookies. The app saves the booth you’re guiding to in your browser so it can resume, and whether the guide panel was open. Favorites are stored only on this device (localStorage) and are never sent anywhere. The site is hosted. on GitHub Pages, which logs visitor IP addresses for security. Map images load from OpenStreetMap, Esri and the fair’s ArcGIS server, which see normal web requests. The optional AI connector (MCP server, hosted on Cloudflare Workers) serves only the same public booth and ride data and is read-only: no accounts, and no logging of what you search. To limit abuse it counts requests per minute using a salted, one-way hash of your IP address; raw IP addresses are not stored.</p>
+    <p>Your location is used only on your device to show where you are and guide you. It is never sent to us or stored on a server. Unless you opt out, the app sends a random device id created on this device (the server stores only a salted hash of it), the booth id when your GPS shows you arriving within about 50 ft of a booth, and the food chip or booth you pick (never what you type). Your IP address is used only as a salted, daily-rotated hash for rate limiting; raw IP addresses are not stored, and those rate-limit rows are deleted in about 2 hours. Visit and tap rows are deleted after 3 days. A booth or search appears only after at least 5 different devices. No accounts, no ads, no tracking cookies. The app saves the booth you’re guiding to in your browser so it can resume, and whether the guide panel was open. Favorites are stored only on this device (localStorage) and are never sent anywhere. Opt out in the Layers panel, or clear this site's data in your browser (which also resets the device id). The site is hosted on GitHub Pages, which logs visitor IP addresses for security. Map images load from OpenStreetMap, Esri and the fair’s ArcGIS server, which see normal web requests. The optional AI connector (MCP server, hosted on Cloudflare Workers) serves only the same public booth and ride data and is read-only: no accounts, and no logging of what you search. To limit abuse it counts requests per minute using a salted, one-way hash of your IP address; raw IP addresses are not stored. Cloudflare sees normal web requests to the counter.</p>
     <h3>Credits</h3>
     <ul>
       <li>Map data <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a> contributors</li>

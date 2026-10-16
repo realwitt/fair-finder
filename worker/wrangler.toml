@@ -1,0 +1,11 @@
+name = "fair-finder-stats"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "fair-finder-stats"
+database_id = "21e906de-74cd-4758-a797-82de92565f22"
+
+[triggers]
+crons = ["17 * * * *"]

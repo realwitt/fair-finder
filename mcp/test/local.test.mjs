@@ -61,7 +61,7 @@ const list = await rpc({ jsonrpc: '2.0', id: 3, method: 'tools/list' });
 const toolArr = list.json && list.json.result && list.json.result.tools || [];
 const names = toolArr.map(t => t.name);
 check('tools/list',
-  names.includes('search') && names.includes('get_details') && names.includes('nearby') && names.length === 3
+  names.includes('search') && names.includes('get_details') && names.includes('nearby') && names.includes('popular_now') && names.length === 4
   && toolArr.every(t => t.inputSchema && t.inputSchema.properties && t.annotations && t.annotations.readOnlyHint === true));
 
 const opt = await raw('https://example.test/anything', { method: 'OPTIONS' });
@@ -78,7 +78,7 @@ const getMcp = await raw('https://example.test/mcp', { method: 'GET' });
 check('GET /mcp 405', getMcp.res.status === 405 && (getMcp.res.headers.get('Allow') || '').includes('POST'));
 
 const health = await raw('https://example.test/', { method: 'GET' });
-check('GET / health', health.json && JSON.stringify(health.json.tools) === JSON.stringify(['search', 'get_details', 'nearby']));
+check('GET / health', health.json && JSON.stringify(health.json.tools) === JSON.stringify(['search', 'get_details', 'nearby', 'popular_now']) && /popular_now only reads aggregate counts/.test(health.json.privacy || ''));
 
 const plain = await raw('https://example.test/mcp', {
   method: 'POST',
@@ -172,8 +172,8 @@ const workerPath = join(dirname(fileURLToPath(import.meta.url)), '../dist/worker
 const src = readFileSync(workerPath, 'utf8');
 check('no console.', !src.includes('console.'));
 
-check('version 1.1.0 and amenity enum',
-  init.json && init.json.result && init.json.result.serverInfo.version === '1.1.0'
+check('version 1.2.0 and amenity enum',
+  init.json && init.json.result && init.json.result.serverInfo.version === '1.2.0'
   && toolArr.some(t => t.name === 'search' && t.inputSchema.properties.type.enum.includes('amenity'))
   && toolArr.some(t => t.name === 'nearby' && t.inputSchema.properties.type.enum.includes('amenity')));
 
@@ -216,5 +216,42 @@ check('get_details am-restroom-3',
   amDet.sc && amDet.sc.type === 'amenity' && amDet.sc.amenity_type === 'restroom' && amDet.sc.location === 'approximate'
   && String(amDet.sc.fair_finder_link).includes('?booth=am-restroom-3')
   && amDet2.sc && amDet2.sc.id === 'am-restroom-3');
+
+const realFetch = globalThis.fetch;
+const popBooth = 'L0-1301';
+globalThis.fetch = async (url) => {
+  const u = String(url);
+  if (u === 'https://fair-finder-stats.lively-shape-f373.workers.dev/top-searches?window=now') {
+    return new Response(JSON.stringify({ window: 'now', items: [{ k: 'chip:hot-dog', n: 6 }] }), { status: 200, headers: { 'content-type': 'application/json' } });
+  }
+  if (u === 'https://fair-finder-stats.lively-shape-f373.workers.dev/top?window=now') {
+    return new Response(JSON.stringify({ window: 'now', items: [{ id: popBooth, n: 7 }] }), { status: 200, headers: { 'content-type': 'application/json' } });
+  }
+  throw new Error('unexpected ' + u);
+};
+const pop = await tool('popular_now', {});
+check('popular_now maps a booth',
+  pop.result && pop.result.isError === false
+  && pop.sc && pop.sc.items && pop.sc.items[0] && pop.sc.items[0].id === popBooth
+  && pop.sc.items[0].name && pop.sc.items[0].fair_finder_link.includes('?booth=' + popBooth)
+  && pop.sc.items[0].n === 7
+  && pop.sc.searches && pop.sc.searches[0] && pop.sc.searches[0].k === 'chip:hot-dog' && pop.sc.searches[0].n === 6
+  && pop.sc.note === '');
+check('popular_now readOnlyHint', toolArr.some(t => t.name === 'popular_now' && t.annotations && t.annotations.readOnlyHint === true));
+
+globalThis.fetch = async () => new Response(JSON.stringify({ window: 'now', items: [] }), { status: 200, headers: { 'content-type': 'application/json' } });
+const popEmpty = await tool('popular_now', {});
+check('popular_now empty payload',
+  popEmpty.result && popEmpty.result.isError === false
+  && popEmpty.sc && popEmpty.sc.items.length === 0 && popEmpty.sc.searches.length === 0
+  && popEmpty.sc.note === 'not enough recent activity yet');
+
+globalThis.fetch = async () => { throw new Error('down'); };
+const popDown = await tool('popular_now', {});
+check('popular_now thrown fetch',
+  popDown.result && popDown.result.isError === false
+  && popDown.sc && popDown.sc.items.length === 0 && popDown.sc.searches.length === 0
+  && popDown.sc.note === 'not enough recent activity yet');
+globalThis.fetch = realFetch;
 
 if (failed) process.exitCode = 1;

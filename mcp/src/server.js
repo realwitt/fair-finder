@@ -1,4 +1,4 @@
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 const PROTOCOLS = ['2025-11-25', '2025-06-18', '2025-03-26', '2024-11-05'];
 const INSTRUCTIONS = 'Fair Finder is an independent, UNOFFICIAL guide to the 2026 N.C. State Fair (Oct 15-25, Raleigh). It is not affiliated with or endorsed by the N.C. State Fair or NCDA&CS. Data: the fair\'s published Food & Ride Finder booth and ride points (names, menus, ticket counts), plus approximate ride height/category from the midway operator. Use search to find foods, booths, rides, or approximate amenities (restrooms, ATMs, first aid, nursing rooms, information, lost and found, wheelchair rental); get_details for one item; nearby for things close to a lat/lon. Every result has a fair_finder_link the user can open on their phone to walk there with live directions. Menus and tickets can change; tell users to check posted signs. Official info: https://www.ncstatefair.org/';
 const UNOFFICIAL_NOTE = 'Unofficial guide. Locations/menus from the fair\u2019s published data; may change.';
@@ -295,6 +295,39 @@ function partialNote(tokens, chosen) {
 }
 
 function link(id) { return 'https://realwitt.github.io/fair-finder/?booth=' + id; }
+
+const STATS_BASE = 'https://fair-finder-stats.lively-shape-f373.workers.dev';
+const QUIET_NOTE = 'not enough recent activity yet';
+
+async function popularNow() {
+  const empty = { items: [], searches: [], note: QUIET_NOTE };
+  try {
+    const opts = { signal: AbortSignal.timeout(3000) };
+    const [topRes, searchRes] = await Promise.all([
+      fetch(STATS_BASE + '/top?window=now', opts),
+      fetch(STATS_BASE + '/top-searches?window=now', opts),
+    ]);
+    if (!topRes.ok || !searchRes.ok) return empty;
+    const top = await topRes.json();
+    const searchesJson = await searchRes.json();
+    const items = [];
+    for (const it of (top && top.items) || []) {
+      if (!it || typeof it.id !== 'string') continue;
+      const b = BOOTH_BY.get(it.id);
+      if (!b) continue;
+      items.push({ id: b.id, name: b.name, area: b.area || '', fair_finder_link: link(b.id), n: it.n });
+    }
+    const searches = [];
+    for (const it of (searchesJson && searchesJson.items) || []) {
+      if (!it || typeof it.k !== 'string' || typeof it.n !== 'number') continue;
+      searches.push({ k: it.k, n: it.n });
+    }
+    if (!items.length && !searches.length) return empty;
+    return { items, searches, note: '' };
+  } catch (e) {
+    return empty;
+  }
+}
 
 function new2026String(nf) {
   if (!nf) return '';
@@ -803,15 +836,23 @@ function tools() {
       },
       annotations: ann('What is near a point'),
     },
+    {
+      name: 'popular_now',
+      title: 'Popular right now',
+      description: 'Read anonymous aggregate counts of booths people are walking to, and of food chips or booths people picked, over the last few hours. Returns items (id, name, area, fair_finder_link, n), searches ({k, n}), and a note. If the counter is unreachable or nothing qualifies, items and searches are empty and the note is "not enough recent activity yet". popular_now only reads aggregate counts.',
+      inputSchema: { type: 'object', properties: {} },
+      annotations: { readOnlyHint: true, openWorldHint: true, idempotentHint: true, title: 'Popular right now' },
+    },
   ];
 }
 
-function callTool(name, args) {
+async function callTool(name, args) {
   let result;
   if (name === 'search') result = searchTool(args);
   else if (name === 'get_details') result = getDetails(args);
   else if (name === 'nearby') result = nearbyTool(args);
-  else return toolError('Unknown tool "' + String(name) + '". Tools are search, get_details, and nearby.');
+  else if (name === 'popular_now') result = await popularNow();
+  else return toolError('Unknown tool "' + String(name) + '". Tools are search, get_details, nearby, and popular_now.');
   if (result && result.fail) return toolError(result.fail);
   return toolOk(result);
 }
@@ -819,7 +860,7 @@ function callTool(name, args) {
 function rpcOk(id, result) { return { jsonrpc: '2.0', id, result }; }
 function rpcErr(id, code, message) { return { jsonrpc: '2.0', id, error: { code, message } }; }
 
-function handleRpc(msg) {
+async function handleRpc(msg) {
   if (!msg || typeof msg !== 'object' || Array.isArray(msg)) {
     return { body: rpcErr(null, -32600, 'Invalid Request') };
   }
@@ -844,7 +885,7 @@ function handleRpc(msg) {
   if (method === 'tools/list') return { body: rpcOk(msg.id, { tools: tools() }) };
   if (method === 'tools/call') {
     const args = params.arguments && typeof params.arguments === 'object' && !Array.isArray(params.arguments) ? params.arguments : {};
-    return { body: rpcOk(msg.id, callTool(params.name, args)) };
+    return { body: rpcOk(msg.id, await callTool(params.name, args)) };
   }
   if (method === 'resources/list') return { body: rpcOk(msg.id, { resources: [] }) };
   if (method === 'prompts/list') return { body: rpcOk(msg.id, { prompts: [] }) };
@@ -906,14 +947,14 @@ async function handlePost(request, env) {
   if (Array.isArray(msg)) {
     const bodies = [];
     for (const one of msg) {
-      const r = handleRpc(one);
+      const r = await handleRpc(one);
       if (!r.notification) bodies.push(r.body);
     }
     if (!bodies.length) return empty(202);
     return json(200, bodies);
   }
   if (!msg || typeof msg !== 'object') return json(200, rpcErr(null, -32600, 'Invalid Request'));
-  const r = handleRpc(msg);
+  const r = await handleRpc(msg);
   if (r.notification) return empty(202);
   return json(200, r.body);
 }
@@ -924,9 +965,9 @@ function health(env) {
     name: 'fair-finder-mcp',
     version: VERSION,
     endpoint: '/mcp',
-    tools: ['search', 'get_details', 'nearby'],
+    tools: ['search', 'get_details', 'nearby', 'popular_now'],
     unofficial: INSTRUCTIONS,
-    privacy: 'No account. The worker does not log IPs, rate-limit keys, or query text. The client IP is salted and SHA-256-hashed only as a rate-limit key.',
+    privacy: 'No account. The worker does not log IPs, rate-limit keys, or query text. The client IP is salted and SHA-256-hashed only as a rate-limit key. popular_now only reads aggregate counts.',
   };
 }
 

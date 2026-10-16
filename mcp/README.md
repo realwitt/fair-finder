@@ -34,11 +34,11 @@ Every hit includes `fair_finder_link` (`https://realwitt.github.io/fair-finder/?
 
 Menus and ticket counts come from the fair's published Food & Ride Finder and can change. Check the signs at the booth. Ride height and category, when present, are approximate and come from the midway operator.
 
-`popular_now` is planned and is not a tool yet. It waits on FF-RANK.
+`popular_now` reads anonymous aggregate counts from the Fair Finder counter: booths people walked to, and food chips or booths people picked, over the last few hours. It returns `{items, searches, note}`. Each booth item has `id`, `name`, `area`, `fair_finder_link`, and `n`. Searches are `{k, n}`. If the counter is unreachable or nothing qualifies, `items` and `searches` are empty and `note` is `not enough recent activity yet`. popular_now only reads aggregate counts. It does not send a location or any free text.
 
 ## Privacy
 
-No accounts. The worker does not log IPs, rate-limit keys, or query text. The client IP is combined with a secret salt and SHA-256-hashed only to form a rate-limit key. The limit is 60 requests per minute per client (IPv6 clients are counted per /64), enforced by the Workers rate-limiting binding plus an in-memory per-isolate backstop. Workers observability/logs are off for this script.
+No accounts. The worker does not log IPs, rate-limit keys, or query text. The client IP is combined with a secret salt and SHA-256-hashed only to form a rate-limit key. popular_now only reads aggregate counts from the stats counter. The limit is 60 requests per minute per client (IPv6 clients are counted per /64), enforced by the Workers rate-limiting binding plus an in-memory per-isolate backstop. Workers observability/logs are off for this script.
 
 Set the salt before deploy:
 

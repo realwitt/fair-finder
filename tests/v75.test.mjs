@@ -325,7 +325,7 @@ const stopped = await p.evaluate(() => {
 ok(!stopped.has && stopped.display === 'none' && stopped.circle, 'no heading hides the arrow, accuracy circle stays ' + JSON.stringify(stopped));
 
 // 16. version + privacy
-ok((await p.textContent('#version')) === 'v7.5 · Oct 15', 'version ' + await p.textContent('#version'));
+ok((await p.textContent('#version')) === 'v7.6 · Oct 15', 'version ' + await p.textContent('#version'));
 await p.click('#btnLayers');
 await p.click('#aboutLink');
 await p.waitForTimeout(200);

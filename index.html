@@ -16,8 +16,8 @@
 <meta name="twitter:card" content="summary">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="stylesheet" href="vendor/leaflet.css?v=75">
-<link rel="stylesheet" href="style.css?v=75">
+<link rel="stylesheet" href="vendor/leaflet.css?v=76">
+<link rel="stylesheet" href="style.css?v=76">
 </head>
 <body>
 <div id="map" aria-label="Map"></div>
@@ -49,6 +49,7 @@
     <button type="button" class="qa" id="qaAtm">💲 Nearest ATM</button>
     <button type="button" class="qa" id="qaAid">⛑ Nearest first aid</button>
   </div>
+  <div id="popular" class="hidden" role="region" aria-label="Popular"></div>
 </header>
 
 <div id="status" role="status">Starting GPS…</div>
@@ -76,6 +77,7 @@
   <label class="row"><input type="checkbox" id="tglATM"> 💲 ATMs <small>(from the fair’s published grounds map, approx.)</small></label>
   <label class="row"><input type="checkbox" id="tglAmenities"> 🚻 Amenities (approx.)</label>
   <label class="row"><input type="checkbox" id="tglDrinks"> 🥤 Drink booths <small>(booths whose fair listing mentions drinks)</small></label>
+  <label class="row"><input type="checkbox" id="tglStats" checked> Share anonymous booth visits &amp; taps (helps rank popular booths)</label>
   <p class="note" id="waterNote">💧 Water refill stations: the fair’s published map and site do <b>not</b> list refill-station locations, so none are shown. A local guide (thisisraleigh.com, unofficial) says there are filling stations across from Casey's Clubhouse and under the trees between Kiddieland and the Scott Building.</p>
   <button id="btnOffline" class="wide">⬇ Save the grounds map for offline</button>
   <p class="note" id="offlineMsg"></p>
@@ -154,14 +156,16 @@
   <div id="aboutBody">Loading…</div>
 </section>
 
-<script src="vendor/leaflet.js?v=75"></script>
-<script src="geo.js?v=75"></script>
-<script src="heading.js?v=75"></script>
-<script src="search.js?v=75"></script>
-<script src="rides.js?v=75"></script>
-<script src="suggest.js?v=75"></script>
-<script src="concepts.js?v=75"></script>
-<script src="route.js?v=75"></script>
-<script src="app.js?v=75"></script>
+<script src="vendor/leaflet.js?v=76"></script>
+<script src="geo.js?v=76"></script>
+<script src="heading.js?v=76"></script>
+<script src="search.js?v=76"></script>
+<script src="rides.js?v=76"></script>
+<script src="suggest.js?v=76"></script>
+<script src="concepts.js?v=76"></script>
+<script src="route.js?v=76"></script>
+<script src="config.js?v=76"></script>
+<script src="stats.js?v=76"></script>
+<script src="app.js?v=76"></script>
 </body>
 </html>

@@ -7,14 +7,14 @@ const OSM = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 // Fair's published grounds-map tile layer full extent (EPSG:3857) converted to lat/lon
 const FAIR_BOUNDS = L.latLngBounds([35.79119, -78.72134], [35.79952, -78.70469]);
 const CENTER = [35.7948, -78.7115];
-const APP_VERSION = 'v7.5 · Oct 15';
+const APP_VERSION = 'v7.6 · Oct 15';
 const $ = id => document.getElementById(id);
 const LS_KEY = 'ff.guideTarget';
 const FAV_KEY = 'ff.favorites.v1';
 const MAP_BEARING = 0;
 function loadFavs() { try { const a = JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); return Array.isArray(a) ? a.filter(x => typeof x === 'string') : []; } catch (e) { return []; } }
 function saveFavs(ids) { try { localStorage.setItem(FAV_KEY, JSON.stringify(ids)); } catch (e) {} }
-const state = { me: null, acc: null, gpsHeading: null, compass: null, compassAt: 0, target: null, booths: [], rides: [], atms: [], amenities: [], results: [], query: '', favs: [], nearType: 'all', pendingNearest: null };
+const state = { me: null, acc: null, gpsHeading: null, compass: null, compassAt: 0, target: null, booths: [], rides: [], atms: [], amenities: [], results: [], query: '', favs: [], nearType: 'all', pendingNearest: null, popular: new Set(), panelMode: 'chips', topBooths: [], topSearches: [] };
 state.favs = loadFavs();
 state.heading = Heading.create();
 window.__ff = state; // exposed for testing
@@ -54,6 +54,16 @@ $('tglRides').onchange = e => e.target.checked ? rideLayer.addTo(map) : map.remo
 $('tglATM').onchange = e => e.target.checked ? atmLayer.addTo(map) : map.removeLayer(atmLayer);
 $('tglAmenities').onchange = e => e.target.checked ? amenityLayer.addTo(map) : map.removeLayer(amenityLayer);
 $('tglDrinks').onchange = e => e.target.checked ? drinkLayer.addTo(map) : map.removeLayer(drinkLayer);
+const tglStats = $('tglStats');
+if (tglStats) {
+  try { tglStats.checked = localStorage.getItem('ff.statsOptOut') !== '1'; } catch (e) {}
+  tglStats.onchange = () => {
+    try {
+      if (tglStats.checked) localStorage.removeItem('ff.statsOptOut');
+      else localStorage.setItem('ff.statsOptOut', '1');
+    } catch (e) {}
+  };
+}
 
 // ---------- URL state (shareable links) ----------
 // ?q=<search>  ?new=1  ?booth=<id>  &ll=<lat>,<lon>&z=<zoom>. Booth ids are the fair GIS object ids (e.g. L0-1314).
@@ -98,7 +108,7 @@ function toast(msg) { const el = $('toast'); el.textContent = msg; el.classList.
 let mvT; map.on('moveend', () => { clearTimeout(mvT); mvT = setTimeout(() => { const c = map.getCenter(); setUrl({ ll: c.lat.toFixed(5) + ',' + c.lng.toFixed(5), z: map.getZoom() }); }, 400); });
 
 // ---------- Legal text (shared with about/) ----------
-const L_ = {"disc_t": "Unofficial guide", "disc": "Fair Finder is an independent, free project. It is not affiliated with, endorsed by, or sponsored by the N.C. State Fair or the N.C. Department of Agriculture &amp; Consumer Services. ‘N.C. State Fair’ is used only to describe the event this guide covers. For official information, see <a href=\"https://www.ncstatefair.org/\" target=\"_blank\" rel=\"noopener\">ncstatefair.org</a>.", "acc": "Booth locations and menus come from the fair’s published data and may change during the fair. ATM locations are approximate. Walking routes come from OpenStreetMap and don’t reflect temporary booths, closures or crowds. Follow posted signs and staff directions; use at your own risk. Provided as-is, with no warranty.", "priv": "Your location is used only on your device to show where you are and guide you. It is never sent to us or stored on a server. No accounts, no analytics, no tracking cookies. The app saves the booth you’re guiding to in your browser so it can resume, and whether the guide panel was open. Favorites are stored only on this device (localStorage) and are never sent anywhere. The site is hosted on GitHub Pages, which logs visitor IP addresses for security. Map images load from OpenStreetMap, Esri and the fair’s ArcGIS server, which see normal web requests. The optional AI connector (MCP server, hosted on Cloudflare Workers) serves only the same public booth and ride data and is read-only: no accounts, and no logging of what you search. To limit abuse it counts requests per minute using a salted, one-way hash of your IP address; raw IP addresses are not stored.", "cred": "<ul class=\"credits\"><li>Map data <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener\">© OpenStreetMap</a> contributors</li><li>Routes: OpenStreetMap data (ODbL) · <a href=\"https://www.openstreetmap.org/fixthemap\" target=\"_blank\" rel=\"noopener\">Report a map issue</a></li><li>Grounds map © N.C. Department of Agriculture &amp; Consumer Services</li><li>Booth data: N.C. State Fair Food &amp; Ride Finder</li><li>Satellite layer (optional): Powered by Esri · Imagery: Esri, Maxar, Earthstar Geographics, and the GIS User Community</li></ul>"};
+const L_ = {"disc_t": "Unofficial guide", "disc": "Fair Finder is an independent, free project. It is not affiliated with, endorsed by, or sponsored by the N.C. State Fair or the N.C. Department of Agriculture &amp; Consumer Services. ‘N.C. State Fair’ is used only to describe the event this guide covers. For official information, see <a href=\"https://www.ncstatefair.org/\" target=\"_blank\" rel=\"noopener\">ncstatefair.org</a>.", "acc": "Booth locations and menus come from the fair’s published data and may change during the fair. ATM locations are approximate. Walking routes come from OpenStreetMap and don’t reflect temporary booths, closures or crowds. Follow posted signs and staff directions; use at your own risk. Provided as-is, with no warranty.", "priv": "Your location is used only on your device to show where you are and guide you. It is never sent to us or stored on a server. Unless you opt out, the app sends a random device id created on this device (the server stores only a salted hash of it), the booth id when your GPS shows you arriving within about 50 ft of a booth, and the food chip or booth you pick (never what you type). Your IP address is used only as a salted, daily-rotated hash for rate limiting; raw IP addresses are not stored, and those rate-limit rows are deleted in about 2 hours. Visit and tap rows are deleted after 3 days. A booth or search appears only after at least 5 different devices. No accounts, no ads, no tracking cookies. The app saves the booth you’re guiding to in your browser so it can resume, and whether the guide panel was open. Favorites are stored only on this device (localStorage) and are never sent anywhere. Opt out in the Layers panel, or clear this site's data in your browser (which also resets the device id). The site is hosted on GitHub Pages, which logs visitor IP addresses for security. Map images load from OpenStreetMap, Esri and the fair’s ArcGIS server, which see normal web requests. The optional AI connector (MCP server, hosted on Cloudflare Workers) serves only the same public booth and ride data and is read-only: no accounts, and no logging of what you search. To limit abuse it counts requests per minute using a salted, one-way hash of your IP address; raw IP addresses are not stored. Cloudflare sees normal web requests to the counter.", "cred": "<ul class=\"credits\"><li>Map data <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener\">© OpenStreetMap</a> contributors</li><li>Routes: OpenStreetMap data (ODbL) · <a href=\"https://www.openstreetmap.org/fixthemap\" target=\"_blank\" rel=\"noopener\">Report a map issue</a></li><li>Grounds map © N.C. Department of Agriculture &amp; Consumer Services</li><li>Booth data: N.C. State Fair Food &amp; Ride Finder</li><li>Satellite layer (optional): Powered by Esri · Imagery: Esri, Maxar, Earthstar Geographics, and the GIS User Community</li></ul>"};
 // ---------- Data ----------
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function isStarrable(b) {
@@ -139,7 +149,7 @@ function popupHtml(b) {
     const alias = b.aliases && b.aliases.length ? `<small>Lot label: ${esc(b.aliases.join(', '))}</small>` : '';
     return `<b>${esc(b.name)}</b> <span class="badge ride">RIDE</span><br><small>${esc(b.area || '')}</small>${pay}${extra.join('')}${alias ? '<br>' + alias : ''}${popBtns(b)}`;
   }
-  return `<b>${esc(b.name)}</b>${b.kind === 'newfood' ? ' <span class="badge new">NEW 2026</span>' : ''}${b.location !== 'exact' ? ' <span class="badge approx">approx. location</span>' : ''}<br>
+  return `<b>${esc(b.name)}</b>${popBadge(b.id)}${b.kind === 'newfood' ? ' <span class="badge new">NEW 2026</span>' : ''}${b.location !== 'exact' ? ' <span class="badge approx">approx. location</span>' : ''}<br>
   <small>${esc(b.area)}${b.lot ? ' · ' + esc(b.lot) : ''}</small>
   ${b.newFood ? `<div><b>New:</b> ${esc(b.newFood.name)}: ${esc(b.newFood.description)}</div>` : ''}
   <div style="max-height:9em;overflow:auto">${esc(b.products || '(no menu listed)')}</div>
@@ -183,6 +193,8 @@ async function loadData() {
   state.rides = ((rd && rd.rides) || []).filter(r => r.lat != null).map(Rides.prepare);
   const rideIds = new Set(state.rides.map(r => r.id));
   state.booths = bd.booths.filter(b => b.lat != null && !rideIds.has(b.id)).map(FoodSearch.prepare);
+  state.tracker = window.Stats ? Stats.createTracker(state.booths) : null;
+  loadTop();
   state.markers = new Map();
   state.booths.filter(b => b.food || b.kind === 'newfood').forEach(b => {
     const m = boothMarker(b).addTo(boothLayer);
@@ -286,6 +298,10 @@ function fuse(lat, lon, acc) {
 function onPos(p) {
   const { latitude: lat, longitude: lon, accuracy, heading, speed } = p.coords;
   state.raw = [lat, lon]; state.me = fuse(lat, lon, accuracy); state.acc = accuracy;
+  if (state.tracker) {
+    const arrived = state.tracker.onFix(state.me[0], state.me[1], accuracy, Date.now());
+    if (arrived) postVisit(arrived);
+  }
   state.fixCount = (state.fixCount || 0) + 1; state.lastFixAt = Date.now(); state.watchRestartsSinceFix = 0;
   if (heading != null && !isNaN(heading) && speed != null && speed > 0.7) { state.gpsHeading = heading; state.gpsHeadingAt = Date.now(); }
   state.heading.onPosition({ latitude: lat, longitude: lon, accuracy: accuracy, speed: speed, heading: heading }, Date.now());
@@ -374,6 +390,142 @@ try { navigator.permissions && navigator.permissions.query({ name: 'geolocation'
 $('btnLocate').onclick = () => { if (!state.compassOn && !state.compassGranted) $('btnCompass').onclick(); // tap also enables the compass beam (iOS needs a tap)
   if (state.me) return map.setView(state.me, Math.max(map.getZoom(), 18)); setStatus(state.gpsDenied ? 'Asking for location again…' : 'No GPS fix yet'); startWatch(); };
 
+// ---------- Anonymous counts (visits and taps) ----------
+function popBadge(id) {
+  return state.popular && state.popular.has(id) ? '<span class="badge pop">🔥 Popular</span>' : '';
+}
+const CHIP_BUTTONS = [
+  ['hot dog', 'Hot dog'],
+  ['corn dog', 'Corn dog'],
+  ['turkey leg', 'Turkey leg'],
+  ['funnel cake', 'Funnel cake'],
+  ['fried cheeseburger', 'Fried cheeseburger'],
+  ['empanada', 'Empanada'],
+  ['lemonade', 'Lemonade'],
+  ['ice cream', 'Ice cream'],
+  ['bbq', 'BBQ'],
+  ['new', '⭐ New 2026'],
+];
+function chipLabel(key) {
+  for (let i = 0; i < CHIP_BUTTONS.length; i++) {
+    if (window.Stats && Stats.chipKey(CHIP_BUTTONS[i][0]) === key) return CHIP_BUTTONS[i];
+  }
+  return null;
+}
+function uuidFallback() {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const h = [...bytes].map(x => x.toString(16).padStart(2, '0')).join('');
+  return h.slice(0, 8) + '-' + h.slice(8, 12) + '-' + h.slice(12, 16) + '-' + h.slice(16, 20) + '-' + h.slice(20);
+}
+function deviceId() {
+  let id = localStorage.getItem('ff.deviceId');
+  if (id) return id;
+  id = crypto.randomUUID ? crypto.randomUUID() : uuidFallback();
+  localStorage.setItem('ff.deviceId', id);
+  return id;
+}
+function boothAllowed(id) {
+  return !!(id && state.booths && state.booths.some(b => b.id === id));
+}
+function searchAllowed(k) {
+  if (typeof k !== 'string' || !window.Stats) return false;
+  if (k.indexOf('chip:') === 0) return Stats.CHIP_KEYS.indexOf(k.slice(5)) !== -1;
+  if (k.indexOf('booth:') === 0) return boothAllowed(k.slice(6));
+  return false;
+}
+function postJSON(path, capId, fields) {
+  try {
+    if (localStorage.getItem('ff.statsOptOut') === '1') return;
+    if (path === '/visit') { if (!boothAllowed(fields.b)) return; }
+    else if (!searchAllowed(fields.k)) return;
+    const now = Date.now();
+    if (!window.Stats || Stats.capHas(localStorage, capId, now)) return;
+    const d = deviceId();
+    if (!d) return;
+    Stats.capMark(localStorage, capId, now);
+    const body = path === '/visit' ? { d: d, b: fields.b } : { d: d, k: fields.k };
+    fetch(ffApiBase() + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      keepalive: true,
+      signal: AbortSignal.timeout(4000),
+    }).then(function () {}, function () {});
+  } catch (e) {}
+}
+function postVisit(id) { postJSON('/visit', id, { b: id }); }
+function postSearch(k) { postJSON('/search', k, { k: k }); }
+let topCache = null;
+function applyTop(pack) {
+  state.topBooths = pack.booths || [];
+  state.topSearches = pack.searches || [];
+  state.popular = new Set(state.topBooths.map(it => it.id));
+  state.panelMode = window.Stats ? Stats.panelMode(state.topBooths.concat(state.topSearches)) : 'chips';
+  renderPopular();
+  if (state.results && state.results.length) renderResults(false, true);
+}
+async function loadTop() {
+  const now = Date.now();
+  try {
+    const raw = sessionStorage.getItem('ff.top');
+    if (raw) {
+      const saved = JSON.parse(raw);
+      if (saved && now - saved.at < 120000) { applyTop(saved); return; }
+    }
+  } catch (e) {}
+  if (topCache && now - topCache.at < 120000) { applyTop(topCache); return; }
+  let base = '';
+  try { base = ffApiBase(); } catch (e) { return; }
+  try {
+    const opts = { signal: AbortSignal.timeout(4000) };
+    const vr = await fetch(base + '/top?window=now', opts);
+    const sr = await fetch(base + '/top-searches?window=now', opts);
+    if (!vr.ok || !sr.ok) return;
+    const vj = await vr.json();
+    const sj = await sr.json();
+    const pack = {
+      at: Date.now(),
+      booths: window.Stats ? Stats.filterCount(vj.items) : [],
+      searches: window.Stats ? Stats.filterCount(sj.items) : [],
+    };
+    topCache = pack;
+    try { sessionStorage.setItem('ff.top', JSON.stringify(pack)); } catch (e) {}
+    applyTop(pack);
+  } catch (e) {}
+}
+function renderPopular() {
+  const el = $('popular');
+  if (!el) return;
+  if (state.panelMode !== 'live') {
+    el.innerHTML = '<h3>Popular foods</h3>' + CHIP_BUTTONS.map(pair =>
+      '<button type="button" class="popBtn" data-q="' + esc(pair[0]) + '">' + esc(pair[1]) + '</button>').join('');
+    return;
+  }
+  let html = '<h3>Popular right now</h3>';
+  for (const it of state.topBooths || []) {
+    const b = state.booths.find(x => x.id === it.id);
+    if (!b) continue;
+    html += '<button type="button" class="popBtn" data-booth="' + esc(b.id) + '">' + esc(b.name) + (b.area ? ' <small>' + esc(b.area) + '</small>' : '') + '</button>';
+  }
+  for (const it of state.topSearches || []) {
+    const k = it.k || '';
+    if (k.indexOf('chip:') === 0) {
+      const pair = chipLabel(k.slice(5));
+      if (!pair) continue;
+      html += '<button type="button" class="popBtn" data-q="' + esc(pair[0]) + '">' + esc(pair[1]) + '</button>';
+    } else if (k.indexOf('booth:') === 0) {
+      const id = k.slice(6);
+      const b = state.booths.find(x => x.id === id);
+      if (!b) continue;
+      html += '<button type="button" class="popBtn" data-booth="' + esc(id) + '">' + esc(b.name) + '</button>';
+    }
+  }
+  el.innerHTML = html;
+}
+
 // ---------- Search ----------
 let tmr, sgT, sgActive = -1, pinPick = false, suppressAc = false, lastSuggest = [], pickAt = 0;
 $('q').addEventListener('input', () => {
@@ -383,13 +535,35 @@ $('q').addEventListener('input', () => {
 });
 $('searchForm').onsubmit = e => { e.preventDefault(); hideSuggest(); runSearch(); $('q').blur(); };
 $('clearQ').onclick = () => { $('q').value = ''; hideSuggest(); clearResults(); };
-document.querySelectorAll('.chip').forEach(c => c.onclick = () => {
+function onChipClick(c) {
   hideSuggest();
-  if (c.dataset.q === 'near') { openNear(); return; }
-  if (c.dataset.q === 'favorites') { openFav(); return; }
+  const q = c.dataset.q;
+  if (q === 'near') { openNear(); return; }
+  if (q === 'favorites') { openFav(); return; }
   if (c.classList.contains('on') && !$('results').classList.contains('hidden')) { $('q').value = ''; clearResults(); return; } // second tap toggles off
-  $('q').value = c.dataset.q === 'new' ? '' : c.dataset.q; runSearch(c.dataset.q === 'new');
-});
+  const key = window.Stats && Stats.chipKey(q);
+  if (key) postSearch('chip:' + key);
+  $('q').value = q === 'new' ? '' : q;
+  runSearch(q === 'new');
+  syncSearchFocus();
+}
+document.querySelectorAll('#chips .chip').forEach(c => { c.onclick = () => onChipClick(c); });
+const popEl = $('popular');
+if (popEl) {
+  popEl.addEventListener('pointerdown', e => { if (e.target.closest('button')) e.preventDefault(); });
+  popEl.addEventListener('mousedown', e => e.preventDefault());
+  popEl.addEventListener('click', e => {
+    const chip = e.target.closest('button[data-q]');
+    if (chip) { onChipClick(chip); return; }
+    const row = e.target.closest('button[data-booth]');
+    if (!row) return;
+    const id = row.dataset.booth;
+    if (boothAllowed(id)) postSearch('booth:' + id);
+    popEl.classList.add('hidden');
+    $('q').blur();
+    startGuide(id);
+  });
+}
 // Chip looks selected while its search is the one showing.
 function syncChips() {
   const open = !$('results').classList.contains('hidden') && !!state.query;
@@ -411,12 +585,15 @@ function clearResults() {
   syncChips(); fitSuggest();
 }
 $('q').addEventListener('focus', () => { document.body.classList.add('typing'); syncSearchFocus(); });
-$('q').addEventListener('blur', () => { document.body.classList.remove('typing'); setTimeout(() => { hideSuggest(); syncSearchFocus(); }, 200); });
+$('q').addEventListener('blur', () => { document.body.classList.remove('typing'); setTimeout(() => { hideSuggest(); syncSearchFocus(); }, 250); });
 function syncSearchFocus() {
   const el = $('searchFocus'); if (!el) return;
   const q = $('q');
   const show = document.activeElement === q && !(q.value || '').trim() && $('suggest').classList.contains('hidden');
   el.classList.toggle('hidden', !show);
+  const pop = $('popular');
+  if (!pop || pop.dataset.ffAc) return;
+  pop.classList.toggle('hidden', !show);
 }
 function dist(b) {
   if (!state.me) return null;
@@ -718,7 +895,7 @@ function renderResults(fit, quiet) {
     return `${head}<li data-id="${esc(b.id)}" data-i="${i}"${r.likely ? ' class="likely"' : ''}>
       <div class="r-top"><span class="r-name">${esc(b.name)}</span><span class="r-dist">${r.d != null ? (r.walk ? '🚶 ' : '') + Geo.fmtFeet(r.d) : ''}</span><button class="rShare" type="button" data-share="${esc(b.id)}" aria-label="Share ${esc(b.name)}">${SHARE_ICO}<span>Share</span></button></div>
       <div class="r-items">${items.map(it => r.matched.length ? `<mark>${hl(it)}</mark>` : hl(it)).join(', ')}</div>
-      <div class="r-meta">${why}${b.kind === 'newfood' ? '<span class="badge new">NEW 2026</span>' : ''}${r.tier === 1 ? '<span class="badge">related</span>' : ''}${b.location !== 'exact' ? '<span class="badge approx">approx.</span>' : ''}${esc(b.area || '')}${b.lot ? ' · ' + esc(b.lot) : ''}</div></li>`;
+      <div class="r-meta">${popBadge(b.id)}${why}${b.kind === 'newfood' ? '<span class="badge new">NEW 2026</span>' : ''}${r.tier === 1 ? '<span class="badge">related</span>' : ''}${b.location !== 'exact' ? '<span class="badge approx">approx.</span>' : ''}${esc(b.area || '')}${b.lot ? ' · ' + esc(b.lot) : ''}</div></li>`;
   }).join('');
   if (!quiet) { $('nearPanel').classList.add('hidden'); $('favPanel').classList.add('hidden'); }
   if (!quiet) $('results').classList.remove('hidden'); // guide stays up: it sits on top of the results sheet
@@ -731,7 +908,15 @@ function renderResults(fit, quiet) {
   }
   syncChips();
 }
-$('resList').onclick = e => { const sb = e.target.closest('[data-share]'); if (sb) { e.stopPropagation(); share(findTarget(sb.dataset.share)); return; } const li = e.target.closest('li[data-id]'); if (li) startGuide(li.dataset.id); };
+$('resList').onclick = e => {
+  const sb = e.target.closest('[data-share]');
+  if (sb) { e.stopPropagation(); share(findTarget(sb.dataset.share)); return; }
+  const li = e.target.closest('li[data-id]');
+  if (!li) return;
+  const id = li.dataset.id;
+  if (state.booths.some(b => b.id === id)) postSearch('booth:' + id);
+  startGuide(id);
+};
 const rideSubsEl = $('rideSubs');
 if (rideSubsEl) rideSubsEl.onclick = e => {
   const b = e.target.closest('.rideSub');
@@ -755,7 +940,13 @@ function hideSuggest() {
   document.body.classList.remove('ac', 'acCover');
   syncSearchFocus();
   const pop = $('popular');
-  if (pop && pop.dataset.ffAc) { pop.classList.remove('hidden'); delete pop.dataset.ffAc; }
+  if (pop && pop.dataset.ffAc) {
+    delete pop.dataset.ffAc;
+    const q = $('q');
+    const restore = document.activeElement === q && !(q.value || '').trim() && $('suggest').classList.contains('hidden');
+    if (restore) pop.classList.remove('hidden');
+    else pop.classList.add('hidden');
+  }
 }
 // Cap the dropdown to what's visible: the visual viewport (so it ends above the iOS keyboard) and, while guiding,
 // the top of the guide sheet (so its Stop ✕ stays tappable). The list scrolls inside.
@@ -859,6 +1050,7 @@ function selectSuggest(li) {
     runSearch();
     return;
   }
+  if (it.type === 'booth' && state.booths.some(b => b.id === it.id)) postSearch('booth:' + it.id);
   pinPick = true;
   suppressAc = true;
   $('q').value = it.label;
@@ -874,6 +1066,10 @@ $('q').addEventListener('input', () => {
 });
 $('q').addEventListener('keydown', e => {
   if (e.isComposing) return;
+  if (e.key === 'Escape') {
+    const pop = $('popular');
+    if (pop && !pop.classList.contains('hidden')) { e.preventDefault(); pop.classList.add('hidden'); }
+  }
   const el = $('suggest');
   if (!el || el.classList.contains('hidden')) return;
   const lis = el.querySelectorAll('li[role="option"]');
@@ -1268,8 +1464,9 @@ $('btnFav').onclick = () => { if (state.target) toggleFav(state.target.id); };
 $('searchFocus').addEventListener('pointerdown', e => { if (e.target.closest('button')) e.preventDefault(); });
 window.FF = { nearMe };
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js?v=75', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
+  navigator.serviceWorker.register('sw.js?v=76', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
 }
 
+renderPopular();
 loadData().catch(e => setStatus('Could not load booth data: ' + e.message));
 })();

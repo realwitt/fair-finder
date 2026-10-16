@@ -218,6 +218,12 @@ body.ac.acCover #results{visibility:hidden}
 #nearList li,#favList li{min-height:52px;padding:8px 12px;border-bottom:1px solid #ddd;display:flex;align-items:center;gap:8px}
 .amenityIcon .am{width:26px;height:26px;border-radius:13px;border:2px solid #000;background:#fff;font-size:15px;line-height:22px;text-align:center}
 .fav{width:44px;height:44px;background:#fff;border:2px solid #000;border-radius:12px;font-size:22px;line-height:1;flex:none}
+#popular{position:absolute;z-index:5500;left:8px;right:8px;top:100%;max-height:38vh;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:#fff;border:3px solid #000;border-radius:12px;padding:8px 8px 2px;box-shadow:0 6px 24px #0008}
+#popular h3{margin:0 0 6px;font-size:15px}
+#popular .popBtn{display:block;width:100%;text-align:left;min-height:44px;margin:0 0 6px;padding:8px 10px;border-radius:12px;border:2px solid #000;background:#fff;font-weight:800;font-size:16px}
+#popular .popBtn small{font-weight:600;color:#444}
+.badge.pop{background:#ffd400}
+#top:has(#popular:not(.hidden)){z-index:5900}
 #guide #btnFav{height:44px}
 #resList li.likelyHead,#suggest li.sgSep{min-height:0;cursor:default;background:#fff;font-size:12px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:#5a2bb0}
 #suggest li.sgSep{border-top:2px solid #7b2ff7}
