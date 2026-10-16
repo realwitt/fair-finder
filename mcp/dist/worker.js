@@ -2166,14 +2166,29 @@ function phraseIn(phrase, words) {
   return false;
 }
 
+// Menu negations ("(No Hot Dogs/Sausage)", "No Hot Dogs or Burgers"), same parser as the app's search.js:
+// the negated phrase is not a match, and the booth is excluded for those items and their synonym groups.
+const strip = t => FoodSearch.stripNegations ? FoodSearch.stripNegations(String(t || '')) : String(t || '');
+const negKey = t => FoodSearch.tokens(t).join(' ');
+function negations(booth) {
+  const out = new Set();
+  if (!FoodSearch.negationItems) return out;
+  const srcs = [booth.name, booth.products, ...(booth.items || [])];
+  if (booth.newFood) srcs.push(booth.newFood.name, booth.newFood.description);
+  for (const src of srcs) for (const k of FoodSearch.negationItems(src)) {
+    out.add(k);
+    for (const g of FoodSearch.SYN) if (g.some(x => negKey(x) === k)) for (const x of g) { const xk = negKey(x); if (xk) out.add(xk); }
+  }
+  return out;
+}
 function prepareBooth(booth) {
   const nf = booth.newFood ? ((booth.newFood.name || '') + ' ' + (booth.newFood.description || '')) : '';
-  const words = Suggest.norm([booth.name, booth.products, nf, ...(booth.items || [])].join(' ')).split(' ').filter(Boolean);
+  const words = Suggest.norm([booth.name, booth.products, nf, ...(booth.items || [])].map(strip).join(' ')).split(' ').filter(Boolean);
   const items = (booth.items || []).map(raw => {
     const text = String(raw);
-    return { raw: text, words: Suggest.norm(text).split(' ').filter(Boolean) };
+    return { raw: text, words: Suggest.norm(strip(text)).split(' ').filter(Boolean) };
   });
-  return { booth, words, items };
+  return { booth, words, items, neg: negations(booth) };
 }
 
 const DOCS = DATA.booths.map(prepareBooth);
@@ -2442,7 +2457,9 @@ function foodHitsBody(query) {
   const tokens = contentTokens(query);
   if (!tokens.length) return { fail: 'Say a food, booth, or ride.' };
   const full = [];
+  const qk = negKey(query);
   for (const doc of DOCS) {
+    if (doc.neg.has(qk)) continue;
     const per = tokens.map(t => ({ token: t, phrases: expansions(t), hit: null }));
     let miss = false;
     for (const p of per) {
@@ -2475,6 +2492,7 @@ function foodHitsBody(query) {
   const phrases = expansions(chosen);
   const partial = [];
   for (const doc of DOCS) {
+    if (doc.neg.has(qk) || doc.neg.has(negKey(chosen))) continue;
     const hit = tokenHit(chosen, phrases, doc.words);
     if (!hit || fullIds.has(doc.booth.id)) continue;
     const matched = collectItems(doc, [chosen], phrases);

@@ -254,4 +254,21 @@ check('popular_now thrown fetch',
   && popDown.sc.note === 'not enough recent activity yet');
 globalThis.fetch = realFetch;
 
+// v7.7: menu negations ("No Hot Dogs/Sausage", "No Hot Dogs or Burgers") are not matches; corn dog has no hot-dog-only rows.
+for (const q of ['hot dog', 'hot dogs', 'corn dog']) {
+  const r = await tool('search', { query: q, limit: 25 });
+  const names = ((r.sc && r.sc.results) || []).map(x => x.name);
+  check('negation booths excluded from ' + q, names.length > 5 && !names.some(n => /Demitiri|Lee, Dennis/.test(n)), names.filter(n => /Demitiri|Lee, Dennis/.test(n)).join(', '));
+}
+{
+  const r = await tool('search', { query: 'corn dog', limit: 25 });
+  const rows = (r.sc && r.sc.results) || [];
+  const hotOnly = rows.filter(x => !/corn|k-?dog/i.test(JSON.stringify(x.matched_items || []) + ' ' + (x.menu_summary || '') + ' ' + x.name));
+  check('corn dog has no hot-dog-only rows', hotOnly.length === 0, hotOnly.map(x => x.name).slice(0, 5).join(', '));
+}
+{
+  const r = await tool('search', { query: 'burger', limit: 25 });
+  check('No Hot Dogs or Burgers booth excluded from burger', !((r.sc && r.sc.results) || []).some(x => /Lee, Dennis/.test(x.name)));
+}
+
 if (failed) process.exitCode = 1;
