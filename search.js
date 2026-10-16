@@ -76,6 +76,8 @@
     if (pt.length <= 8 && pt[0] !== dt[0]) return false;
     return lev(pt, dt, max) <= max;
   }
+  // Every token of the phrase must hit inside THIS field (one menu item or the name).
+  // Callers pass a single item, so "corn" and "dog" in different dishes do not combine.
   function phraseScore(phraseToks, docToks, docJoined, allowFuzzy) {
     if (allowFuzzy == null) allowFuzzy = true;
     if (!phraseToks.length) return 0;
@@ -112,9 +114,21 @@
       }
     }
     const ps = (toks, docToks, joined) => phraseScore(toks, docToks, joined, allowFuzzy);
+    // Score each menu item and the name on its own. A multi-word chip ("corn dog")
+    // must hit one item, not "corn" from one dish and "dog" from another.
+    const fields = [{ toks: booth._nameToks, joined: booth._nameJoined }].concat(booth._items);
+    // New-food blurbs are one paragraph. Score each clause so "frozen … cream" in a slush
+    // writeup does not become ice cream, while "pulled pork" in that blurb still counts.
+    if (booth.newFood && booth.newFood.description) {
+      const bits = String(booth.newFood.description).split(/[,|;]|\.\s+|\s+\|\s+/);
+      for (const bit of bits) {
+        const nt = tokens(bit);
+        if (nt.length) fields.push({ toks: nt, joined: ' ' + nt.join(' ') + ' ' });
+      }
+    }
     let best = 0;
-    for (const p of phrases) {
-      best = Math.max(best, p.w * ps(p.toks, booth._toks, booth._joined));
+    for (const f of fields) {
+      for (const p of phrases) best = Math.max(best, p.w * ps(p.toks, f.toks, f.joined));
     }
     if (!best) return null;
     const matched = [];

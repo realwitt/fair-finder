@@ -136,7 +136,13 @@ function popBtns(b) {
 }
 const AM_ICON = { restroom: '🚻', first_aid: '⛑', nursing_room: '🍼', information: 'ℹ️', lost_and_found: '🧳', wheelchair_rental: '♿', atm: '💲' };
 function amIcon(type) { return AM_ICON[type] || '📍'; }
-function rideNameText(b) { return (b.name || '') + (b.aliases && b.aliases.length ? ' · aka ' + b.aliases.join(', ') : ''); }
+function rideAliases(b) {
+  return (b.aliases || []).filter(a => a && !(window.Suggest && Suggest.sameSpelling(b.name, a)));
+}
+function rideNameText(b) {
+  const al = rideAliases(b);
+  return (b.name || '') + (al.length ? ' · aka ' + al.join(', ') : '');
+}
 function popupHtml(b) {
   if (b.kind === 'amenity') {
     return `<b>${esc(b.name)}</b> <span class="badge approx">approximate location</span><br><small>${esc(b.area || '')}</small>${popBtns(b)}`;
@@ -219,10 +225,24 @@ async function loadData() {
     (state.atms || []).forEach(x => { const d = Geo.distanceM(a.lat, a.lon, x.lat, x.lon); if (d < bd) { bd = d; best = x; } });
     if (best && bd < 40) state.atmAlias[a.id] = best.id;
   });
-  state.amenities = ((amn && amn.amenities) || []).filter(a => a.type !== 'atm').map(a => ({
-    id: a.id, name: a.name, area: a.area || '', lat: a.lat, lon: a.lon,
+  const amRaw = (amn && amn.amenities) || [];
+  state.amenities = amRaw.filter(a => a.type !== 'atm').map(a => ({
+    id: a.id, name: a.name, area: properArea(a.area), lat: a.lat, lon: a.lon,
     location: 'approximate', kind: 'amenity', amenityType: a.type, products: ''
   }));
+  const areaPool = state.booths.concat(state.rides);
+  state.amenities.forEach(a => { if (!a.area) a.area = nearestProperArea(a.lat, a.lon, areaPool); });
+  const amAtms = amRaw.filter(a => a.type === 'atm');
+  (state.atms || []).forEach(atm => {
+    let best = '', bd = Infinity;
+    amAtms.forEach(s => {
+      const area = properArea(s.area);
+      if (!area) return;
+      const d = Geo.distanceM(atm.lat, atm.lon, s.lat, s.lon);
+      if (d < bd) { bd = d; best = area; }
+    });
+    atm.area = (best && bd < 80) ? best : nearestProperArea(atm.lat, atm.lon, areaPool);
+  });
   state.amenities.forEach(a => {
     const icon = L.divIcon({ className: 'amenityIcon', html: `<div class="am am-${esc(a.amenityType)}">${amIcon(a.amenityType)}</div>`, iconSize: [26, 26], iconAnchor: [13, 13] });
     const m = L.marker([a.lat, a.lon], { icon, keyboard: false });
@@ -600,6 +620,33 @@ function dist(b) {
   const w = walkDist(b); if (w != null) return w;
   return Geo.distanceM(state.me[0], state.me[1], b.lat, b.lon);
 }
+function properArea(area) {
+  const a = String(area || '').trim();
+  if (!a || a.length < 3 || /^(hv|ch|l)$/i.test(a)) return '';
+  if (/published grounds map/i.test(a)) return '';
+  return a;
+}
+function nearestProperArea(lat, lon, pool) {
+  let best = '', bd = Infinity;
+  for (const p of pool) {
+    const area = properArea(p.area);
+    if (!area || p.lat == null || p.lon == null) continue;
+    const d = Geo.distanceM(lat, lon, p.lat, p.lon);
+    if (d < bd) { bd = d; best = area; }
+  }
+  return best;
+}
+function amenityPlace(t) {
+  if (!t) return '';
+  const area = properArea(t.area);
+  let away = '';
+  if (state.me && t.lat != null && t.lon != null) {
+    refreshWalk();
+    const w = walkDist(t);
+    away = w != null ? ('🚶 ' + Geo.fmtFeet(w)) : Geo.fmtFeet(Geo.distanceM(state.me[0], state.me[1], t.lat, t.lon));
+  }
+  return [area, away].filter(Boolean).join(' · ');
+}
 // Walking distance via one Dijkstra from the user's snapped position (recomputed when the user moves > 8 m).
 function refreshWalk(force) {
   const g = state.graph; if (!g || !state.me) return;
@@ -654,6 +701,26 @@ function nearMe(pos, items, opts) {
     if (a.meters !== b.meters) return a.meters - b.meters;
     return String(a.item.name || '').localeCompare(String(b.item.name || ''));
   });
+  if (type === 'all') {
+    // Keep the nearest restroom, ATM and first aid on the list even when food fills the cap.
+    const head = rows.slice(0, limit);
+    const extras = [];
+    for (const t of ['restroom', 'atm', 'first_aid']) {
+      if (head.some(r => r.item.amenityType === t)) continue;
+      const hit = rows.find(r => r.item.amenityType === t);
+      if (hit) extras.push(hit);
+    }
+    if (!extras.length) return head;
+    const merged = head.concat(extras);
+    merged.sort((a, b) => {
+      if (a.meters == null && b.meters == null) return String(a.item.name || '').localeCompare(String(b.item.name || ''));
+      if (a.meters == null) return 1;
+      if (b.meters == null) return -1;
+      if (a.meters !== b.meters) return a.meters - b.meters;
+      return String(a.item.name || '').localeCompare(String(b.item.name || ''));
+    });
+    return merged;
+  }
   return rows.slice(0, limit);
 }
 function nearItems() {
@@ -661,7 +728,7 @@ function nearItems() {
   for (const b of state.booths) if (b.food || b.kind === 'newfood') out.push({ id: b.id, name: b.name, lat: b.lat, lon: b.lon, kind: 'food' });
   for (const r of state.rides) out.push({ id: r.id, name: r.name, lat: r.lat, lon: r.lon, kind: 'ride', aliases: r.aliases, area: r.area, tickets: r.tickets });
   for (const a of state.amenities) out.push({ id: a.id, name: a.name, lat: a.lat, lon: a.lon, kind: 'amenity', amenityType: a.amenityType, area: a.area });
-  for (const a of state.atms || []) out.push({ id: a.id, name: 'ATM', lat: a.lat, lon: a.lon, kind: 'amenity', amenityType: 'atm' });
+  for (const a of state.atms || []) out.push({ id: a.id, name: 'ATM', lat: a.lat, lon: a.lon, kind: 'amenity', amenityType: 'atm', area: a.area || '' });
   return out;
 }
 function nearDistText(row) {
@@ -674,8 +741,12 @@ function rowIcon(item) {
   if (item.kind === 'ride') return '🎡';
   return amIcon(item.amenityType);
 }
+function collapseGuideForSheet() {
+  if (state.target && sheet.visible && sheet.state === 'expanded') sheet.set('collapsed');
+}
 function openNear() {
   hideSuggest();
+  collapseGuideForSheet();
   $('favPanel').classList.add('hidden'); $('results').classList.add('hidden'); // one sheet at a time
   $('nearPanel').classList.remove('hidden');
   state.nearType = 'all';
@@ -700,7 +771,7 @@ function renderNear() {
   gps.classList.add('hidden');
   refreshWalk();
   const rows = nearMe(state.me, nearItems(), { type: state.nearType || 'all', graph: state.graph });
-  $('nearCount').textContent = 'Near me';
+  $('nearCount').textContent = 'Near me · ' + rows.length;
   const seen = {}; rows.forEach(r => { seen[r.item.name] = (seen[r.item.name] || 0) + 1; });
   list.innerHTML = rows.map(row => {
     const it = row.item;
@@ -744,6 +815,7 @@ function favDistText(t) {
 }
 function openFav() {
   hideSuggest();
+  collapseGuideForSheet();
   $('nearPanel').classList.add('hidden'); $('results').classList.add('hidden'); // one sheet at a time
   $('favPanel').classList.remove('hidden');
   renderFav();
@@ -770,7 +842,7 @@ function renderFav() {
   $('favCount').textContent = '★ Favorites';
   $('favList').innerHTML = rows.map(t => {
     const name = t.kind === 'ride' ? rideNameText(t) : t.name;
-    return `<li data-id="${esc(t.id)}"><span class="r-name">${esc(name)}</span><span class="r-dist">${esc(favDistText(t))}</span><button type="button" data-id="${esc(t.id)}">Guide me here</button><button type="button" class="favRemove" data-id="${esc(t.id)}" aria-label="Remove ${esc(t.name)}">Remove</button></li>`;
+    return `<li data-id="${esc(t.id)}"><span class="r-name">${esc(name)}</span><span class="r-dist">${esc(favDistText(t))}</span><span class="favActs"><button type="button" class="favGo" data-id="${esc(t.id)}">Guide me here</button><button type="button" class="favRemove" data-id="${esc(t.id)}" aria-label="Remove ${esc(t.name)}">Remove</button></span></li>`;
   }).join('');
 }
 function syncGuideFav() {
@@ -812,8 +884,11 @@ function amenityDirect(q) {
 }
 // One classification for the results list and the dropdown. Direct wins over likely (by id).
 function packQuery(q) {
+  // Exact concept terms skip edit-distance (that is what pulled "slushie" onto sushi/plush).
+  // Food chips still expand their synonym group, which is the v7.3.1 recall; a typed exact term like "slushie" does not.
   const exact = !!(state.concepts && state.concepts.exactTerm(q));
-  const opts = { allowFuzzy: !exact, synonymExpand: !exact };
+  const chip = !!(window.Stats && Stats.chipKey(q));
+  const opts = { allowFuzzy: !exact, synonymExpand: !exact || chip };
   const direct = [];
   const seen = new Set();
   function push(item, extra) {
@@ -892,13 +967,14 @@ function renderResults(fit, quiet) {
         <div class="r-meta">${why}${esc(b.area || '')}</div></li>`;
     }
     const items = (r.matched.length ? r.matched : (b.items || [])).slice(0, 4);
+    const label = b.kind === 'amenity' && b.area ? (b.name + ' · ' + b.area) : b.name;
     return `${head}<li data-id="${esc(b.id)}" data-i="${i}"${r.likely ? ' class="likely"' : ''}>
-      <div class="r-top"><span class="r-name">${esc(b.name)}</span><span class="r-dist">${r.d != null ? (r.walk ? '🚶 ' : '') + Geo.fmtFeet(r.d) : ''}</span><button class="rShare" type="button" data-share="${esc(b.id)}" aria-label="Share ${esc(b.name)}">${SHARE_ICO}<span>Share</span></button></div>
+      <div class="r-top"><span class="r-name">${esc(label)}</span><span class="r-dist">${r.d != null ? (r.walk ? '🚶 ' : '') + Geo.fmtFeet(r.d) : ''}</span><button class="rShare" type="button" data-share="${esc(b.id)}" aria-label="Share ${esc(b.name)}">${SHARE_ICO}<span>Share</span></button></div>
       <div class="r-items">${items.map(it => r.matched.length ? `<mark>${hl(it)}</mark>` : hl(it)).join(', ')}</div>
       <div class="r-meta">${popBadge(b.id)}${why}${b.kind === 'newfood' ? '<span class="badge new">NEW 2026</span>' : ''}${r.tier === 1 ? '<span class="badge">related</span>' : ''}${b.location !== 'exact' ? '<span class="badge approx">approx.</span>' : ''}${esc(b.area || '')}${b.lot ? ' · ' + esc(b.lot) : ''}</div></li>`;
   }).join('');
-  if (!quiet) { $('nearPanel').classList.add('hidden'); $('favPanel').classList.add('hidden'); }
-  if (!quiet) $('results').classList.remove('hidden'); // guide stays up: it sits on top of the results sheet
+  if (!quiet) { collapseGuideForSheet(); $('nearPanel').classList.add('hidden'); $('favPanel').classList.add('hidden'); }
+  if (!quiet) $('results').classList.remove('hidden'); // guide stays up, collapsed: one expanded sheet at a time
   fitSuggest();
   document.body.classList.toggle('guiding', !!state.target);
   if (fit && rs.length) {
@@ -996,7 +1072,7 @@ function renderSuggest() {
     const key = 'amenity\0' + a.booth.id;
     if (have.has(key)) continue;
     have.add(key);
-    prepend.push({ type: 'amenity', id: a.booth.id, label: a.booth.name, sub: a.booth.area || '', score: 95, amenityType: a.booth.amenityType });
+    prepend.push({ type: 'amenity', id: a.booth.id, label: a.booth.name, sub: amenityPlace(a.booth), score: 95, amenityType: a.booth.amenityType });
   }
   items = prepend.concat(items);
   const likelyItems = pack.likely.map(l => ({
@@ -1010,8 +1086,9 @@ function renderSuggest() {
   sgActive = -1;
   let seenLikely = false;
   el.innerHTML = items.map((it, i) => {
-    const aka = it.alias ? ` <small>aka ${esc(it.alias)}</small>` : '';
-    const sub = it.sub ? ` <small>${esc(it.sub)}</small>` : '';
+    const aka = it.alias && !(window.Suggest && Suggest.sameSpelling(it.label, it.alias)) ? ` <small>aka ${esc(it.alias)}</small>` : '';
+    const subText = it.type === 'amenity' ? amenityPlace(findTarget(it.id) || it) : (it.sub || '');
+    const sub = subText ? ` <small>${esc(subText)}</small>` : '';
     const head = it.likely && !seenLikely ? (seenLikely = true, '<li class="sgSep" role="presentation">Likely matches · did you mean</li>') : '';
     const why = it.likely && it.why ? ` <small class="sgWhy">${esc(it.why)}</small>` : '';
     return `${head}<li role="option" id="sg-${i}" data-i="${i}" data-type="${esc(it.type)}" data-id="${esc(it.id)}"${it.likely ? ' class="likely"' : ''}>${''}<span class="sgTag">${sgTag(it.type, it)}</span> ${esc(it.label)}${aka}${sub}${why}</li>`;
@@ -1109,7 +1186,7 @@ function findTarget(id) {
   const b = state.booths.find(x => x.id === id); if (b) return b;
   const am = (state.amenities || []).find(x => x.id === id); if (am) return am;
   if (state.atmAlias && state.atmAlias[id]) id = state.atmAlias[id];
-  const a = (state.atms || []).find(x => x.id === id); if (a) return { id: a.id, name: 'ATM', lat: a.lat, lon: a.lon, location: 'approximate', area: 'From the fair’s published grounds map', products: '' };
+  const a = (state.atms || []).find(x => x.id === id); if (a) return { id: a.id, name: 'ATM', lat: a.lat, lon: a.lon, location: 'approximate', kind: 'amenity', amenityType: 'atm', area: a.area || '', products: '' };
 }
 function startGuide(id, resume, fromUrl) {
   hideSuggest();

@@ -230,3 +230,16 @@ body.ac.acCover #results{visibility:hidden}
 #resList li.likelyHead{border-top:3px solid #7b2ff7;padding:8px 14px}
 
 #nearList .r-sub{display:block;font-size:12px;font-weight:400;color:#555;line-height:1.2}
+/* Expanded guide wraps long names and the hint. The collapsed bar keeps its fixed ellipsis. */
+#guide[data-snap="expanded"] #sheetBar{height:auto;min-height:104px}
+#guide[data-snap="expanded"] #guideHint{height:auto;min-height:42px;-webkit-line-clamp:unset;display:block;overflow:visible}
+#guide[data-snap="expanded"] #guideTop{height:auto;min-height:48px;align-items:flex-start}
+#guide[data-snap="expanded"] #guideName{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.2}
+#nearPanel #nearQuick.qaRow{flex-wrap:wrap;overflow:visible}
+#nearPanel #nearQuick .qa{flex:1 1 auto;white-space:nowrap;font-size:14px;padding:0 10px}
+#favList li{flex-wrap:wrap}
+#favList .r-name{flex:1;min-width:0}
+#favList .favActs{flex:1 0 100%;display:flex;gap:8px;margin-top:6px}
+#favList .favGo,#favList .favRemove{white-space:nowrap;min-height:44px;border-radius:12px;border:2px solid #000;font-weight:800;font-size:15px;padding:0 12px}
+#favList .favGo{flex:1;background:var(--navy);color:#fff}
+#favList .favRemove{flex:0 0 auto;background:#fff;color:#111}

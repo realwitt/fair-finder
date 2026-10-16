@@ -30,7 +30,7 @@
  "notes": [
   "Booth names, menu text (PRODUCT field) and coordinates are copied verbatim from the fair's published feature service. 'items' is that menu text split on commas/pipes.",
   "location='exact' means the fair's own GIS point for the booth (WGS84, reprojected by the ArcGIS server). Those points are placed by the fair on its map, typically within a few meters of the booth.",
-  "'food' and 'drinks' are keyword flags computed from the fair's menu text. They are not categories published by the fair.",
+  "'food' and 'drinks' are keyword flags computed from the fair's menu text. They are not categories published by the fair. 'food' matches whole words (and simple plurals) in the menu, or a strong food word in the name. It does not match substrings, so a commercial exhibitor is not food just because the name contains roll, eat or kitchen.",
   "Rides and gates are excluded, as are placeholder points with no name and no menu text (skipped_blank). Kinds: vendor = 'Vendor' features, newfood = 'New Foods 2026' features (separate points from the vendor list, often the same operator), sponsor = sponsor layer."
  ],
  "counts": {
@@ -999,7 +999,7 @@
     "basement waterproofing & concrete lifting"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": true,
    "lat": 35.7946384,
    "lon": -78.7083063,
@@ -1047,7 +1047,7 @@
     "Demonstration"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": true,
    "lat": 35.796621,
    "lon": -78.7147533,
@@ -1076,7 +1076,7 @@
     "Team Christmas Ornaments"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7943556,
    "lon": -78.7084716,
@@ -1105,7 +1105,7 @@
     "Team Christmas Ornaments"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7943802,
    "lon": -78.7084867,
@@ -1170,7 +1170,7 @@
     "Myra bags"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7955728,
    "lon": -78.7128887,
@@ -1191,7 +1191,7 @@
     "Myra bags"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7955569,
    "lon": -78.7128611,
@@ -1212,7 +1212,7 @@
     "Myra bags"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7955411,
    "lon": -78.7128335,
@@ -1559,7 +1559,7 @@
     "Outdoor Kitchens"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7931177,
    "lon": -78.7102062,
@@ -1582,7 +1582,7 @@
     "Outdoor Kitchens"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.793081,
    "lon": -78.7102819,
@@ -1694,7 +1694,7 @@
     "Pins and other give-aways available"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7944908,
    "lon": -78.7084417,
@@ -2093,7 +2093,7 @@
     "Cuticle Oil"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7951242,
    "lon": -78.707119,
@@ -2537,7 +2537,7 @@
     "Hats"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7951442,
    "lon": -78.7118493,
@@ -2733,7 +2733,7 @@
     "The North Carolina Agritourism Industry"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7964207,
    "lon": -78.7152698,
@@ -4763,7 +4763,7 @@
     "Art"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": true,
    "lat": 35.7961742,
    "lon": -78.7083231,
@@ -4934,7 +4934,7 @@
     "Waterless Cookware"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": true,
    "lat": 35.7944666,
    "lon": -78.7082004,
@@ -4954,7 +4954,7 @@
     "Waterless Cookware"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": true,
    "lat": 35.7944789,
    "lon": -78.7081703,
@@ -5518,7 +5518,7 @@
     "T-Shirts"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7954835,
    "lon": -78.7126774,
@@ -5538,7 +5538,7 @@
     "Leather goods"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7934886,
    "lon": -78.7107083,
@@ -5836,7 +5836,7 @@
    "products": "",
    "items": [],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7950995,
    "lon": -78.7071792,
@@ -6598,7 +6598,7 @@
     "Wagons"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7972642,
    "lon": -78.7089644,
@@ -6621,7 +6621,7 @@
     "Electrics"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7938169,
    "lon": -78.7090516,
@@ -6644,7 +6644,7 @@
     "Electrics-flat"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7975737,
    "lon": -78.7153896,
@@ -6667,7 +6667,7 @@
     "Wagons"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7973784,
    "lon": -78.7114764,
@@ -6992,7 +6992,7 @@
    "products": "",
    "items": [],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7963142,
    "lon": -78.7158289,
@@ -7400,7 +7400,7 @@
    "products": "The Peace Booth provides the following resource for those interested in learning more about being a peacemaker in today world.",
    "items": [],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7945402,
    "lon": -78.7082458,
@@ -7649,7 +7649,7 @@
     "Smokey Bear will be greeting and visiting with guests"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7964981,
    "lon": -78.7162812,
@@ -8197,7 +8197,7 @@
     "Custom arcade machine"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7945278,
    "lon": -78.7083513,
@@ -8215,7 +8215,7 @@
    "products": "",
    "items": [],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7948907,
    "lon": -78.7071637,
@@ -8233,7 +8233,7 @@
    "products": "",
    "items": [],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.794903,
    "lon": -78.7071336,
@@ -8521,7 +8521,7 @@
     "Seating only"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7949369,
    "lon": -78.7093257,
@@ -9444,7 +9444,7 @@
     "T-Shirts"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7933461,
    "lon": -78.7108453,
@@ -9467,7 +9467,7 @@
     "T-Shirts"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7956309,
    "lon": -78.7128142,
@@ -9490,7 +9490,7 @@
     "T-Shirts"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.795615,
    "lon": -78.7127867,
@@ -9513,7 +9513,7 @@
     "T-Shirts"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7955992,
    "lon": -78.7127591,
@@ -10042,7 +10042,7 @@
     "Soco Swings"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7950255,
    "lon": -78.7073601,
@@ -10062,7 +10062,7 @@
     "Soco Swings"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7950379,
    "lon": -78.7073299,
@@ -10105,7 +10105,7 @@
     "Boutique Dog Bandanas"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7962052,
    "lon": -78.7080904,
@@ -10125,7 +10125,7 @@
     "Boutique Dog Bandanas"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7962299,
    "lon": -78.7081052,
@@ -10760,7 +10760,7 @@
     "Exercise Machine"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7961344,
    "lon": -78.7078833,
@@ -10780,7 +10780,7 @@
     "Exercise Machine"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7961592,
    "lon": -78.707898,
@@ -10800,7 +10800,7 @@
     "Caricatures Drawing"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7947644,
    "lon": -78.7107102,
@@ -11315,7 +11315,7 @@
    "products": "",
    "items": [],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7944543,
    "lon": -78.7082305,
@@ -12018,7 +12018,7 @@
    "products": "",
    "items": [],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7943926,
    "lon": -78.7083812,
@@ -12259,7 +12259,7 @@
     "Caricature Drawings"
    ],
    "newFood": null,
-   "food": true,
+   "food": false,
    "drinks": false,
    "lat": 35.7946433,
    "lon": -78.7117652,

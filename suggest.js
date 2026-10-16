@@ -55,6 +55,17 @@
     }
     return prev[bLen];
   }
+  // True when an alias is just a near-spelling of the name (Puppy Roll / Puppy Role):
+  // same letters, or a tiny edit distance on the compact form.
+  function sameSpelling(a, b) {
+    const na = compact(a), nb = compact(b);
+    if (!na || !nb) return false;
+    if (na === nb) return true;
+    if (na.length === nb.length && na.split('').sort().join('') === nb.split('').sort().join('')) return true;
+    const max = Math.max(na.length, nb.length) <= 12 ? 1 : 2;
+    if (Math.abs(na.length - nb.length) > max) return false;
+    return levWithin(na, nb, 0, nb.length, max) <= max;
+  }
   function entry(type, id, label, source, extra) {
     const n = norm(source);
     const e = {
@@ -85,7 +96,8 @@
       if (!r || !r.name) continue;
       let sub = r.area || '';
       if (rideNameN.get(compact(r.name)) > 1) {
-        const aka = (r.aliases && r.aliases.length) ? ('aka ' + r.aliases.join(', ')) : '';
+        const akaNames = (r.aliases || []).filter(a => a && !sameSpelling(r.name, a));
+        const aka = akaNames.length ? ('aka ' + akaNames.join(', ')) : '';
         const tickets = r.tickets != null ? (r.tickets + ' tickets') : '';
         sub = [aka, r.area || '', tickets].filter(Boolean).join(' · ');
       }
@@ -93,7 +105,8 @@
       const al = r.aliases || [];
       for (let j = 0; j < al.length; j++) {
         if (!al[j]) continue;
-        entries.push(entry('ride', r.id, r.name, al[j], { isAlias: true, alias: al[j], sub: r.area || '' }));
+        const showAlias = !sameSpelling(r.name, al[j]);
+        entries.push(entry('ride', r.id, r.name, al[j], { isAlias: true, alias: showAlias ? al[j] : '', sub: r.area || '' }));
       }
     }
     const isB = b => b && b.name && (b.food || b.kind === 'newfood' || b.kind === 'sponsor');
@@ -221,7 +234,7 @@
     }
     return out;
   }
-  const api = { norm, compact, buildIndex, query };
+  const api = { norm, compact, buildIndex, query, sameSpelling };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.Suggest = api;
 })(typeof window !== 'undefined' ? window : this);
