@@ -1,5 +1,5 @@
 import { chromium, webkit, devices } from 'playwright';
-const BASE = process.env.BASE || 'https://realwitt.github.io/fair-finder/';
+const BASE = process.env.BASE || 'https://fairfinder.birbol.com/';
 const eng = process.env.FF_ENGINE === 'webkit' ? webkit : chromium;
 const ID = 'L0-1387', OTHER = 'L0-1193';
 const ME = { latitude: 35.79485, longitude: -78.7093, accuracy: 5 };

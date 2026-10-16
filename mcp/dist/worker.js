@@ -51,11 +51,44 @@ const __root = {};
     ['corn', 'roasted corn', 'street corn', 'elote', 'corn on the cob'],
   ];
   // Related (weaker) matches: query group -> extra phrases at lower weight
-  const RELATED = { 'hot dog': ['corn dog', 'corndog', 'chili dog', 'sausage'], 'corn dog': ['hot dog', 'kdog'], 'cheeseburger': ['krispy kreme burger'], 'drink': ['lemonade', 'tea', 'water', 'coffee', 'slush', 'smoothie', 'juice'], 'soda': ['lemonade', 'tea', 'water'] };
+  // Corn dog does not pull hot-dog stands. A corn dog is a different item; kdog stays a synonym above.
+  const RELATED = { 'hot dog': ['corn dog', 'corndog', 'chili dog', 'sausage'], 'corn dog': ['kdog'], 'cheeseburger': ['krispy kreme burger'], 'drink': ['lemonade', 'tea', 'water', 'coffee', 'slush', 'smoothie', 'juice'], 'soda': ['lemonade', 'tea', 'water'] };
   const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[’'`]/g, '').replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, ' ').trim();
   const stem = w => w.length > 4 && w.endsWith('es') && !w.endsWith('ses') ? w.slice(0, -2) : (w.length > 3 && w.endsWith('s') && !w.endsWith('ss') ? w.slice(0, -1) : w);
   const tokens = s => norm(s).split(' ').filter(Boolean).map(stem);
+  const phraseKey = s => tokens(s).join(' ');
+  const SYN_OF = new Map();
+  SYN.forEach((g, i) => { for (const s of g) { const k = phraseKey(s); if (k && !SYN_OF.has(k)) SYN_OF.set(k, i); } });
+  // "No <item> [/ <item> | or <item> …]" at a clause start or after "(". The phrase itself is not a match,
+  // and each listed item (plus its synonym group) excludes the booth from that search.
+  const NEG_RE = /(?:^|[(.;:,])\s*no\s+([a-z0-9][^.;:)(\n]{0,80})/gi;
+  function negationItems(raw) {
+    const s = String(raw || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[’'`]/g, '');
+    const out = [];
+    NEG_RE.lastIndex = 0;
+    let m;
+    while ((m = NEG_RE.exec(s))) {
+      for (let p of m[1].split(/\s*(?:\/|\bor\b|,)\s*/)) {
+        p = p.replace(/[^a-z0-9\s]+/g, ' ').replace(/\s+/g, ' ').trim();
+        const toks = tokens(p);
+        if (!toks.length || toks.length > 6) continue;
+        out.push(toks.join(' '));
+      }
+    }
+    return out;
+  }
+  function stripNegations(raw) {
+    return String(raw || '').replace(/(?:^|[(.;:,])\s*no\s+[a-z0-9][^.;:)(\n]{0,80}/gi, ' ');
+  }
+  function addNegations(into, raw) {
+    for (const k of negationItems(raw)) {
+      into.add(k);
+      const gi = SYN_OF.get(k);
+      if (gi == null) continue;
+      for (const s of SYN[gi]) { const sk = phraseKey(s); if (sk) into.add(sk); }
+    }
+  }
   function lev(a, b, max) {
     if (Math.abs(a.length - b.length) > max) return max + 1;
     let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
@@ -94,11 +127,16 @@ const __root = {};
     return hit === phraseToks.length ? 0.85 : 0;
   }
   function prepare(booth) {
-    const fields = [booth.name, booth.products, booth.newFood ? booth.newFood.name + ' ' + booth.newFood.description : '', ...(booth.items || [])].join(' | ');
+    const neg = new Set();
+    const srcs = [booth.name, booth.products, ...(booth.items || [])];
+    if (booth.newFood) srcs.push(booth.newFood.name, booth.newFood.description);
+    for (const s of srcs) addNegations(neg, s);
+    booth._neg = neg;
+    const fields = srcs.map(s => stripNegations(s || '')).join(' | ');
     const t = tokens(fields);
     booth._toks = t; booth._joined = ' ' + t.join(' ') + ' ';
-    booth._nameToks = tokens(booth.name); booth._nameJoined = ' ' + booth._nameToks.join(' ') + ' ';
-    booth._items = (booth.items || []).map(it => { const tk = tokens(it); return { raw: it, toks: tk, joined: ' ' + tk.join(' ') + ' ' }; });
+    booth._nameToks = tokens(stripNegations(booth.name)); booth._nameJoined = ' ' + booth._nameToks.join(' ') + ' ';
+    booth._items = (booth.items || []).map(it => { const tk = tokens(stripNegations(it)); return { raw: it, toks: tk, joined: ' ' + tk.join(' ') + ' ' }; });
     return booth;
   }
   // Returns {score, matched:[item strings]} or null.
@@ -108,6 +146,8 @@ const __root = {};
     const allowFuzzy = opts.allowFuzzy !== false;
     const synonymExpand = opts.synonymExpand !== false;
     const q = tokens(query); if (!q.length) return null;
+    // Menu text that says "No hot dogs" (or "No hot dogs/sausage", "No hot dogs or burgers") is not a hit for those items.
+    if (booth._neg && booth._neg.has(q.join(' '))) return null;
     const phrases = [{ toks: q, w: 1 }];
     if (synonymExpand) {
       for (const g of groupsFor(query)) {
@@ -124,7 +164,7 @@ const __root = {};
     if (booth.newFood && booth.newFood.description) {
       const bits = String(booth.newFood.description).split(/[,|;]|\.\s+|\s+\|\s+/);
       for (const bit of bits) {
-        const nt = tokens(bit);
+        const nt = tokens(stripNegations(bit));
         if (nt.length) fields.push({ toks: nt, joined: ' ' + nt.join(' ') + ' ' });
       }
     }
@@ -139,7 +179,7 @@ const __root = {};
     }
     let score = best + Math.min(matched.length, 3) * 0.05;
     if (phrases.some(p => ps(p.toks, booth._nameToks, booth._nameJoined) > 0)) score += 0.1;
-    if (booth.newFood && phrases.some(p => ps(p.toks, tokens(booth.newFood.name), ' ' + tokens(booth.newFood.name).join(' ') + ' ') > 0)) score += 0.1;
+    if (booth.newFood && phrases.some(p => { const nt = tokens(stripNegations(booth.newFood.name)); return ps(p.toks, nt, ' ' + nt.join(' ') + ' ') > 0; })) score += 0.1;
     return { score, matched };
   }
   function search(booths, query, opts) {
@@ -147,7 +187,7 @@ const __root = {};
     for (const b of booths) { const m = match(b, query, opts); if (m) out.push({ booth: b, ...m }); }
     return out;
   }
-  const api = { prepare, match, search, norm, tokens, lev, SYN };
+  const api = { prepare, match, search, norm, tokens, lev, SYN, negationItems, stripNegations };
   if (typeof module !== 'undefined') module.exports = api; else root.FoodSearch = api;
 })(this);
 
@@ -275,8 +315,13 @@ const __root = {};
       entries.push(entry('booth', b.id, b.name, b.name, { sub: sub }));
     }
     const best = new Map();
+    const FS = getFS();
     function considerFood(raw) {
       if (!raw || typeof raw !== 'string') return;
+      if (FS && FS.stripNegations) {
+        raw = FS.stripNegations(raw).replace(/\(\s*\)/g, ' ').replace(/\s+/g, ' ').trim();
+        if (!raw || !/[a-z0-9]/i.test(raw)) return;
+      }
       const n = norm(raw);
       const c = compactFromNorm(n);
       if (!c) return;
@@ -297,7 +342,6 @@ const __root = {};
       entries.push(entry('food', foods[i], foods[i], foods[i]));
       kept.add(compact(foods[i]));
     }
-    const FS = getFS();
     const syn = FS && FS.SYN;
     if (syn) {
       for (let i = 0; i < syn.length; i++) {
@@ -2247,7 +2291,7 @@ function partialNote(tokens, chosen) {
   return 'Partial match: the listing has "' + chosen + '" (or a close synonym) but does not mention ' + (others || 'the other words') + '. Ask at the booth.';
 }
 
-function link(id) { return 'https://realwitt.github.io/fair-finder/?booth=' + id; }
+function link(id) { return 'https://fairfinder.birbol.com/?booth=' + id; }
 
 const STATS_BASE = 'https://fair-finder-stats.lively-shape-f373.workers.dev';
 const QUIET_NOTE = 'not enough recent activity yet';

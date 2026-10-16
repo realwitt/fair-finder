@@ -53,7 +53,7 @@ ok(sh && /\?booth=meet_35\.79513_-78\.71200$/.test(sh.url) && /walk to me/.test(
 const spot = sh && sh.url;
 await p.context().close();
 // friend opens the spot link -> guided to it
-p = await page(true); await p.goto(spot.replace('https://realwitt.github.io/fair-finder/', URL)); await p.waitForTimeout(4000);
+p = await page(true); await p.goto(spot.replace(/^https:\/\/(realwitt\.github\.io\/fair-finder|fairfinder\.birbol\.com)\//, URL)); await p.waitForTimeout(4000);
 const g = await p.evaluate(() => ({ t: __ff.target && __ff.target.id, name: document.getElementById('guideName').textContent, mode: __ff.guide && __ff.guide.mode }));
 ok(g.t === 'meet_35.79513_-78.71200' && /Shared spot/.test(g.name) && g.mode === 'route', 'friend opening the spot link is guided there: ' + JSON.stringify(g));
 await p.context().close();

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate b/<id>.html share pages (Open Graph preview with the booth name) that redirect to ../?booth=<id>."""
 import json, html, os
-BASE = "https://realwitt.github.io/fair-finder/"
+BASE = "https://fairfinder.birbol.com/"
 os.makedirs("b", exist_ok=True)
 d = json.load(open("data/booths.json")); a = json.load(open("data/atms.json"))
 items = [(b["id"], b["name"], (b["newFood"]["name"] + ". " if b.get("newFood") else "") + (b.get("products") or ""), b.get("area") or "") for b in d["booths"]]

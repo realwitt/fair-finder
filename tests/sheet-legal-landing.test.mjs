@@ -113,7 +113,7 @@ ok(/Allow location/.test(L.txt) && /Enable compass/.test(L.txt) && /Add to Home 
 ok(/not affiliated with, endorsed by, or sponsored by/.test(L.txt) && /Food & Ride Finder/.test(L.txt) && /OpenStreetMap/.test(L.txt), 'landing footer disclaimer + credits');
 ok(!/flyer|qr code|\bQR\b|poster/i.test(L.txt), 'landing page has no flyer/QR suggestions');
 ok(!/\b\d(\.\d)?\s?(stars?|★)|reviews?\b|testimonial|users love|downloads/i.test(L.txt), 'no reviews/ratings/stats claims');
-const ogimg = await lp.evaluate(async () => (await fetch(document.querySelector('meta[property="og:image"]').content.replace('https://realwitt.github.io/fair-finder/', location.href.replace(/about\/.*$/, '')))).status);
+const ogimg = await lp.evaluate(async () => (await fetch(document.querySelector('meta[property="og:image"]').content.replace(/^https:\/\/(realwitt\.github\.io\/fair-finder|fairfinder\.birbol\.com)\//, location.href.replace(/about\/.*$/, '')))).status);
 ok(ogimg === 200, 'og:image reachable');
 await lp.screenshot({ path: `${SH}/20-v7-landing.png`, fullPage: true });
 await lp.screenshot({ path: `${SH}/20-v7-landing-top.png` });
