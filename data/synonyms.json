@@ -1,0 +1,1431 @@
+{
+ "_about": "Fair Finder concept map (v7.3.1). Plain JSON, reusable (app search/autocomplete 'Likely matches' and the Fair Finder MCP server). ride_types: type id -> label + search terms. rides: ride id (data/rides.json) -> name + type ids (assigned by hand from each ride's well-known model; [] = type unknown). foods: concept id -> synonyms/spellings; a booth matches a food concept when its name/menu text contains one of the terms. Matching is an expansion layer: show concept hits only after direct hits.",
+ "version": "2026-10-15",
+ "ride_types": {
+  "pirate-ship": {
+   "label": "Pirate ship / swinging ship",
+   "terms": [
+    "pirate ship",
+    "pirate",
+    "pirates",
+    "swinging ship",
+    "swing ship",
+    "viking ship",
+    "ship",
+    "swinging boat"
+   ]
+  },
+  "boat": {
+   "label": "Boat ride",
+   "terms": [
+    "boat",
+    "boat ride",
+    "boats",
+    "tug boat",
+    "tugboat"
+   ]
+  },
+  "drop-tower": {
+   "label": "Drop tower",
+   "terms": [
+    "drop tower",
+    "drop",
+    "free fall",
+    "freefall",
+    "tower",
+    "drop ride"
+   ]
+  },
+  "ferris-wheel": {
+   "label": "Ferris wheel",
+   "terms": [
+    "ferris wheel",
+    "ferris",
+    "big wheel",
+    "giant wheel",
+    "observation wheel",
+    "wheel"
+   ]
+  },
+  "coaster": {
+   "label": "Roller coaster",
+   "terms": [
+    "roller coaster",
+    "rollercoaster",
+    "coaster",
+    "coasters",
+    "kiddie coaster",
+    "wild mouse"
+   ]
+  },
+  "carousel": {
+   "label": "Carousel",
+   "terms": [
+    "carousel",
+    "carrousel",
+    "merry go round",
+    "merry-go-round",
+    "merrygoround",
+    "horses"
+   ]
+  },
+  "funhouse": {
+   "label": "Fun house / walk-through",
+   "terms": [
+    "fun house",
+    "funhouse",
+    "walk through",
+    "walkthrough",
+    "maze",
+    "mirror maze",
+    "glass house",
+    "house of mirrors"
+   ]
+  },
+  "swings": {
+   "label": "Swing ride",
+   "terms": [
+    "swings",
+    "swing",
+    "swing ride",
+    "wave swinger",
+    "chair swing",
+    "flying swings"
+   ]
+  },
+  "bumper-cars": {
+   "label": "Bumper cars",
+   "terms": [
+    "bumper cars",
+    "bumper car",
+    "bumper",
+    "dodgem",
+    "dodgems",
+    "dodgem cars",
+    "scooters"
+   ]
+  },
+  "slide": {
+   "label": "Slide",
+   "terms": [
+    "slide",
+    "giant slide",
+    "big slide",
+    "super slide",
+    "slides",
+    "fun slide"
+   ]
+  },
+  "dark-ride": {
+   "label": "Haunted house / dark ride",
+   "terms": [
+    "haunted house",
+    "haunted",
+    "dark ride",
+    "spooky",
+    "scary",
+    "ghost",
+    "ghosts",
+    "haunt"
+   ]
+  },
+  "spinning": {
+   "label": "Spinning ride",
+   "terms": [
+    "spinning ride",
+    "spinning",
+    "spinner",
+    "spin",
+    "spins",
+    "scrambler"
+   ]
+  },
+  "tilt-a-whirl": {
+   "label": "Tilt-A-Whirl type",
+   "terms": [
+    "tilt a whirl",
+    "tiltawhirl",
+    "tilt-a-whirl",
+    "whirl"
+   ]
+  },
+  "teacups": {
+   "label": "Teacups",
+   "terms": [
+    "teacups",
+    "teacup",
+    "tea cups",
+    "tea cup",
+    "cups",
+    "spinning cups"
+   ]
+  },
+  "train": {
+   "label": "Kiddie train",
+   "terms": [
+    "train",
+    "trains",
+    "choo choo",
+    "kiddie train"
+   ]
+  },
+  "tram": {
+   "label": "Tram / shuttle",
+   "terms": [
+    "tram",
+    "trams",
+    "shuttle",
+    "trolley",
+    "trackless train"
+   ]
+  },
+  "chairlift": {
+   "label": "Sky ride / chair lift",
+   "terms": [
+    "sky ride",
+    "skyride",
+    "chair lift",
+    "chairlift",
+    "ski lift",
+    "sky lift",
+    "skylift",
+    "gondola"
+   ]
+  },
+  "gravitron": {
+   "label": "Gravitron / rotor",
+   "terms": [
+    "gravitron",
+    "rotor",
+    "spaceship",
+    "starship",
+    "zero gravity"
+   ]
+  },
+  "himalaya": {
+   "label": "Himalaya / music express",
+   "terms": [
+    "himalaya",
+    "music express",
+    "musik express"
+   ]
+  },
+  "pendulum": {
+   "label": "Pendulum / giant swing",
+   "terms": [
+    "pendulum",
+    "giant swing",
+    "frisbee",
+    "pendulum ride"
+   ]
+  },
+  "flips": {
+   "label": "Upside-down / looping",
+   "terms": [
+    "upside down",
+    "upsidedown",
+    "loop",
+    "loops",
+    "looping",
+    "flip",
+    "flips",
+    "inverts",
+    "zipper"
+   ]
+  },
+  "bungee": {
+   "label": "Bungee",
+   "terms": [
+    "bungee",
+    "bungy",
+    "bungee jump",
+    "bungee trampoline",
+    "trampoline"
+   ]
+  },
+  "kiddie-vehicles": {
+   "label": "Kiddie cars / trucks",
+   "terms": [
+    "kiddie cars",
+    "cars",
+    "car ride",
+    "trucks",
+    "monster truck",
+    "monster trucks",
+    "race cars",
+    "diggers",
+    "jeeps"
+   ]
+  },
+  "flying": {
+   "label": "Flying ride",
+   "terms": [
+    "helicopter",
+    "helicopters",
+    "planes",
+    "airplane",
+    "airplanes",
+    "jets",
+    "flying",
+    "fly",
+    "dumbo",
+    "elephant",
+    "elephants"
+   ]
+  },
+  "balloon": {
+   "label": "Balloon ride",
+   "terms": [
+    "balloon",
+    "balloons",
+    "hot air balloon",
+    "balloon ride"
+   ]
+  },
+  "paratrooper": {
+   "label": "Paratrooper",
+   "terms": [
+    "paratrooper",
+    "umbrella ride"
+   ]
+  },
+  "climbing": {
+   "label": "Climbing wall",
+   "terms": [
+    "climbing wall",
+    "rock wall",
+    "climbing",
+    "rock climbing",
+    "climb"
+   ]
+  },
+  "animals": {
+   "label": "Pony rides",
+   "terms": [
+    "pony",
+    "ponies",
+    "pony ride",
+    "horse ride",
+    "horseback"
+   ]
+  },
+  "bull": {
+   "label": "Mechanical bull",
+   "terms": [
+    "mechanical bull",
+    "bull riding",
+    "bull ride",
+    "bucking bronco",
+    "rodeo"
+   ]
+  },
+  "water-ball": {
+   "label": "Water walking ball",
+   "terms": [
+    "hamster ball",
+    "water ball",
+    "water walking ball",
+    "bubble ball",
+    "zorb",
+    "water walk"
+   ]
+  },
+  "thrill": {
+   "label": "Thrill rides",
+   "terms": [
+    "thrill",
+    "thrill ride",
+    "thrill rides",
+    "extreme",
+    "intense",
+    "big rides"
+   ]
+  },
+  "kiddie": {
+   "label": "Kiddie rides",
+   "terms": [
+    "kiddie",
+    "kiddie ride",
+    "kiddie rides",
+    "kids",
+    "kid rides",
+    "toddler",
+    "little kids",
+    "children"
+   ]
+  }
+ },
+ "rides": {
+  "L0-1149": {
+   "name": "Air Maxx",
+   "types": [
+    "pendulum",
+    "thrill"
+   ]
+  },
+  "L0-1163": {
+   "name": "Alien Abduction",
+   "types": [
+    "spinning",
+    "gravitron"
+   ]
+  },
+  "L0-1095": {
+   "name": "Alpine Bobs",
+   "types": [
+    "spinning"
+   ]
+  },
+  "L0-1153": {
+   "name": "America 250 Wheel",
+   "types": [
+    "ferris-wheel"
+   ]
+  },
+  "L0-1137": {
+   "name": "Asylum",
+   "types": [
+    "dark-ride",
+    "funhouse"
+   ]
+  },
+  "L0-1148": {
+   "name": "Axis",
+   "types": [
+    "pendulum",
+    "flips",
+    "thrill"
+   ]
+  },
+  "L0-1106": {
+   "name": "Baby Train",
+   "types": [
+    "train",
+    "kiddie"
+   ]
+  },
+  "L0-1155": {
+   "name": "Balloon Fiesta Wheel",
+   "types": [
+    "ferris-wheel",
+    "balloon",
+    "kiddie"
+   ]
+  },
+  "L0-1191": {
+   "name": "Berries",
+   "types": [
+    "teacups",
+    "spinning",
+    "kiddie"
+   ]
+  },
+  "L0-1696": {
+   "name": "Bull Ride",
+   "types": [
+    "bull"
+   ]
+  },
+  "L0-1185": {
+   "name": "Bungee",
+   "types": [
+    "bungee",
+    "thrill"
+   ]
+  },
+  "L0-1129": {
+   "name": "Bungee Jump",
+   "types": [
+    "bungee"
+   ]
+  },
+  "L0-1136": {
+   "name": "Casino",
+   "types": [
+    "spinning"
+   ]
+  },
+  "L0-1168": {
+   "name": "Charlie Chopper",
+   "types": [
+    "flying",
+    "kiddie"
+   ]
+  },
+  "L0-1094": {
+   "name": "Chop Shop Bumper Cars",
+   "types": [
+    "bumper-cars"
+   ]
+  },
+  "L0-1174": {
+   "name": "Circus Train",
+   "types": [
+    "train",
+    "kiddie"
+   ]
+  },
+  "L0-1165": {
+   "name": "Cliff Hanger",
+   "types": [
+    "flying",
+    "spinning",
+    "thrill"
+   ]
+  },
+  "L0-1169": {
+   "name": "Cliff Hanger",
+   "types": [
+    "flying",
+    "spinning",
+    "thrill"
+   ]
+  },
+  "L0-1134": {
+   "name": "Colossus",
+   "types": [
+    "ferris-wheel"
+   ]
+  },
+  "L0-1160": {
+   "name": "Construction Zone",
+   "types": [
+    "kiddie-vehicles",
+    "kiddie"
+   ]
+  },
+  "L0-1124": {
+   "name": "Crazy Cars",
+   "types": [
+    "kiddie-vehicles",
+    "spinning"
+   ]
+  },
+  "L0-1188": {
+   "name": "Crazy Chopper",
+   "types": [
+    "flying"
+   ]
+  },
+  "L0-1120": {
+   "name": "Cyclops",
+   "types": [
+    "pendulum",
+    "spinning",
+    "thrill"
+   ]
+  },
+  "L0-1151": {
+   "name": "Diesel Punk Fun House",
+   "types": [
+    "funhouse"
+   ]
+  },
+  "L0-1093": {
+   "name": "Dodgem Scooters",
+   "types": [
+    "bumper-cars"
+   ]
+  },
+  "L0-1138": {
+   "name": "Double Carousel",
+   "types": [
+    "carousel"
+   ]
+  },
+  "L0-1119": {
+   "name": "Downdraft",
+   "types": [
+    "spinning",
+    "thrill"
+   ]
+  },
+  "L0-1150": {
+   "name": "Downdraft",
+   "types": [
+    "spinning",
+    "thrill"
+   ]
+  },
+  "L0-1189": {
+   "name": "Dragon Coaster",
+   "types": [
+    "coaster"
+   ]
+  },
+  "L0-1112": {
+   "name": "Dragon Wagon",
+   "types": [
+    "coaster",
+    "kiddie"
+   ]
+  },
+  "L0-1135": {
+   "name": "Flipside",
+   "types": [
+    "flips",
+    "thrill"
+   ]
+  },
+  "L0-1152": {
+   "name": "Flying Bobs",
+   "types": [
+    "spinning"
+   ]
+  },
+  "L0-1115": {
+   "name": "Fun Slide",
+   "types": [
+    "slide"
+   ]
+  },
+  "L0-1107": {
+   "name": "Giant Parthenon Wheel",
+   "types": [
+    "ferris-wheel"
+   ]
+  },
+  "L0-1098": {
+   "name": "Giant Wheel",
+   "types": [
+    "ferris-wheel"
+   ]
+  },
+  "L0-1146": {
+   "name": "Hamster Ball",
+   "types": [
+    "water-ball"
+   ]
+  },
+  "L0-1132": {
+   "name": "Hamster Dance",
+   "types": [
+    "kiddie"
+   ]
+  },
+  "L0-1172": {
+   "name": "HELICOPTERS",
+   "types": [
+    "flying",
+    "kiddie"
+   ]
+  },
+  "L0-1183": {
+   "name": "Hillbilly Village",
+   "types": [
+    "funhouse"
+   ]
+  },
+  "L0-1164": {
+   "name": "Inferno",
+   "types": [
+    "flips",
+    "spinning",
+    "thrill"
+   ]
+  },
+  "L0-1166": {
+   "name": "Itsy Bitsy Spider Wheel",
+   "types": [
+    "ferris-wheel",
+    "kiddie"
+   ]
+  },
+  "L0-1175": {
+   "name": "Jalopy Junction",
+   "types": [
+    "kiddie-vehicles",
+    "kiddie"
+   ]
+  },
+  "L0-1170": {
+   "name": "Jumbo Elephant",
+   "types": [
+    "flying"
+   ]
+  },
+  "L0-1133": {
+   "name": "Kite Flyer",
+   "types": [
+    "flying"
+   ]
+  },
+  "L0-1125": {
+   "name": "Kraken",
+   "types": [
+    "spinning",
+    "thrill"
+   ]
+  },
+  "L0-1694": {
+   "name": "Lighthouse Dive",
+   "types": [
+    "drop-tower",
+    "kiddie"
+   ]
+  },
+  "L0-1105": {
+   "name": "Lolly Swings",
+   "types": [
+    "swings",
+    "kiddie"
+   ]
+  },
+  "L0-1142": {
+   "name": "Magic Maze Glass House",
+   "types": [
+    "funhouse"
+   ]
+  },
+  "L0-1173": {
+   "name": "Mechanical Bull",
+   "types": [
+    "bull"
+   ]
+  },
+  "L0-1096": {
+   "name": "Mega Drop",
+   "types": [
+    "drop-tower",
+    "thrill"
+   ]
+  },
+  "L0-1121": {
+   "name": "Merry-Go-Round",
+   "types": [
+    "carousel"
+   ]
+  },
+  "L0-1110": {
+   "name": "Mighty Mouse Roller Coaster",
+   "types": [
+    "coaster"
+   ]
+  },
+  "L0-1186": {
+   "name": "Mini Himalaya",
+   "types": [
+    "himalaya",
+    "kiddie"
+   ]
+  },
+  "L0-1123": {
+   "name": "Mini Paratrooper",
+   "types": [
+    "paratrooper",
+    "kiddie"
+   ]
+  },
+  "L0-1116": {
+   "name": "Mirror Maze",
+   "types": [
+    "funhouse"
+   ]
+  },
+  "L0-1118": {
+   "name": "Monster Truck",
+   "types": [
+    "kiddie-vehicles",
+    "kiddie"
+   ]
+  },
+  "L0-1156": {
+   "name": "Monster Trucks",
+   "types": [
+    "kiddie-vehicles",
+    "kiddie"
+   ]
+  },
+  "L0-1162": {
+   "name": "Mulligan Wheel",
+   "types": [
+    "ferris-wheel"
+   ]
+  },
+  "L0-1100": {
+   "name": "Orbiter",
+   "types": [
+    "spinning",
+    "thrill"
+   ]
+  },
+  "L0-1128": {
+   "name": "Pirate's Island",
+   "types": [
+    "funhouse"
+   ]
+  },
+  "L0-1157": {
+   "name": "Pony Rides",
+   "types": [
+    "animals"
+   ]
+  },
+  "L0-1171": {
+   "name": "Puppy Roll",
+   "types": [
+    "spinning",
+    "kiddie"
+   ]
+  },
+  "L0-1187": {
+   "name": "Raiders",
+   "types": [
+    "funhouse"
+   ]
+  },
+  "L0-1167": {
+   "name": "Rock Climbing Wall",
+   "types": [
+    "climbing"
+   ]
+  },
+  "L0-1140": {
+   "name": "Rock Star",
+   "types": [
+    "pendulum",
+    "flips",
+    "thrill"
+   ]
+  },
+  "L0-1147": {
+   "name": "Rockin' Tug Boat",
+   "types": [
+    "boat",
+    "kiddie"
+   ]
+  },
+  "L0-1114": {
+   "name": "Samba Balloons",
+   "types": [
+    "balloon",
+    "spinning",
+    "kiddie"
+   ]
+  },
+  "L0-1139": {
+   "name": "Sea Ray Ship",
+   "types": [
+    "pirate-ship",
+    "boat"
+   ]
+  },
+  "L0-1104": {
+   "name": "Ship's Ahoy",
+   "types": [
+    "pirate-ship",
+    "boat",
+    "kiddie"
+   ]
+  },
+  "L0-1101": {
+   "name": "Silver Streak",
+   "types": [
+    "coaster"
+   ]
+  },
+  "L0-1108": {
+   "name": "Sizzler",
+   "types": [
+    "spinning"
+   ]
+  },
+  "L0-1182": {
+   "name": "Sky Hawk",
+   "types": [
+    "flying",
+    "flips",
+    "thrill"
+   ]
+  },
+  "L0-1181": {
+   "name": "Starship 4000",
+   "types": [
+    "gravitron",
+    "thrill"
+   ]
+  },
+  "L0-1184": {
+   "name": "Starship 4000",
+   "types": [
+    "gravitron",
+    "thrill"
+   ]
+  },
+  "L0-1143": {
+   "name": "State Fair Flyer - Orville",
+   "types": [
+    "chairlift"
+   ]
+  },
+  "L0-1144": {
+   "name": "State Fair Flyer - Wilbur",
+   "types": [
+    "chairlift"
+   ]
+  },
+  "L0-1097": {
+   "name": "Super Cyclone",
+   "types": [
+    "tilt-a-whirl",
+    "spinning"
+   ]
+  },
+  "L0-1178": {
+   "name": "Super Himalaya",
+   "types": [
+    "himalaya",
+    "thrill"
+   ]
+  },
+  "L0-1113": {
+   "name": "Super Slide",
+   "types": [
+    "slide"
+   ]
+  },
+  "L0-1335": {
+   "name": "Super Slide",
+   "types": [
+    "slide"
+   ]
+  },
+  "L0-1145": {
+   "name": "Surf City Fun House",
+   "types": [
+    "funhouse"
+   ]
+  },
+  "L0-1122": {
+   "name": "Teacup",
+   "types": [
+    "teacups",
+    "kiddie"
+   ]
+  },
+  "L0-1092": {
+   "name": "Teacups",
+   "types": [
+    "teacups"
+   ]
+  },
+  "L0-1176": {
+   "name": "Techno Jump",
+   "types": [
+    "spinning",
+    "kiddie"
+   ]
+  },
+  "L0-1117": {
+   "name": "Tesla AC",
+   "types": []
+  },
+  "L0-1127": {
+   "name": "The Haunted",
+   "types": [
+    "dark-ride"
+   ]
+  },
+  "L0-1099": {
+   "name": "Tilt a Whirl",
+   "types": [
+    "tilt-a-whirl",
+    "spinning"
+   ]
+  },
+  "L0-1158": {
+   "name": "Tram Rides",
+   "types": [
+    "tram"
+   ]
+  },
+  "L0-1159": {
+   "name": "Tram Rides",
+   "types": [
+    "tram"
+   ]
+  },
+  "L0-1179": {
+   "name": "Twin Twister",
+   "types": [
+    "spinning"
+   ]
+  },
+  "L0-1161": {
+   "name": "Undersea Adventure",
+   "types": [
+    "kiddie"
+   ]
+  },
+  "L0-1131": {
+   "name": "Up Up Away",
+   "types": [
+    "balloon",
+    "kiddie"
+   ]
+  },
+  "L0-1102": {
+   "name": "Wacky Worm",
+   "types": [
+    "coaster",
+    "kiddie"
+   ]
+  },
+  "L0-1141": {
+   "name": "Wacky Worm",
+   "types": [
+    "coaster",
+    "kiddie"
+   ]
+  },
+  "L0-1109": {
+   "name": "Wave Swinger",
+   "types": [
+    "swings"
+   ]
+  },
+  "L0-1154": {
+   "name": "Wave Swinger",
+   "types": [
+    "swings"
+   ]
+  },
+  "L0-1103": {
+   "name": "Wiggle Wurm",
+   "types": [
+    "coaster",
+    "kiddie"
+   ]
+  },
+  "L0-1130": {
+   "name": "Wipeout",
+   "types": [
+    "spinning",
+    "thrill"
+   ]
+  },
+  "L0-1126": {
+   "name": "Zero Gravity",
+   "types": [
+    "gravitron",
+    "thrill"
+   ]
+  },
+  "L0-1177": {
+   "name": "Zipper",
+   "types": [
+    "flips",
+    "spinning",
+    "thrill"
+   ]
+  }
+ },
+ "foods": {
+  "slush": {
+   "terms": [
+    "slush",
+    "slushie",
+    "slushy",
+    "slushies",
+    "icee",
+    "frozen drink",
+    "frozen drinks",
+    "frozen lemonade",
+    "italian ice",
+    "granita"
+   ]
+  },
+  "sno-cone": {
+   "terms": [
+    "sno cone",
+    "snow cone",
+    "sno-cone",
+    "snocone",
+    "shaved ice",
+    "snowball",
+    "hawaiian shaved ice"
+   ]
+  },
+  "bbq": {
+   "terms": [
+    "bbq",
+    "barbecue",
+    "barbeque",
+    "bar-b-q",
+    "bar b q",
+    "pulled pork",
+    "brisket",
+    "ribs",
+    "smoked"
+   ]
+  },
+  "fries": {
+   "terms": [
+    "fries",
+    "french fries",
+    "fry",
+    "ribbon fries",
+    "cheese fries",
+    "curly fries",
+    "chips",
+    "potato"
+   ]
+  },
+  "funnel-cake": {
+   "terms": [
+    "funnel cake",
+    "funnel cakes",
+    "funnelcake",
+    "fried dough",
+    "elephant ear",
+    "elephant ears",
+    "zeppole"
+   ]
+  },
+  "lemonade": {
+   "terms": [
+    "lemonade",
+    "lemonaid",
+    "lemon shake up",
+    "lemon shake-up",
+    "shake up",
+    "shake-up",
+    "shakeup",
+    "limeade",
+    "fresh squeezed"
+   ]
+  },
+  "turkey-leg": {
+   "terms": [
+    "turkey leg",
+    "turkey legs",
+    "smoked turkey",
+    "drumstick",
+    "turkey"
+   ]
+  },
+  "corn-dog": {
+   "terms": [
+    "corn dog",
+    "corndog",
+    "corn dogs",
+    "corndogs",
+    "korean corn dog",
+    "kdog",
+    "k-dog",
+    "foot long corn dog"
+   ]
+  },
+  "hot-dog": {
+   "terms": [
+    "hot dog",
+    "hotdog",
+    "hot dogs",
+    "frank",
+    "franks",
+    "frankfurter",
+    "wiener",
+    "weiner",
+    "footlong",
+    "foot long",
+    "chili dog",
+    "slaw dog"
+   ]
+  },
+  "cotton-candy": {
+   "terms": [
+    "cotton candy",
+    "candy floss",
+    "fairy floss",
+    "spun sugar"
+   ]
+  },
+  "ice-cream": {
+   "terms": [
+    "ice cream",
+    "icecream",
+    "soft serve",
+    "softserve",
+    "sundae",
+    "cone",
+    "gelato",
+    "custard",
+    "frozen custard",
+    "frozen yogurt",
+    "froyo"
+   ]
+  },
+  "donut": {
+   "terms": [
+    "donut",
+    "donuts",
+    "doughnut",
+    "doughnuts",
+    "beignet",
+    "beignets",
+    "mini donuts"
+   ]
+  },
+  "gyro": {
+   "terms": [
+    "gyro",
+    "gyros",
+    "pita",
+    "shawarma",
+    "kabob",
+    "kebab",
+    "souvlaki",
+    "greek"
+   ]
+  },
+  "burger": {
+   "terms": [
+    "burger",
+    "burgers",
+    "cheeseburger",
+    "hamburger",
+    "hamburgers",
+    "cheese burger"
+   ]
+  },
+  "chicken": {
+   "terms": [
+    "chicken",
+    "fried chicken",
+    "chicken tenders",
+    "tenders",
+    "wings",
+    "chicken wings",
+    "nuggets",
+    "chicken strips"
+   ]
+  },
+  "sausage": {
+   "terms": [
+    "sausage",
+    "italian sausage",
+    "polish sausage",
+    "bratwurst",
+    "brat",
+    "kielbasa"
+   ]
+  },
+  "philly": {
+   "terms": [
+    "philly",
+    "cheesesteak",
+    "cheese steak",
+    "philly cheesesteak",
+    "steak and cheese"
+   ]
+  },
+  "candy-apple": {
+   "terms": [
+    "candy apple",
+    "candy apples",
+    "caramel apple",
+    "caramel apples",
+    "toffee apple"
+   ]
+  },
+  "popcorn": {
+   "terms": [
+    "popcorn",
+    "kettle corn",
+    "kettlecorn",
+    "caramel corn"
+   ]
+  },
+  "pickle": {
+   "terms": [
+    "pickle",
+    "pickles",
+    "fried pickles",
+    "pickle on a stick",
+    "dill pickle"
+   ]
+  },
+  "milkshake": {
+   "terms": [
+    "milkshake",
+    "milk shake",
+    "shake",
+    "shakes",
+    "malt",
+    "float",
+    "floats"
+   ]
+  },
+  "smoothie": {
+   "terms": [
+    "smoothie",
+    "smoothies",
+    "fruit smoothie",
+    "juice",
+    "fresh juice"
+   ]
+  },
+  "coffee": {
+   "terms": [
+    "coffee",
+    "iced coffee",
+    "frozen coffee",
+    "latte",
+    "espresso",
+    "cold brew",
+    "cappuccino"
+   ]
+  },
+  "tea": {
+   "terms": [
+    "tea",
+    "sweet tea",
+    "iced tea",
+    "bubble tea",
+    "boba"
+   ]
+  },
+  "soda": {
+   "terms": [
+    "soda",
+    "pop",
+    "soft drink",
+    "coke",
+    "pepsi",
+    "cheerwine",
+    "root beer",
+    "fountain drink"
+   ]
+  },
+  "water": {
+   "terms": [
+    "water",
+    "bottled water",
+    "bottle water",
+    "water bottle"
+   ]
+  },
+  "taco": {
+   "terms": [
+    "taco",
+    "tacos",
+    "burrito",
+    "burritos",
+    "quesadilla",
+    "nachos",
+    "mexican"
+   ]
+  },
+  "pizza": {
+   "terms": [
+    "pizza",
+    "pizzas",
+    "slice",
+    "pepperoni"
+   ]
+  },
+  "seafood": {
+   "terms": [
+    "seafood",
+    "shrimp",
+    "fish",
+    "oyster",
+    "oysters",
+    "crab",
+    "fish and chips",
+    "calamari"
+   ]
+  },
+  "churro": {
+   "terms": [
+    "churro",
+    "churros"
+   ]
+  },
+  "pretzel": {
+   "terms": [
+    "pretzel",
+    "pretzels",
+    "soft pretzel"
+   ]
+  },
+  "nuts": {
+   "terms": [
+    "peanuts",
+    "boiled peanuts",
+    "roasted peanuts",
+    "nuts",
+    "cashews",
+    "pecans",
+    "almonds"
+   ]
+  },
+  "fudge": {
+   "terms": [
+    "fudge",
+    "candy",
+    "chocolate",
+    "chocolate covered"
+   ]
+  },
+  "cookie": {
+   "terms": [
+    "cookie",
+    "cookies",
+    "cookie dough",
+    "brownie",
+    "brownies"
+   ]
+  },
+  "pie": {
+   "terms": [
+    "pie",
+    "pies",
+    "cobbler",
+    "fried pie"
+   ]
+  },
+  "beer-wine": {
+   "terms": [
+    "beer",
+    "wine",
+    "cider",
+    "hard cider",
+    "mead",
+    "alcohol"
+   ]
+  },
+  "sweet-potato": {
+   "terms": [
+    "sweet potato",
+    "sweet potatoes",
+    "yam"
+   ]
+  },
+  "biscuit": {
+   "terms": [
+    "ham biscuit",
+    "biscuit",
+    "biscuits",
+    "sausage biscuit"
+   ]
+  },
+  "egg-roll": {
+   "terms": [
+    "egg roll",
+    "egg rolls",
+    "eggroll",
+    "spring roll"
+   ]
+  },
+  "vegan": {
+   "terms": [
+    "vegan",
+    "vegetarian",
+    "plant based",
+    "veggie",
+    "meatless"
+   ]
+  }
+ }
+}

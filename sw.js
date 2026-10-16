@@ -1,5 +1,5 @@
-const V = 'ff-shell-v7-3';
-const SHELL = ['./', 'index.html', 'style.css?v=73', 'app.js?v=73', 'geo.js?v=73', 'search.js?v=73', 'rides.js?v=73', 'suggest.js?v=73', 'route.js?v=73', 'vendor/leaflet.js?v=73', 'vendor/leaflet.css?v=73', 'data/booths.json', 'data/rides.json', 'data/atms.json', 'data/walkways.json', 'manifest.webmanifest', 'icons/icon-192.png', 'about/', 'about/about.css?v=73'];
+const V = 'ff-shell-v7-3-1';
+const SHELL = ['./', 'index.html', 'style.css?v=731', 'app.js?v=731', 'geo.js?v=731', 'search.js?v=731', 'rides.js?v=731', 'suggest.js?v=731', 'concepts.js?v=731', 'route.js?v=731', 'vendor/leaflet.js?v=731', 'vendor/leaflet.css?v=731', 'data/booths.json', 'data/rides.json', 'data/synonyms.json', 'data/atms.json', 'data/walkways.json', 'manifest.webmanifest', 'icons/icon-192.png', 'about/', 'about/about.css?v=731'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('ff-shell-') && k !== V).map(k => caches.delete(k))))
   .then(() => caches.open('ff-tiles-v1')).then(async c => { for (const r of await c.keys()) if (!isTile(r.url)) await c.delete(r); }) // purge OSM/Esri tiles cached by v1–v6

@@ -1,0 +1,46 @@
+// v7.3.1: concept ("likely match") layer from data/synonyms.json. Node only.
+import { createRequire } from 'module';
+import fs from 'fs';
+const require = createRequire(import.meta.url);
+const FoodSearch = require('../search.js'), Suggest = require('../suggest.js'), Rides = require('../rides.js'), Concepts = require('../concepts.js');
+const fails = []; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails.push(m); };
+const J = f => JSON.parse(fs.readFileSync(new URL('../data/' + f, import.meta.url), 'utf8'));
+const syn = J('synonyms.json'), rides = J('rides.json').rides.map(Rides.prepare);
+const rideIds = new Set(rides.map(r => r.id));
+const booths = J('booths.json').booths.filter(b => b.lat != null && !rideIds.has(b.id)).map(FoodSearch.prepare);
+const index = Suggest.buildIndex({ booths, rides });
+const C = Concepts.create(syn);
+// shape: plain JSON, every ride covered, all type ids defined
+ok(syn.ride_types && syn.rides && syn.foods, 'synonyms.json has ride_types/rides/foods');
+ok(rides.every(r => syn.rides[r.id] && syn.rides[r.id].name === r.name), 'every ride in synonyms.json');
+ok(Object.values(syn.rides).every(r => r.types.every(t => syn.ride_types[t])), 'all ride type ids defined');
+ok(Object.values(syn.rides).filter(r => r.types.length).length >= 95, 'nearly every ride typed');
+const app = (q, cap = 5) => { // mirrors app.js: direct first, then likely not already direct, none for an exact hit
+  const direct = Suggest.query(index, q, 8);
+  if (direct.some(d => d.score >= 100)) return { direct, likely: [] };
+  const ex = new Set(direct.filter(d => d.type !== 'food').map(d => d.id));
+  return { direct, likely: C.likely(q, { rides, booths, exclude: ex, limit: cap }) };
+};
+let r = app('pirate');
+ok(r.direct.some(d => d.label === "Pirate's Island"), "pirate: Pirate's Island direct " + r.direct.map(d => d.label).join('; '));
+ok(r.likely.some(l => l.item.name === 'Sea Ray Ship'), 'pirate: Sea Ray Ship likely ' + r.likely.map(l => l.item.name).join('; '));
+ok(!r.likely.some(l => l.item.name === "Pirate's Island"), 'pirate: direct hit not repeated in likely');
+r = app('bumper cars');
+const dodgem = [...r.direct.map(d => d.label), ...r.likely.map(l => l.item.name)];
+ok(dodgem.includes('Dodgem Scooters'), 'bumper cars finds Dodgem Scooters ' + dodgem.join('; '));
+ok(r.likely.every(l => l.why === 'Bumper cars'), 'bumper cars: only the bumper-car concept (not "cars")');
+const slushText = b => /slush/i.test(b._joined);
+const sr = FoodSearch.search(booths, 'slushie').map(x => x.booth);
+const sl = C.likely('slushie', { rides, booths, limit: 50 }).map(l => l.item);
+ok([...sr, ...sl].filter(slushText).length >= 2, 'slushie finds slush booths: ' + [...new Set([...sr, ...sl].filter(slushText).map(b => b.name))].join('; '));
+ok(C.likely('icee', { rides, booths, limit: 50 }).every(l => !/^Howling Cow$/.test(l.item.name)), 'icee does not match plain ice cream booths');
+ok(app('zipper').likely.length === 0, 'exact ride name: no likely noise');
+r = app('corn dog'); ok(r.direct[0].score >= 100 && r.likely.length === 0, 'exact food: no likely noise');
+r = app('carousel');
+ok(r.direct.some(d => d.label === 'Double Carousel') && r.likely.some(l => l.item.name === 'Merry-Go-Round'), 'carousel: Double Carousel direct, Merry-Go-Round likely');
+ok(app('ferris wheel').likely.some(l => l.item.name === 'Colossus'), 'ferris wheel -> Colossus');
+ok(C.likely('candy floss', { rides, booths }).some(l => /cotton candy/i.test(l.item._joined)), 'candy floss -> cotton candy booth');
+ok(app('pirate', 5).likely.length <= 5, 'likely capped at 5');
+ok(C.likely('zz', { rides, booths }).length === 0 && C.likely('qwxyz', { rides, booths }).length === 0, 'no concept, no likely');
+console.log(fails.length ? fails.length + ' FAILURES\n' + fails.join('\n') : 'ALL PASS');
+process.exit(fails.length ? 1 : 0);

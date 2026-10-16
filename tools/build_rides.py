@@ -2,7 +2,9 @@
 """Build data/rides.json from the fair's published Food & Ride Finder layer (FEATURETYPE='Rides' + OBJECTID 1335 'Super Slide').
 Public name = FoodRideAppName (what the official app shows). Lot/contract labels become search aliases.
 TICKETS=-1 means 'Cash Only'. Optional details (category, height) are merged from tools/ride_details.json
-(midway operator Powers Great American Midways' published lists; approximate, shown as 'per midway operator')."""
+(midway operator Powers Great American Midways' published lists; approximate, shown as 'per midway operator').
+category_source: 'operator' (from those lists) or 'estimated' (v7.3.1: assigned from the well-known ride type for rides the
+operator lists don't categorize; shown as e.g. 'Thrill (est.)'). cashPrice: the fair's PRODUCT price for Cash Only rides."""
 import json, re, sys, urllib.request, urllib.parse, datetime, os
 SVC = "https://services6.arcgis.com/3Sj1fiIDvQtFfbvg/arcgis/rest/services/StateFairFRFapp2026_WFL1_view/FeatureServer/0"
 q = urllib.parse.urlencode({"where": "FEATURETYPE='Rides' OR OBJECTID=1335", "outFields": "OBJECTID,FoodRideAppName,NAMELABEL,CONTRACT,LOC_NAME,LOT_LOC,TICKETS,PRODUCT,FEATURETYPE,MAP_PAGE", "outSR": 4326, "f": "geojson"})
@@ -25,7 +27,8 @@ for f in g["features"]:
     rides.append({"id": f"L0-{oid}", "name": name, "kind": "ride", "aliases": aliases,
         "area": d.get("area") or title(p.get("LOC_NAME")), "lot": None,
         "tickets": t if isinstance(t, (int, float)) and t > 0 else None, "cashOnly": t == -1,
-        "category": d.get("category"), "heightText": d.get("heightText"),
+        "category": d.get("category"), "category_source": d.get("category_source") if d.get("category") else None,
+        "cashPrice": d.get("cashPrice") if t == -1 else None, "heightText": d.get("heightText"),
         "lat": round(lat, 7), "lon": round(lon, 7), "location": "exact"})
 rides.sort(key=lambda r: r["name"].lower())
 out = {"generated": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),

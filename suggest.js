@@ -83,11 +83,15 @@
         entries.push(entry('ride', r.id, r.name, al[j], { isAlias: true, alias: al[j], sub: r.area || '' }));
       }
     }
+    const isB = b => b && b.name && (b.food || b.kind === 'newfood' || b.kind === 'sponsor');
+    const nameN = new Map(); // same-name booths (e.g. two 'Goldenkdog' in I Lot) also show their lot to tell them apart
+    for (let i = 0; i < booths.length; i++) if (isB(booths[i])) { const k = compact(booths[i].name); nameN.set(k, (nameN.get(k) || 0) + 1); }
     for (let i = 0; i < booths.length; i++) {
       const b = booths[i];
-      if (!b || !b.name) continue;
-      if (!(b.food || b.kind === 'newfood' || b.kind === 'sponsor')) continue;
-      entries.push(entry('booth', b.id, b.name, b.name, { sub: b.area || '' }));
+      if (!isB(b)) continue;
+      const dup = nameN.get(compact(b.name)) > 1;
+      const sub = dup ? [b.area, b.lot || b.id].filter(Boolean).join(' · ') : (b.area || '');
+      entries.push(entry('booth', b.id, b.name, b.name, { sub: sub }));
     }
     const best = new Map();
     function considerFood(raw) {

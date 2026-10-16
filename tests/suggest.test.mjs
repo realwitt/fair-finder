@@ -46,12 +46,22 @@ const kid = Rides.filter(rides, 'kiddie');
 ok(kid.length > 0 && kid.length < rides.length && kid.every(r => r.category === 'kiddie'), 'kiddie filter ' + kid.length + '/' + rides.length);
 ok(Rides.filter(rides, 'all').length === rides.length, 'filter all');
 const tw = rides.find(r => r.id === 'L0-1099');
-ok(Rides.cardMeta(tw) === 'Midway · 4 tickets', 'cardMeta tickets ' + JSON.stringify(Rides.cardMeta(tw)));
+ok(Rides.cardMeta(tw) === 'Midway · 4 tickets\nFamily (est.)' && tw.category_source === 'estimated', 'cardMeta tickets + estimated category ' + JSON.stringify(Rides.cardMeta(tw)));
 ok(tw.products === '' && Array.isArray(tw.items) && tw.kind === 'ride', 'prepare ride');
 const cash = rides.find(r => r.cashOnly && r.area);
 ok(Rides.cardMeta(cash).includes('Cash Only'), 'cardMeta cash ' + Rides.cardMeta(cash));
 const cat = rides.find(r => r.category && r.heightText);
-ok(cat && Rides.cardMeta(cat).includes('(per midway operator)') && Rides.cardMeta(cat).includes(cat.category), 'cardMeta height/category');
+ok(cat && Rides.cardMeta(cat).includes('(per midway operator)') && Rides.cardMeta(cat).toLowerCase().includes(cat.category), 'cardMeta height/category');
+// v7.3.1: every ride has a category; estimated ones say so; Cash Only rides show the fair's cash price
+ok(rides.every(r => ['kiddie', 'family', 'thrill'].includes(r.category)), 'every ride categorized');
+const est = rides.filter(r => r.category_source === 'estimated');
+ok(est.length >= 30 && est.every(r => / \(est\.\)$/.test(Rides.catLabel(r))), 'estimated categories labelled (est.) ' + est.length);
+ok(rides.filter(r => !r.category_source || r.category_source === 'operator').every(r => /per midway operator/.test(Rides.catLabel(r))), 'operator categories labelled per operator');
+const bungee = rides.find(r => r.name === 'Bungee');
+ok(bungee && /Cash Only · \$10/.test(Rides.cardMeta(bungee)), 'bungee cash price ' + (bungee && Rides.cardMeta(bungee)));
+ok(['L0-1099', 'L0-1097'].every(id => rides.find(r => r.id === id).name === (id === 'L0-1099' ? 'Tilt a Whirl' : 'Super Cyclone')), 'official Tilt a Whirl / Super Cyclone naming unchanged');
+const gk = Suggest.query(index, 'goldenkdog');
+ok(gk.length === 2 && gk[0].sub !== gk[1].sub && gk.every(x => /LOT I00/.test(x.sub)), 'same-name booths show lot ' + JSON.stringify(gk.map(x => x.sub)));
 
 const qs = [];
 const seeds = ['tilt', 'tilt a', 'super', 'super cyclone', 'emp', 'empanada', 'hot dog', 'ride', 'zzqq', 'funnel', 'air', 'whril', 'lemonade', 'bbq', 'tiltawhirl', 'tilt a whril', 'cyclone', 'kiddie', 'wheel', 'slide'];

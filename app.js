@@ -7,7 +7,7 @@ const OSM = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 // Fair's published grounds-map tile layer full extent (EPSG:3857) converted to lat/lon
 const FAIR_BOUNDS = L.latLngBounds([35.79119, -78.72134], [35.79952, -78.70469]);
 const CENTER = [35.7948, -78.7115];
-const APP_VERSION = 'v7.3 · Oct 15';
+const APP_VERSION = 'v7.3.1 · Oct 15';
 const $ = id => document.getElementById(id);
 const LS_KEY = 'ff.guideTarget';
 const state = { me: null, acc: null, gpsHeading: null, compass: null, compassAt: 0, target: null, booths: [], rides: [], atms: [], results: [], query: '' };
@@ -91,10 +91,10 @@ function popBtns(b) {
 }
 function popupHtml(b) {
   if (b.kind === 'ride') {
-    const pay = b.tickets != null ? `<div>🎟 ${b.tickets} tickets (fair’s listing)</div>` : (b.cashOnly ? '<div>Cash Only</div>' : '');
+    const pay = b.tickets != null ? `<div>🎟 ${b.tickets} tickets (fair’s listing)</div>` : (b.cashOnly ? `<div>💵 Cash Only${b.cashPrice ? ' · ' + esc(b.cashPrice) + ' (fair’s listing)' : ''}</div>` : '');
     const extra = [];
     if (b.heightText) extra.push(`<div>${esc(b.heightText)} (per midway operator)</div>`);
-    if (b.category) extra.push(`<div>${esc(b.category)} (per midway operator)</div>`);
+    if (b.category) extra.push(`<div class="rideCat">${esc(Rides.catLabel(b))}</div>`);
     const alias = b.aliases && b.aliases.length ? `<small>Lot label: ${esc(b.aliases.join(', '))}</small>` : '';
     return `<b>${esc(b.name)}</b> <span class="badge ride">RIDE</span><br><small>${esc(b.area || '')}</small>${pay}${extra.join('')}${alias ? '<br>' + alias : ''}${popBtns(b)}`;
   }
@@ -128,10 +128,11 @@ map.on('popupopen', e => {
 map.on('popupclose', e => { document.body.classList.remove('popup'); if (e.popup._ffId && !state.target && urlBoothId() === e.popup._ffId) setUrl({ booth: null }); });
 
 async function loadData() {
-  const [bd, ad, rd] = await Promise.all([
+  const [bd, ad, rd, syn] = await Promise.all([
     fetch('data/booths.json').then(r => r.json()),
     fetch('data/atms.json').then(r => r.json()).catch(() => null),
     fetch('data/rides.json').then(r => r.json()).catch(() => null),
+    fetch('data/synonyms.json').then(r => r.json()).catch(() => null),
   ]);
   state.meta = bd;
   state.rideMeta = rd;
@@ -149,6 +150,7 @@ async function loadData() {
     state.markers.set(r.id, m);
   });
   state.suggestIndex = Suggest.buildIndex({ booths: state.booths, rides: state.rides });
+  state.concepts = syn && window.Concepts ? Concepts.create(syn) : null;
   state.booths.filter(b => b.drinks).forEach(b => L.circleMarker([b.lat, b.lon], { renderer: canvas, radius: 8, color: '#000', weight: 2, fillColor: '#00b3ff', fillOpacity: 1 }).bindPopup(() => popupHtml(b)).addTo(drinkLayer));
   if (ad) {
     state.atms = ad.atms;
@@ -289,13 +291,27 @@ $('q').addEventListener('input', () => {
 });
 $('searchForm').onsubmit = e => { e.preventDefault(); hideSuggest(); runSearch(); $('q').blur(); };
 $('clearQ').onclick = () => { $('q').value = ''; hideSuggest(); clearResults(); };
-document.querySelectorAll('.chip').forEach(c => c.onclick = () => { hideSuggest(); $('q').value = c.dataset.q === 'new' ? '' : c.dataset.q; runSearch(c.dataset.q === 'new'); });
+document.querySelectorAll('.chip').forEach(c => c.onclick = () => {
+  hideSuggest();
+  if (c.classList.contains('on') && !$('results').classList.contains('hidden')) { $('q').value = ''; clearResults(); return; } // second tap toggles off
+  $('q').value = c.dataset.q === 'new' ? '' : c.dataset.q; runSearch(c.dataset.q === 'new');
+});
+// Chip looks selected while its search is the one showing.
+function syncChips() {
+  const open = !$('results').classList.contains('hidden') && !!state.query;
+  const q = String(state.query || '').toLowerCase();
+  document.querySelectorAll('.chip').forEach(c => {
+    const on = open && (c.dataset.q === 'new' ? q === 'new foods 2026' : c.dataset.q === 'rides' ? q === 'rides' : q === c.dataset.q);
+    c.classList.toggle('on', on); c.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
 $('closeResults').onclick = clearResults;
 function clearResults() {
   state.results = []; state.query = '';
   hitLayer.clearLayers(); $('results').classList.add('hidden');
   const subs = $('rideSubs'); if (subs) subs.classList.add('hidden');
   setUrl({ q: null, new: null });
+  syncChips(); fitSuggest();
 }
 $('q').addEventListener('focus', () => document.body.classList.add('typing'));
 $('q').addEventListener('blur', () => { document.body.classList.remove('typing'); setTimeout(hideSuggest, 150); });
@@ -333,6 +349,17 @@ function ridesMatching(q) {
   }
   return out;
 }
+// Concept matches (data/synonyms.json) not already direct hits, nearest first. Never for an exact name hit.
+function likelyFor(q, exclude, cap) {
+  if (!state.concepts) return [];
+  const qc = Suggest.compact(q);
+  if (state.rides.some(r => Suggest.compact(r.name) === qc) || state.booths.some(b => b.food && Suggest.compact(b.name) === qc)) return [];
+  const ls = state.concepts.likely(q, { rides: state.rides, booths: state.booths, exclude, limit: 200 });
+  refreshWalk();
+  ls.forEach(l => { l.d = dist(l.item); });
+  ls.sort((a, b) => (a.d != null && b.d != null ? a.d - b.d : 0));
+  return ls.slice(0, cap);
+}
 function isRidesQuery(q) { const n = String(q || '').trim().toLowerCase(); return n === 'rides' || n === 'ride'; }
 function runSearch(newOnly, fromUrl) {
   const q = $('q').value.trim();
@@ -352,7 +379,9 @@ function runSearch(newOnly, fromUrl) {
     const seen = new Set();
     for (let i = 0; i < state.results.length; i++) seen.add(state.results[i].booth.id);
     const extra = ridesMatching(q);
-    for (let i = 0; i < extra.length; i++) if (!seen.has(extra[i].id)) state.results.push({ booth: extra[i], score: 1, matched: [] });
+    for (let i = 0; i < extra.length; i++) if (!seen.has(extra[i].id)) { seen.add(extra[i].id); state.results.push({ booth: extra[i], score: 1, matched: [] }); }
+    const nDirect = state.results.length;
+    likelyFor(q, seen, nDirect ? 5 : 30).forEach(l => state.results.push({ booth: l.item, score: 0.5, matched: [], likely: true, why: l.why }));
     state.query = q;
   }
   renderResults(true);
@@ -360,45 +389,55 @@ function runSearch(newOnly, fromUrl) {
 function renderResults(fit, quiet) {
   const rs = state.results;
   refreshWalk();
-  rs.forEach(r => { r.d = dist(r.booth); r.walk = state.dj && r.d != null && walkDist(r.booth) != null; r.tier = r.score >= 0.85 ? 0 : 1; });
+  rs.forEach(r => { r.d = dist(r.booth); r.walk = state.dj && r.d != null && walkDist(r.booth) != null; r.tier = r.likely ? 2 : r.score >= 0.85 ? 0 : 1; });
   rs.sort((a, b) => a.tier - b.tier || (a.d != null && b.d != null ? a.d - b.d : b.score - a.score));
   hitLayer.clearLayers();
   rs.forEach(r => (r.booth.kind === 'ride' ? rideMarker(r.booth, true) : boothMarker(r.booth, 'hit')).addTo(hitLayer));
-  $('resCount').textContent = rs.length ? `${rs.length} results for “${state.query}”${state.me ? (state.dj ? ', nearest walk first' : ', nearest first') : ''}` : `No results for “${state.query}”`;
+  const nLik = rs.filter(r => r.likely).length, nDir = rs.length - nLik;
+  const near = state.me ? (state.dj ? ', nearest walk first' : ', nearest first') : '';
+  $('resCount').textContent = !rs.length ? `No results for “${state.query}”`
+    : nDir ? `${nDir} result${nDir === 1 ? '' : 's'} for “${state.query}”${near}${nLik ? ` · ${nLik} likely` : ''}`
+    : `No direct results for “${state.query}” · ${nLik} likely match${nLik === 1 ? '' : 'es'}${near}`;
   const subs = $('rideSubs'); if (subs) subs.classList.toggle('hidden', state.query !== 'Rides');
   const hl = (s) => esc(s);
   const cap = state.query === 'Rides' ? rs.length : 80;
+  const firstLik = rs.findIndex(r => r.likely);
   $('resList').innerHTML = rs.slice(0, cap).map((r, i) => {
     const b = r.booth;
+    const lh = i === firstLik ? '<div class="likelyHead">Likely matches</div>' : '';
+    const why = r.likely && r.why ? `<span class="badge likely">${esc(r.why)}</span>` : '';
     if (b.kind === 'ride') {
-      const pay = b.tickets != null ? (b.tickets + ' tickets') : (b.cashOnly ? 'Cash Only' : '');
-      return `<li data-id="${esc(b.id)}" data-i="${i}">
+      const pay = [Rides.payText(b), b.category ? Rides.catLabel(b).replace(' (per midway operator)', '') : ''].filter(Boolean).join(' · ');
+      return `<li data-id="${esc(b.id)}" data-i="${i}"${r.likely ? ' class="likely"' : ''}>${lh}
         <div class="r-top"><span class="r-name">🎡 ${esc(b.name)}</span><span class="r-dist">${r.d != null ? (r.walk ? '🚶 ' : '') + Geo.fmtFeet(r.d) : ''}</span><button class="rShare" type="button" data-share="${esc(b.id)}" aria-label="Share ${esc(b.name)}">${SHARE_ICO}<span>Share</span></button></div>
         <div class="r-items">${esc(pay)}</div>
-        <div class="r-meta">${esc(b.area || '')}</div></li>`;
+        <div class="r-meta">${why}${esc(b.area || '')}</div></li>`;
     }
     const items = (r.matched.length ? r.matched : (b.items || [])).slice(0, 4);
-    return `<li data-id="${esc(b.id)}" data-i="${i}">
+    return `<li data-id="${esc(b.id)}" data-i="${i}"${r.likely ? ' class="likely"' : ''}>${lh}
       <div class="r-top"><span class="r-name">${esc(b.name)}</span><span class="r-dist">${r.d != null ? (r.walk ? '🚶 ' : '') + Geo.fmtFeet(r.d) : ''}</span><button class="rShare" type="button" data-share="${esc(b.id)}" aria-label="Share ${esc(b.name)}">${SHARE_ICO}<span>Share</span></button></div>
       <div class="r-items">${items.map(it => r.matched.length ? `<mark>${hl(it)}</mark>` : hl(it)).join(', ')}</div>
-      <div class="r-meta">${b.kind === 'newfood' ? '<span class="badge new">NEW 2026</span>' : ''}${r.tier ? '<span class="badge">related</span>' : ''}${b.location !== 'exact' ? '<span class="badge approx">approx.</span>' : ''}${esc(b.area)}${b.lot ? ' · ' + esc(b.lot) : ''}</div></li>`;
+      <div class="r-meta">${why}${b.kind === 'newfood' ? '<span class="badge new">NEW 2026</span>' : ''}${r.tier === 1 ? '<span class="badge">related</span>' : ''}${b.location !== 'exact' ? '<span class="badge approx">approx.</span>' : ''}${esc(b.area)}${b.lot ? ' · ' + esc(b.lot) : ''}</div></li>`;
   }).join('');
   if (!quiet) $('results').classList.remove('hidden'); // guide stays up: it sits on top of the results sheet
+  fitSuggest();
   document.body.classList.toggle('guiding', !!state.target);
   if (fit && rs.length) {
-    const pts = rs.slice(0, 5).map(r => [r.booth.lat, r.booth.lon]); if (state.me) pts.push(state.me);
-    map.fitBounds(L.latLngBounds(pts).pad(0.2), { maxZoom: 19, paddingBottomRight: [0, window.innerHeight * 0.45] });
+    const rideList = state.query === 'Rides';
+    const pts = (rideList ? rs : (rs.some(r => !r.likely) ? rs.filter(r => !r.likely) : rs).slice(0, 5)).map(r => [r.booth.lat, r.booth.lon]); if (state.me && !rideList) pts.push(state.me);
+    map.fitBounds(L.latLngBounds(pts).pad(rideList ? 0.05 : 0.2), { maxZoom: rideList ? 18 : 19, paddingBottomRight: [0, window.innerHeight * 0.45] });
   }
+  syncChips();
 }
-$('resList').onclick = e => { const sb = e.target.closest('[data-share]'); if (sb) { e.stopPropagation(); share(findTarget(sb.dataset.share)); return; } const li = e.target.closest('li'); if (li) startGuide(li.dataset.id); };
+$('resList').onclick = e => { const sb = e.target.closest('[data-share]'); if (sb) { e.stopPropagation(); share(findTarget(sb.dataset.share)); return; } const li = e.target.closest('li[data-id]'); if (li) startGuide(li.dataset.id); };
 const rideSubsEl = $('rideSubs');
 if (rideSubsEl) rideSubsEl.onclick = e => {
   const b = e.target.closest('.rideSub');
   if (!b || state.query !== 'Rides') return;
   state.rideSub = b.dataset.sub;
-  rideSubsEl.querySelectorAll('.rideSub').forEach(x => x.classList.toggle('on', x === b));
+  rideSubsEl.querySelectorAll('.rideSub').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
   state.results = Rides.filter(state.rides, state.rideSub).map(r => ({ booth: r, score: 1, matched: [] }));
-  renderResults(false);
+  renderResults(true);
 };
 
 // ---------- Autocomplete ----------
@@ -411,15 +450,37 @@ function hideSuggest() {
   sgActive = -1;
   $('q').setAttribute('aria-expanded', 'false');
   $('q').removeAttribute('aria-activedescendant');
-  document.body.classList.remove('ac');
+  document.body.classList.remove('ac', 'acCover');
   const pop = $('popular');
   if (pop && pop.dataset.ffAc) { pop.classList.remove('hidden'); delete pop.dataset.ffAc; }
 }
+// Cap the dropdown to what's visible: the visual viewport (so it ends above the iOS keyboard) and, while guiding,
+// the top of the guide sheet (so its Stop ✕ stays tappable). The list scrolls inside.
+function fitSuggest() {
+  const el = $('suggest');
+  if (!el || el.classList.contains('hidden')) { document.body.classList.remove('acCover'); return; }
+  const vv = window.visualViewport;
+  let bottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
+  const below = id => { const s = $(id); if (s && !s.classList.contains('hidden')) { const t = s.getBoundingClientRect().top; if (t > 0 && t < bottom) bottom = t; } };
+  below('guide');
+  const top = el.getBoundingClientRect().top, beforeRes = bottom;
+  below('results');
+  const cover = bottom - top < 150; // no room above the results sheet: let the dropdown use the space, sheet steps aside
+  document.body.classList.toggle('acCover', cover);
+  if (cover) bottom = beforeRes;
+  el.style.maxHeight = Math.max(96, Math.floor(bottom - top - 8)) + 'px';
+}
+if (window.visualViewport) { visualViewport.addEventListener('resize', fitSuggest); visualViewport.addEventListener('scroll', fitSuggest); }
+window.addEventListener('resize', fitSuggest);
 function sgTag(type) { return type === 'ride' ? '🎡 Ride' : type === 'booth' ? '🍴 Booth' : '🍽 Food'; }
 function renderSuggest() {
   const raw = $('q').value;
   if (!raw.trim() || !state.suggestIndex) { hideSuggest(); return; }
   const items = Suggest.query(state.suggestIndex, raw, 8);
+  if (!items.some(it => it.score >= 100)) { // concept matches after the direct ones, never for an exact hit
+    const ex = new Set(items.filter(it => it.type !== 'food').map(it => it.id));
+    likelyFor(raw, ex, 5).forEach(l => items.push({ type: l.type, id: l.item.id, label: l.item.name, sub: l.item.area || '', likely: true, why: l.why }));
+  }
   lastSuggest = items;
   const el = $('suggest');
   if (!items.length) { hideSuggest(); return; }
@@ -427,22 +488,28 @@ function renderSuggest() {
   el.innerHTML = items.map((it, i) => {
     const aka = it.alias ? ` <small>aka ${esc(it.alias)}</small>` : '';
     const sub = it.sub ? ` <small>${esc(it.sub)}</small>` : '';
-    return `<li role="option" id="sg-${i}" data-i="${i}" data-type="${esc(it.type)}" data-id="${esc(it.id)}"><span class="sgTag">${sgTag(it.type)}</span> ${esc(it.label)}${aka}${sub}</li>`;
+    const head = it.likely && !(items[i - 1] && items[i - 1].likely) ? '<span class="sgHead">Likely matches · did you mean</span>' : '';
+    const why = it.likely && it.why ? ` <small class="sgWhy">${esc(it.why)}</small>` : '';
+    return `<li role="option" id="sg-${i}" data-i="${i}" data-type="${esc(it.type)}" data-id="${esc(it.id)}"${it.likely ? ' class="likely"' : ''}>${head}<span class="sgTag">${sgTag(it.type)}</span> ${esc(it.label)}${aka}${sub}${why}</li>`;
   }).join('');
   el.classList.remove('hidden');
   $('q').setAttribute('aria-expanded', 'true');
   document.body.classList.add('ac');
+  fitSuggest();
   const pop = $('popular');
   if (pop && !pop.classList.contains('hidden')) { pop.classList.add('hidden'); pop.dataset.ffAc = '1'; }
 }
+// Suggestion pick: pan to the item and open its card (Guide me here / Share).
 function openTarget(id) {
   const t = findTarget(id);
   const m = state.markers && state.markers.get(id);
-  $('results').classList.add('hidden');
+  $('results').classList.add('hidden'); syncChips();
   map.stop(); // cancel a search fitBounds animation that would pull the zoom back down
-  if (t) map.setView([t.lat, t.lon], 19, { animate: false });
-  if (m) m.openPopup();
-  else if (t) startGuide(id);
+  if (!t) return;
+  map.setView([t.lat, t.lon], 19, { animate: false });
+  if (m && map.hasLayer(m)) m.openPopup();
+  else if (t.kind === 'ride' || t.food || t.kind === 'newfood' || t.kind === 'sponsor') L.popup(POP).setLatLng([t.lat, t.lon]).setContent(popupHtml(t)).openOn(map); // layer hidden: still show the card
+  else startGuide(id);
 }
 function selectSuggest(li) {
   const now = Date.now();
@@ -491,12 +558,8 @@ $('q').addEventListener('keydown', e => {
     if (sgActive >= 0 && lis[sgActive]) { e.preventDefault(); selectSuggest(lis[sgActive]); }
   } else if (e.key === 'Escape') { e.preventDefault(); hideSuggest(); }
 });
-$('suggest').addEventListener('pointerdown', e => {
-  const li = e.target.closest('li');
-  if (!li) return;
-  e.preventDefault();
-  selectSuggest(li);
-});
+$('suggest').addEventListener('pointerdown', e => { if (e.target.closest('li')) e.preventDefault(); }); // keep focus; pick on click so touch can scroll the list
+$('suggest').addEventListener('mousedown', e => e.preventDefault());
 $('suggest').addEventListener('click', e => {
   const li = e.target.closest('li');
   if (li) selectSuggest(li);
@@ -533,9 +596,9 @@ function startGuide(id, resume, fromUrl) {
     menu.setAttribute('aria-label', 'Ride, from fair listing');
     const lines = [];
     if (t.tickets != null) lines.push(t.tickets + ' tickets (fair’s listing)');
-    else if (t.cashOnly) lines.push('Cash Only');
+    else if (t.cashOnly) lines.push('Cash Only' + (t.cashPrice ? ' · ' + t.cashPrice + ' (fair’s listing)' : ''));
     if (t.heightText) lines.push(t.heightText + ' (per midway operator)');
-    if (t.category) lines.push(t.category + ' (per midway operator)');
+    if (t.category) lines.push(Rides.catLabel(t));
     if (t.aliases && t.aliases.length) lines.push('Lot label: ' + t.aliases.join(', '));
     $('guideMenuBody').textContent = lines.join('\n') || Rides.cardMeta(t) || '(no details listed)';
     menu.style.visibility = 'visible';
@@ -841,7 +904,7 @@ $('btnOffline').onclick = async () => {
 };
 $('version').textContent = APP_VERSION;
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js?v=73', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
+  navigator.serviceWorker.register('sw.js?v=731', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
 }
 
 loadData().catch(e => setStatus('Could not load booth data: ' + e.message));
