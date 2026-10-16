@@ -62,8 +62,32 @@ if (tglStats) {
       if (tglStats.checked) localStorage.removeItem('ff.statsOptOut');
       else localStorage.setItem('ff.statsOptOut', '1');
     } catch (e) {}
+    syncStatsNote();
   };
 }
+function dismissStatsNote() {
+  const el = $('statsNote');
+  if (el) { el.classList.add('hidden'); clearTimeout(el._t); }
+  try { localStorage.setItem('ff.statsNoteSeen', '1'); } catch (e) {}
+}
+function syncStatsNote() {
+  const el = $('statsNote');
+  if (!el) return;
+  let seen = false, on = true;
+  try { seen = localStorage.getItem('ff.statsNoteSeen') === '1'; on = localStorage.getItem('ff.statsOptOut') !== '1'; } catch (e) { seen = true; }
+  if (seen || !on) { el.classList.add('hidden'); clearTimeout(el._t); return; }
+  if (!el.classList.contains('hidden')) return;
+  el.classList.remove('hidden');
+  clearTimeout(el._t);
+  el._t = setTimeout(dismissStatsNote, 12000);
+}
+const statsNoteOk = $('statsNoteOk'), statsNoteSettings = $('statsNoteSettings');
+if (statsNoteOk) statsNoteOk.onclick = () => dismissStatsNote();
+if (statsNoteSettings) statsNoteSettings.onclick = e => {
+  e.preventDefault();
+  $('layersPanel').classList.remove('hidden');
+};
+syncStatsNote();
 
 // ---------- URL state (shareable links) ----------
 // ?q=<search>  ?new=1  ?booth=<id>  &ll=<lat>,<lon>&z=<zoom>. Booth ids are the fair GIS object ids (e.g. L0-1314).
@@ -108,7 +132,7 @@ function toast(msg) { const el = $('toast'); el.textContent = msg; el.classList.
 let mvT; map.on('moveend', () => { clearTimeout(mvT); mvT = setTimeout(() => { const c = map.getCenter(); setUrl({ ll: c.lat.toFixed(5) + ',' + c.lng.toFixed(5), z: map.getZoom() }); }, 400); });
 
 // ---------- Legal text (shared with about/) ----------
-const L_ = {"disc_t": "Unofficial guide", "disc": "Fair Finder is an independent, free project. It is not affiliated with, endorsed by, or sponsored by the N.C. State Fair or the N.C. Department of Agriculture &amp; Consumer Services. ‘N.C. State Fair’ is used only to describe the event this guide covers. For official information, see <a href=\"https://www.ncstatefair.org/\" target=\"_blank\" rel=\"noopener\">ncstatefair.org</a>.", "acc": "Booth locations and menus come from the fair’s published data and may change during the fair. ATM locations are approximate. Walking routes come from OpenStreetMap and don’t reflect temporary booths, closures or crowds. Follow posted signs and staff directions; use at your own risk. Provided as-is, with no warranty.", "priv": "Your location is used only on your device to show where you are and guide you. It is never sent to us or stored on a server. Unless you opt out, the app sends a random device id created on this device (the server stores only a salted hash of it), the booth id when your GPS shows you arriving within about 50 ft of a booth, and the food chip or booth you pick (never what you type). Your IP address is used only as a salted, daily-rotated hash for rate limiting; raw IP addresses are not stored, and those rate-limit rows are deleted in about 2 hours. Visit and tap rows are deleted after 3 days. A booth or search appears only after at least 5 different devices. No accounts, no ads, no tracking cookies. The app saves the booth you’re guiding to in your browser so it can resume, and whether the guide panel was open. Favorites are stored only on this device (localStorage) and are never sent anywhere. Opt out in the Layers panel, or clear this site's data in your browser (which also resets the device id). The site is hosted on GitHub Pages, which logs visitor IP addresses for security. Map images load from OpenStreetMap, Esri and the fair’s ArcGIS server, which see normal web requests. The optional AI connector (MCP server, hosted on Cloudflare Workers) serves only the same public booth and ride data and is read-only: no accounts, and no logging of what you search. To limit abuse it counts requests per minute using a salted, one-way hash of your IP address; raw IP addresses are not stored. Cloudflare sees normal web requests to the counter.", "cred": "<ul class=\"credits\"><li>Map data <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener\">© OpenStreetMap</a> contributors</li><li>Routes: OpenStreetMap data (ODbL) · <a href=\"https://www.openstreetmap.org/fixthemap\" target=\"_blank\" rel=\"noopener\">Report a map issue</a></li><li>Grounds map © N.C. Department of Agriculture &amp; Consumer Services</li><li>Booth data: N.C. State Fair Food &amp; Ride Finder</li><li>Satellite layer (optional): Powered by Esri · Imagery: Esri, Maxar, Earthstar Geographics, and the GIS User Community</li></ul>"};
+const L_ = {"disc_t": "Unofficial guide", "disc": "Fair Finder is an independent, free project. It is not affiliated with, endorsed by, or sponsored by the N.C. State Fair or the N.C. Department of Agriculture &amp; Consumer Services. ‘N.C. State Fair’ is used only to describe the event this guide covers. For official information, see <a href=\"https://www.ncstatefair.org/\" target=\"_blank\" rel=\"noopener\">ncstatefair.org</a>.", "acc": "Booth locations and menus come from the fair’s published data and may change during the fair. ATM locations are approximate. Walking routes come from OpenStreetMap and don’t reflect temporary booths, closures or crowds. Follow posted signs and staff directions; use at your own risk. Provided as-is, with no warranty.", "priv": "Your location is used only on your device to show where you are and guide you. It is never sent to us or stored on a server. Unless you opt out, the app sends a random device id created on this device (the server stores only a salted hash of it), the booth id when your GPS shows you arriving within about 50 ft of a booth, and the food chip or booth you pick (never what you type). Your IP address is used only as a salted, daily-rotated hash for rate limiting; raw IP addresses are not stored, and those rate-limit rows are deleted in about 2 hours. Visit and tap rows are deleted after 3 days. A booth or search appears only after at least 5 different devices. No accounts, no ads, no tracking cookies. The app saves the booth you’re guiding to in your browser so it can resume, and whether the guide panel was open. Favorites are stored only on this device (localStorage) and are never sent anywhere. Opt out in the Layers panel, or clear this site's data in your browser (which also resets the device id). The site is hosted on GitHub Pages, which logs visitor IP addresses for security. Map images load from OpenStreetMap, Esri and the fair’s ArcGIS server, which see normal web requests. The optional AI connector (MCP server, hosted on Cloudflare Workers) serves only the same public booth and ride data and is read-only: no accounts, and no logging of what you search. To limit abuse it counts requests per minute using a salted, one-way hash of your IP address; raw IP addresses are not stored. The visit/tap counter also runs on Cloudflare Workers, so Cloudflare sees normal web requests to it.", "cred": "<ul class=\"credits\"><li>Map data <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener\">© OpenStreetMap</a> contributors</li><li>Routes: OpenStreetMap data (ODbL) · <a href=\"https://www.openstreetmap.org/fixthemap\" target=\"_blank\" rel=\"noopener\">Report a map issue</a></li><li>Grounds map © N.C. Department of Agriculture &amp; Consumer Services</li><li>Booth data: N.C. State Fair Food &amp; Ride Finder</li><li>Satellite layer (optional): Powered by Esri · Imagery: Esri, Maxar, Earthstar Geographics, and the GIS User Community</li></ul>"};
 // ---------- Data ----------
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function isStarrable(b) {
@@ -520,7 +544,7 @@ function renderPopular() {
   const el = $('popular');
   if (!el) return;
   if (state.panelMode !== 'live') {
-    el.innerHTML = '<h3>Popular foods</h3>' + CHIP_BUTTONS.map(pair =>
+    el.innerHTML = '<h3>Try searching</h3>' + CHIP_BUTTONS.map(pair =>
       '<button type="button" class="popBtn" data-q="' + esc(pair[0]) + '">' + esc(pair[1]) + '</button>').join('');
     return;
   }
@@ -1265,9 +1289,10 @@ function updateGuide() {
   if (!state.me && state.gpsDenied) {
     $('guideDist').textContent = 'Location off'; $('guideHint').textContent = 'Here is the booth on the map. Allow location (tap ◎) for directions.'; $('guideMeta').textContent = 'Location off'; $('guideUpd').textContent = '';
     if (!state.shownNoLoc) { state.shownNoLoc = true; map.setView([t.lat, t.lon], 19); }
+    fitGuideDist();
     return;
   }
-  if (!state.me) { $('guideDist').textContent = '—'; $('guideHint').textContent = 'Waiting for your GPS position…'; $('guideMeta').textContent = 'GPS: waiting for a fix'; $('guideUpd').textContent = 'updating…'; return; }
+  if (!state.me) { $('guideDist').textContent = '—'; $('guideHint').textContent = 'Waiting for your GPS position…'; $('guideMeta').textContent = 'GPS: waiting for a fix'; $('guideUpd').textContent = 'updating…'; fitGuideDist(); return; }
   const d = Geo.distanceM(state.me[0], state.me[1], t.lat, t.lon);
   let br = Geo.bearingDeg(state.me[0], state.me[1], t.lat, t.lon);
   const { h, src } = currentHeading();
@@ -1324,6 +1349,22 @@ function updateGuide() {
   }
   // When collapsed, fit each new route (and you) into the visible map above the bar, once per route.
   if (mode === 'route' && sheet.state === 'collapsed' && state.fittedRouteAt !== R.at) { state.fittedRouteAt = R.at; fitGuideView(false); }
+  fitGuideDist();
+}
+function fitGuideDist() {
+  const el = $('guideDist');
+  if (!el) return;
+  const apply = () => {
+    if (el.clientWidth < 20) return;
+    let size = 16;
+    el.style.fontSize = size + 'px';
+    while (size > 10 && el.scrollWidth > el.clientWidth) {
+      size -= 0.5;
+      el.style.fontSize = size + 'px';
+    }
+  };
+  apply();
+  if (el.clientWidth < 20) requestAnimationFrame(apply);
 }
 // One wording source for the hint, derived from the SAME bearing the arrow shows (br), so they can't disagree.
 function routeHint(br, h, turn, remaining) {
@@ -1530,7 +1571,6 @@ $('favList').onclick = e => {
   const b = e.target.closest('button[data-id]');
   if (b) startGuide(b.dataset.id);
 };
-$('qaNear').onclick = () => openNear();
 $('qaRestroom').onclick = () => goNearest('restroom');
 $('qaAtm').onclick = () => goNearest('atm');
 $('qaAid').onclick = () => goNearest('first_aid');

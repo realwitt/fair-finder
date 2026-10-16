@@ -105,7 +105,7 @@ try {
     await p.tap('#q');
     await p.waitForTimeout(400);
     const txt = await p.locator('#popular').innerText();
-    ok(/Popular foods/.test(txt) && await p.locator('#popular button[data-q="hot dog"]').count() === 1, 'abort falls back to food chips');
+    ok(/Try searching/.test(txt) && !/Popular foods/.test(txt) && await p.locator('#popular button[data-q="hot dog"]').count() === 1, 'abort falls back to food chips');
     ok(await p.locator('#searchFocus').isVisible(), 'search focus stays visible with the fallback');
     ok(posts.length === 0, 'abort sends no posts');
     await p.screenshot({ path: SH + '/v76-fallback.png' });

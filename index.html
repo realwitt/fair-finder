@@ -44,7 +44,6 @@
     <button class="chip" data-q="new">⭐ New 2026</button>
   </div>
   <div id="searchFocus" class="hidden">
-    <button type="button" class="qa" id="qaNear">📍 Near me</button>
     <button type="button" class="qa" id="qaRestroom">🚻 Nearest restroom</button>
     <button type="button" class="qa" id="qaAtm">💲 Nearest ATM</button>
     <button type="button" class="qa" id="qaAid">⛑ Nearest first aid</button>
@@ -54,6 +53,10 @@
 
 <div id="status" role="status">Starting GPS…</div>
 <div id="toast" class="hidden" role="status"></div>
+<div id="statsNote" class="statsNote hidden" role="note">
+  <p>Fair Finder counts booth visits and food-chip taps with a random device id (no location, no typing). Turn it off in ☰ Layers.</p>
+  <p class="statsNoteActs"><button type="button" id="statsNoteOk">Got it</button> <a href="#layers" id="statsNoteSettings">Settings</a></p>
+</div>
 <button id="btnGpsRefresh" type="button" aria-label="Location paused, tap to refresh">📍 Location paused · tap to refresh</button>
 <div id="version" aria-label="App version"></div>
 <a id="aboutPill" href="about/">About</a>
@@ -77,7 +80,7 @@
   <label class="row"><input type="checkbox" id="tglATM"> 💲 ATMs <small>(from the fair’s published grounds map, approx.)</small></label>
   <label class="row"><input type="checkbox" id="tglAmenities"> 🚻 Amenities (approx.)</label>
   <label class="row"><input type="checkbox" id="tglDrinks"> 🥤 Drink booths <small>(booths whose fair listing mentions drinks)</small></label>
-  <label class="row"><input type="checkbox" id="tglStats" checked> Share anonymous booth visits &amp; taps (helps rank popular booths)</label>
+  <label class="row"><input type="checkbox" id="tglStats" checked> Share booth visits &amp; taps (random device id, no location)</label>
   <p class="note" id="waterNote">💧 Water refill stations: the fair’s published map and site do <b>not</b> list refill-station locations, so none are shown. A local guide (thisisraleigh.com, unofficial) says there are filling stations across from Casey's Clubhouse and under the trees between Kiddieland and the Scott Building.</p>
   <button id="btnOffline" class="wide">⬇ Save the grounds map for offline</button>
   <p class="note" id="offlineMsg"></p>
