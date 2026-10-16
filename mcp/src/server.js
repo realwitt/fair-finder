@@ -5,10 +5,10 @@ const UNOFFICIAL_NOTE = 'Unofficial guide. Locations/menus from the fair\u2019s 
 const DETAILS_SOURCE = 'Ticket counts come from the fair\u2019s published Food & Ride Finder. Heights and categories, when present, are per midway operator (approximate).';
 const SRC = 'per midway operator (approximate)';
 const STOP = new Set('a an the some any where wheres is find get me i can buy at fair food best near of for with and to want looking'.split(' '));
-const FROZEN_SLUSH = ['slush','slushie','slushy','icee','italian ice','sno cone','snow cone','sno-ball','snowball','shaved ice','frozen lemonade','frozen'];
+const FROZEN_SLUSH = ['slush','slushie','slushy','icee','italian ice','sno cone','snow cone','sno-ball','snowball','shaved ice','frozen lemonade','frozen drink','frozen slush'];
 const FROZEN = {
   slush: FROZEN_SLUSH, slushie: FROZEN_SLUSH, slushy: FROZEN_SLUSH, slushies: FROZEN_SLUSH,
-  icee: FROZEN_SLUSH, icees: FROZEN_SLUSH, ice: FROZEN_SLUSH,
+  icee: FROZEN_SLUSH, icees: FROZEN_SLUSH,
   lemonade: ['lemonade','frozen lemonade','lemon shake up','shake up','shake-up'],
 };
 const OUTSIDE_NOTE = 'That point is more than 3 km from the N.C. State Fairgrounds (Raleigh), so there is nothing nearby to show.';
@@ -58,7 +58,19 @@ function loadConceptGroups(SYNONYMS) {
   return null;
 }
 
-const CONCEPT_GROUPS = loadConceptGroups(SYNONYMS);
+function foodConceptGroups(syn) {
+  const out = [];
+  const fd = syn && syn.foods && typeof syn.foods === 'object' ? syn.foods : null;
+  if (fd) for (const k in fd) { const t = fd[k] && fd[k].terms; if (Array.isArray(t) && t.length) out.push(t.filter(x => typeof x === 'string')); }
+  else { const g = loadConceptGroups(syn); if (g) out.push(...g); }
+  for (const g of FoodSearch.SYN) out.push(g);
+  const seenF = new Set();
+  for (const k of Object.keys(FROZEN)) { const g = FROZEN[k]; if (!seenF.has(g)) { seenF.add(g); out.push([k, ...g]); } }
+  return out;
+}
+const CONCEPT_GROUPS = foodConceptGroups(SYNONYMS);
+// Same concept layer the app uses (concepts.js + data/synonyms.json): ride types ('pirate ship') and food concepts.
+const CONCEPTS = (typeof Concepts !== 'undefined' && Concepts && SYNONYMS && SYNONYMS.foods) ? Concepts.create(SYNONYMS) : null;
 const RIDE_INDEX = Suggest.buildIndex({ rides: DATA.rides });
 const BOOTH_INDEX = Suggest.buildIndex({ booths: DATA.booths });
 const RIDE_BY = new Map(DATA.rides.map(r => [r.id, r]));
@@ -162,7 +174,7 @@ function phraseKind(phrase, token, words) {
   if (pw.length === 1) {
     const w = pw[0];
     const exact = words.some(doc => doc === w || (stem(doc) === stem(w) && stem(w).length >= 3));
-    if (!exact && w.length >= 5) return 'typo';
+    if (!exact) return (w.length >= 5 && ownForms(token).includes(w)) ? 'typo' : null; // typo tolerance only on the user's own word
   }
   return 'syn';
 }
@@ -342,7 +354,7 @@ function rideHits(query) {
       : hit.score >= 60 ? 'partial' : 'fuzzy';
     const row = rideSummary(ride, hit.alias ? 'lot_label' : 'name', quality, note);
     row.score = hit.score;
-    row.tier = quality === 'partial' ? 'likely' : 'direct';
+    row.tier = (quality === 'partial' || quality === 'fuzzy') ? 'likely' : 'direct';
     out.push(row);
   }
   return out;
@@ -361,7 +373,7 @@ function boothNameHits(query) {
       : hit.score >= 60 ? 'partial' : 'fuzzy';
     const row = boothSummary(booth, 'name', quality);
     row.score = hit.score;
-    row.tier = quality === 'partial' ? 'likely' : 'direct';
+    row.tier = (quality === 'partial' || quality === 'fuzzy') ? 'likely' : 'direct';
     out.push(row);
   }
   return out;
@@ -404,7 +416,8 @@ function foodHits(query) {
     full.push(row);
   }
   full.sort((a, b) => b.score - a.score || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
-  if (full.length) return full;
+  if (full.length >= 3 || tokens.length < 2) return full;
+  const fullIds = new Set(full.map(r => r.id));
 
   const chosen = fallbackToken(tokens);
   const note = partialNote(tokens, chosen);
@@ -412,7 +425,7 @@ function foodHits(query) {
   const partial = [];
   for (const doc of DOCS) {
     const hit = tokenHit(chosen, phrases, doc.words);
-    if (!hit) continue;
+    if (!hit || fullIds.has(doc.booth.id)) continue;
     const matched = collectItems(doc, [chosen], phrases);
     const row = boothSummary(doc.booth, 'menu', 'partial', note, matched.slice(0, 5));
     if (!row.matched_items) {
@@ -424,7 +437,7 @@ function foodHits(query) {
     partial.push(row);
   }
   partial.sort((a, b) => b.score - a.score || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
-  return partial;
+  return full.concat(partial);
 }
 
 function capTiers(rows, limit) {
@@ -506,8 +519,22 @@ function searchTool(args) {
     if (foods.fail) return foods;
     rows = mergeAny(rideHits(query), boothNameHits(query), foods);
   }
+  if (CONCEPTS) {
+    const have = new Set(rows.map(r => r.id));
+    const extra = CONCEPTS.likely(query, {
+      rides: type === 'any' || type === 'ride' ? DATA.rides : [],
+      booths: type === 'any' || type === 'food' ? DATA.booths : [],
+      exclude: have, limit: 10,
+    });
+    for (const x of extra) {
+      const note = 'Likely match: ' + x.why + (x.type === 'ride' ? ' (ride type from Fair Finder\u2019s concept map).' : ' (menu mentions it).');
+      const row = x.type === 'ride' ? rideSummary(x.item, 'concept', 'likely', note) : boothSummary(x.item, 'concept', 'likely', note);
+      row.tier = 'likely'; row.score = 0;
+      rows.push(row);
+    }
+  }
   const packed = capTiers(rows, limit);
-  return { query, type, count: packed.count, direct: packed.direct, likely: packed.likely, results: packed.results, note: UNOFFICIAL_NOTE };
+  return { query, type, count: packed.count, direct: packed.direct, likely: packed.likely, note: UNOFFICIAL_NOTE + ' direct = matches your words; likely = related items found via synonyms/concepts or partial matches.' };
 }
 
 function parseId(v) {

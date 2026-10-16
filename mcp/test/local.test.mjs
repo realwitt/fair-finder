@@ -40,7 +40,8 @@ async function rpc(msg, env, headers) {
 async function tool(name, args, env) {
   const out = await rpc({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name, arguments: args } }, env);
   const result = out.json && out.json.result;
-  return { ...out, result, sc: result && result.structuredContent };
+  const sc = result && result.structuredContent; if (sc && sc.direct) sc.results = sc.direct.concat(sc.likely || []);
+  return { ...out, result, sc };
 }
 
 const init = await rpc({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-03-26' } });

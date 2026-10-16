@@ -38,6 +38,7 @@ function slim() {
 const DATA = slim();
 const searchJs = readFileSync(join(repo, 'search.js'), 'utf8');
 const suggestJs = readFileSync(join(repo, 'suggest.js'), 'utf8');
+const conceptsJs = existsSync(join(repo, 'concepts.js')) ? readFileSync(join(repo, 'concepts.js'), 'utf8') : '';
 const serverJs = readFileSync(join(mcpDir, 'src/server.js'), 'utf8');
 
 let synonymsJs = 'null';
@@ -59,7 +60,11 @@ ${searchJs}
 (function () {
 ${suggestJs}
 }).call(__root);
+(function () {
+${conceptsJs}
+}).call(__root);
 const FoodSearch = __root.FoodSearch;
+const Concepts = __root.Concepts;
 const Suggest = __root.Suggest;
 const DATA = ${JSON.stringify(DATA)};
 const SYNONYMS = ${synonymsJs};
