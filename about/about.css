@@ -36,3 +36,5 @@ footer h3{color:#fff;font-size:16px;margin:20px 0 6px}
 footer p,footer ul{margin:0 0 8px}
 footer ul{padding-left:18px}
 .disc{border-left:4px solid var(--hi);padding-left:12px;color:#fff}
+.ai .endpoint{margin:12px 0 18px;font-size:17px}
+.ai code{display:inline-block;max-width:100%;overflow-wrap:anywhere;background:#fff;border:2px solid #000;border-radius:8px;padding:4px 8px;font-size:15px;user-select:all}

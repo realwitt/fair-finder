@@ -71,6 +71,19 @@
   </div>
 </section>
 
+<section class="ai" id="ai">
+  <div class="wrap">
+    <h2>Use with your AI</h2>
+    <p>Fair Finder also runs a small, read-only <b>MCP server</b>, so AI assistants that support remote MCP connectors can search the same booth, food and ride data in a chat (for example “where can I get a cherry slush?” or “where’s the Tilt-A-Whirl?”). Every answer includes a Fair Finder link that opens walking directions on your phone. It is unofficial, like the app.</p>
+    <p class="endpoint">Server URL: <code>https://fair-finder-mcp.lively-shape-f373.workers.dev/mcp</code></p>
+    <ol class="steps">
+      <li><b>Claude</b>Settings › Connectors › Add custom connector. Paste the server URL and choose “No sign in”.</li>
+      <li><b>ChatGPT</b>Turn on developer mode (Settings › Apps &amp; Connectors › Advanced), then create an app or connector with the server URL and “No Authentication”.</li>
+      <li><b>Other MCP clients</b>Add a remote (streamable HTTP) MCP server with the URL above. No API key or account is needed. Tools: search, get_details, nearby.</li>
+    </ol>
+  </div>
+</section>
+
 <section class="again">
   <div class="wrap"><a class="cta" href="../">Open the app</a></div>
 </section>
@@ -82,7 +95,7 @@
     <h3>Accuracy</h3>
     <p>Booth locations and menus come from the fair’s published data and may change during the fair. ATM locations are approximate. Walking routes come from OpenStreetMap and don’t reflect temporary booths, closures or crowds. Follow posted signs and staff directions; use at your own risk. Provided as-is, with no warranty.</p>
     <h3>Privacy</h3>
-    <p>Your location is used only on your device to show where you are and guide you. It is never sent to us or stored on a server. No accounts, no analytics, no tracking cookies. The app saves the booth you’re guiding to in your browser so it can resume, and whether the guide panel was open. The site is hosted on GitHub Pages, which logs visitor IP addresses for security. Map images load from OpenStreetMap, Esri and the fair’s ArcGIS server, which see normal web requests.</p>
+    <p>Your location is used only on your device to show where you are and guide you. It is never sent to us or stored on a server. No accounts, no analytics, no tracking cookies. The app saves the booth you’re guiding to in your browser so it can resume, and whether the guide panel was open. The site is hosted on GitHub Pages, which logs visitor IP addresses for security. Map images load from OpenStreetMap, Esri and the fair’s ArcGIS server, which see normal web requests. The optional AI connector (MCP server, hosted on Cloudflare Workers) serves only the same public booth and ride data and is read-only: no accounts, and no logging of what you search. To limit abuse it counts requests per minute using a salted, one-way hash of your IP address; raw IP addresses are not stored.</p>
     <h3>Credits</h3>
     <ul>
       <li>Map data <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap</a> contributors</li>

@@ -1,0 +1,12 @@
+name = "fair-finder-mcp"
+main = "dist/worker.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+# SALT is a secret: wrangler secret put SALT
+# Do not commit a value.
+
+[[ratelimits]]
+name = "RL"
+namespace_id = "1001"
+simple = { limit = 60, period = 60 }
