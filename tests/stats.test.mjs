@@ -135,6 +135,19 @@ ok(Stats.panelMode([{ n: 5 }, { n: 5 }, { n: 4 }]) === 'chips', 'only qualifying
 ok(Stats.panelMode([{ n: 5 }, { n: 6 }, { n: 7 }]) === 'live', '3 qualifying items is live');
 ok(Stats.panelMode([{ n: 5 }, { n: 5 }, { n: 5 }, { n: 1 }]) === 'live', 'extra low rows do not hide a live panel');
 
+
+// v7.6.1 dense booths: standing at A with neighbours B (5 m) and C (11 m) counts only A, once per stop
+{
+  const A = { id: 'A', lat: 35.795, lon: -78.71 }, Bn = { id: 'B', lat: 35.795 + 5 / 111320, lon: -78.71 }, Cn = { id: 'C', lat: 35.795 - 11 / 111320, lon: -78.71 };
+  const tr = Stats.createTracker([A, Bn, Cn]); const at = m => 35.795 + m / 111320; const T0 = 1e12; const got = [];
+  tr.onFix(at(-50), -78.71, 8, T0);
+  for (let t = 1; t <= 30; t++) { const r = tr.onFix(at(1), -78.71, 8, T0 + t * 1000); if (r) got.push(r); }
+  ok(got.length === 1 && got[0] === 'A', 'dense row: only the nearest booth counts, once per stop ' + JSON.stringify(got));
+  const tr2 = Stats.createTracker([A, Bn]); const got2 = [];
+  tr2.onFix(at(-50), -78.71, 8, T0);
+  for (let t = 1; t <= 20; t++) { const r = tr2.onFix(at(t % 2 ? 1 : 4), -78.71, 8, T0 + t * 1000); if (r) got2.push(r); }
+  ok(got2.length === 0, 'GPS flipping between two neighbours never reaches dwell (undercount rather than double count) ' + JSON.stringify(got2));
+}
 if (fails.length) {
   console.log(fails.length + ' FAILURES');
   process.exit(1);

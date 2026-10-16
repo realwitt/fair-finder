@@ -89,38 +89,41 @@
       s.dwellStart = null;
       s.fixes = 0;
     }
+    // v7.6.1: booths are dense (most have a neighbour within 15 m), so only the single nearest booth
+    // inside ARRIVE_M accrues dwell, and one counted arrival disarms every booth within OUTSIDE_M of it
+    // (one visit per stop). Each booth still needs a good fix > OUTSIDE_M away before it can count.
     function onFix(lat, lon, acc, now) {
       if (typeof acc !== 'number' || !(acc <= MAX_ACC_M)) return null;
-      let best = null, bestD = Infinity;
+      let near = null, nearD = Infinity;
+      const close = [];
       for (let i = 0; i < list.length; i++) {
         const b = list[i];
         const d = Geo.distanceM(lat, lon, b.lat, b.lon);
-        if (d > PREFILTER_M) {
-          if (st.has(b.id)) markOutside(st.get(b.id));
-          continue;
-        }
+        if (d > PREFILTER_M) { if (st.has(b.id)) markOutside(st.get(b.id)); continue; }
         const s = slot(b.id);
-        if (d > OUTSIDE_M) {
-          markOutside(s);
-          continue;
-        }
-        if (d > ARRIVE_M) {
-          s.dwellStart = null;
-          s.fixes = 0;
-          continue;
-        }
+        if (d > OUTSIDE_M) { markOutside(s); continue; }
+        close.push([b, s, d]);
+        if (d <= ARRIVE_M && d < nearD) { nearD = d; near = b; }
+      }
+      let best = null;
+      for (let i = 0; i < close.length; i++) {
+        const b = close[i][0], s = close[i][1];
+        if (b !== near) { s.dwellStart = null; s.fixes = 0; continue; }
         if (!s.armed || s.counted) continue;
         if (s.dwellStart == null) { s.dwellStart = now; s.fixes = 1; continue; }
         s.fixes += 1;
-        if (s.fixes >= 2 && now - s.dwellStart >= DWELL_MS) {
-          s.counted = true;
-          s.armed = false;
-          s.dwellStart = null;
-          s.fixes = 0;
-          if (d < bestD) { bestD = d; best = b.id; }
-        }
+        if (s.fixes >= 2 && now - s.dwellStart >= DWELL_MS) best = b;
       }
-      return best;
+      if (best) {
+        for (let i = 0; i < close.length; i++) {
+          const s = close[i][1];
+          if (close[i][0] === best || Geo.distanceM(best.lat, best.lon, close[i][0].lat, close[i][0].lon) <= OUTSIDE_M) {
+            s.counted = true; s.armed = false; s.dwellStart = null; s.fixes = 0;
+          }
+        }
+        return best.id;
+      }
+      return null;
     }
     return { onFix: onFix };
   }
