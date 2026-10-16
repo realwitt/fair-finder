@@ -7,7 +7,7 @@ const OSM = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 // Fair's published grounds-map tile layer full extent (EPSG:3857) converted to lat/lon
 const FAIR_BOUNDS = L.latLngBounds([35.79119, -78.72134], [35.79952, -78.70469]);
 const CENTER = [35.7948, -78.7115];
-const APP_VERSION = 'v7.6.1 · Oct 16';
+const APP_VERSION = 'v7.7 · Oct 16';
 const $ = id => document.getElementById(id);
 const LS_KEY = 'ff.guideTarget';
 const FAV_KEY = 'ff.favorites.v1';
@@ -1581,7 +1581,7 @@ $('btnFav').onclick = () => { if (state.target) toggleFav(state.target.id); };
 $('searchFocus').addEventListener('pointerdown', e => { if (e.target.closest('button')) e.preventDefault(); });
 window.FF = { nearMe };
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js?v=761', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
+  navigator.serviceWorker.register('sw.js?v=77', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
 }
 
 renderPopular();

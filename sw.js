@@ -1,5 +1,5 @@
-const V = 'ff-shell-v7-6-1';
-const SHELL = ['./', 'index.html', 'style.css?v=761', 'app.js?v=761', 'geo.js?v=761', 'search.js?v=761', 'rides.js?v=761', 'suggest.js?v=761', 'concepts.js?v=761', 'route.js?v=761', 'config.js?v=761', 'stats.js?v=761', 'vendor/leaflet.js?v=761', 'vendor/leaflet.css?v=761', 'data/booths.json', 'data/rides.json', 'data/synonyms.json', 'data/atms.json', 'data/walkways.json', 'manifest.webmanifest', 'icons/icon-192.png', 'about/', 'about/about.css?v=761', 'heading.js?v=761', 'data/amenities.json'];
+const V = 'ff-shell-v7-7';
+const SHELL = ['./', 'index.html', 'style.css?v=77', 'app.js?v=77', 'geo.js?v=77', 'search.js?v=77', 'rides.js?v=77', 'suggest.js?v=77', 'concepts.js?v=77', 'route.js?v=77', 'config.js?v=77', 'stats.js?v=77', 'vendor/leaflet.js?v=77', 'vendor/leaflet.css?v=77', 'data/booths.json', 'data/rides.json', 'data/synonyms.json', 'data/atms.json', 'data/walkways.json', 'manifest.webmanifest', 'icons/icon-192.png', 'about/', 'about/about.css?v=77', 'heading.js?v=77', 'data/amenities.json'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('ff-shell-') && k !== V).map(k => caches.delete(k))))
   .then(() => caches.open('ff-tiles-v1')).then(async c => { for (const r of await c.keys()) if (!isTile(r.url)) await c.delete(r); }) // purge OSM/Esri tiles cached by v1–v6
