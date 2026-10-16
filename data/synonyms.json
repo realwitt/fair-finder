@@ -1,5 +1,5 @@
 {
- "_about": "Fair Finder concept map (v7.3.1). Plain JSON, reusable (app search/autocomplete 'Likely matches' and the Fair Finder MCP server). ride_types: type id -> label + search terms. rides: ride id (data/rides.json) -> name + type ids (assigned by hand from each ride's well-known model; [] = type unknown). foods: concept id -> synonyms/spellings; a booth matches a food concept when its name/menu text contains one of the terms. Matching is an expansion layer: show concept hits only after direct hits.",
+ "_about": "Fair Finder concept map (v7.5). Plain JSON, reusable (app search/autocomplete 'Likely matches' and the Fair Finder MCP server). ride_types: type id -> label + search terms. rides: ride id (data/rides.json) -> name + type ids (assigned by hand from each ride's well-known model; [] = type unknown). foods: concept id -> synonyms/spellings; a booth matches a food concept when its name/menu text contains one of the terms. amenities: amenity type -> label + search terms (restroom, atm, first aid, and the other published amenity types). Matching is an expansion layer: show concept hits only after direct hits. Amenity points themselves are direct hits, not likely-match rows.",
  "version": "2026-10-15",
  "ride_types": {
   "pirate-ship": {
@@ -1426,6 +1426,36 @@
     "veggie",
     "meatless"
    ]
+  }
+ },
+ "amenities": {
+  "restroom": {
+   "label": "Restroom",
+   "terms": ["restroom", "restrooms", "bathroom", "bathrooms", "toilet", "toilets", "potty", "wc", "loo", "rest room"]
+  },
+  "atm": {
+   "label": "ATM",
+   "terms": ["atm", "atms", "cash", "cash machine", "money"]
+  },
+  "first_aid": {
+   "label": "First aid",
+   "terms": ["first aid", "medical", "nurse", "ems", "doctor", "injury"]
+  },
+  "nursing_room": {
+   "label": "Nursing room",
+   "terms": ["nursing", "mothers room", "mother's room", "lactation", "breastfeeding", "baby changing"]
+  },
+  "information": {
+   "label": "Information",
+   "terms": ["info", "information", "help desk"]
+  },
+  "lost_and_found": {
+   "label": "Lost and found",
+   "terms": ["lost and found", "lost & found", "lost child", "reconnection"]
+  },
+  "wheelchair_rental": {
+   "label": "Wheelchair rental",
+   "terms": ["wheelchair", "stroller", "scooter rental"]
   }
  }
 }

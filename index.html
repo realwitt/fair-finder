@@ -16,8 +16,8 @@
 <meta name="twitter:card" content="summary">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="stylesheet" href="vendor/leaflet.css?v=74">
-<link rel="stylesheet" href="style.css?v=74">
+<link rel="stylesheet" href="vendor/leaflet.css?v=75">
+<link rel="stylesheet" href="style.css?v=75">
 </head>
 <body>
 <div id="map" aria-label="Map"></div>
@@ -29,6 +29,8 @@
   </form>
   <ul id="suggest" role="listbox" class="hidden" aria-label="Suggestions"></ul>
   <div id="chips">
+    <button class="chip" id="chipNear" type="button" data-q="near" aria-pressed="false">📍 Near me</button>
+    <button class="chip" id="chipFav" type="button" data-q="favorites" aria-pressed="false">★ Favorites</button>
     <button class="chip" data-q="rides" aria-pressed="false">🎡 Rides</button>
     <button class="chip" data-q="hot dog">Hot dog</button>
     <button class="chip" data-q="corn dog">Corn dog</button>
@@ -40,6 +42,12 @@
     <button class="chip" data-q="ice cream">Ice cream</button>
     <button class="chip" data-q="bbq">BBQ</button>
     <button class="chip" data-q="new">⭐ New 2026</button>
+  </div>
+  <div id="searchFocus" class="hidden">
+    <button type="button" class="qa" id="qaNear">📍 Near me</button>
+    <button type="button" class="qa" id="qaRestroom">🚻 Nearest restroom</button>
+    <button type="button" class="qa" id="qaAtm">💲 Nearest ATM</button>
+    <button type="button" class="qa" id="qaAid">⛑ Nearest first aid</button>
   </div>
 </header>
 
@@ -66,6 +74,7 @@
   <label class="row"><input type="checkbox" id="tglFood" checked> Food booths (fair’s published booth data)</label>
   <label class="row"><input type="checkbox" id="tglRides" checked> 🎡 Rides <small>(fair’s published ride points)</small></label>
   <label class="row"><input type="checkbox" id="tglATM"> 💲 ATMs <small>(from the fair’s published grounds map, approx.)</small></label>
+  <label class="row"><input type="checkbox" id="tglAmenities"> 🚻 Amenities (approx.)</label>
   <label class="row"><input type="checkbox" id="tglDrinks"> 🥤 Drink booths <small>(booths whose fair listing mentions drinks)</small></label>
   <p class="note" id="waterNote">💧 Water refill stations: the fair’s published map and site do <b>not</b> list refill-station locations, so none are shown. A local guide (thisisraleigh.com, unofficial) says there are filling stations across from Casey's Clubhouse and under the trees between Kiddieland and the Scott Building.</p>
   <button id="btnOffline" class="wide">⬇ Save the grounds map for offline</button>
@@ -85,6 +94,33 @@
   <ol id="resList"></ol>
 </section>
 
+<section id="nearPanel" class="sheet hidden" aria-label="Near me">
+  <div class="sheet-head">
+    <span id="nearCount">Near me</span>
+    <button class="close" id="closeNear" type="button" aria-label="Close">✕</button>
+    <div id="nearQuick" class="qaRow">
+      <button type="button" class="qa" id="nearQaRestroom">🚻 Nearest restroom</button>
+      <button type="button" class="qa" id="nearQaAtm">💲 Nearest ATM</button>
+      <button type="button" class="qa" id="nearQaAid">⛑ Nearest first aid</button>
+    </div>
+    <div id="nearFilters" class="rideSubs" role="group" aria-label="Near me type">
+      <button type="button" class="rideSub on" data-nt="all">All</button>
+      <button type="button" class="rideSub" data-nt="food">Food</button>
+      <button type="button" class="rideSub" data-nt="rides">Rides</button>
+      <button type="button" class="rideSub" data-nt="amenities">Amenities</button>
+    </div>
+  </div>
+  <p id="nearGps" class="note hidden"></p>
+  <ol id="nearList"></ol>
+</section>
+
+<section id="favPanel" class="sheet hidden" aria-label="Favorites">
+  <div class="sheet-head"><span id="favCount">★ Favorites</span>
+    <button class="close" id="closeFav" type="button" aria-label="Close">✕</button></div>
+  <p id="favEmpty" class="note hidden">No favorites yet. Tap the star on a booth or ride.</p>
+  <ol id="favList"></ol>
+</section>
+
 <section id="guide" class="hidden" aria-label="Walking guide" data-snap="collapsed">
   <div id="sheetBar" role="button" tabindex="0" aria-controls="guideMore" aria-expanded="false" aria-label="Expand guide panel">
     <span class="grabber" aria-hidden="true"></span>
@@ -99,6 +135,7 @@
   <div id="guideMore">
     <div id="guideTop">
       <div id="guideName"></div>
+      <button type="button" id="btnFav" class="fav" aria-pressed="false" aria-label="Save">☆</button>
       <button id="btnShare" class="shareP" aria-label="Share this booth"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v7h14v-7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Share</span></button>
       <button id="btnShowList" class="small" aria-label="Show results list">List</button>
     </div>
@@ -117,13 +154,14 @@
   <div id="aboutBody">Loading…</div>
 </section>
 
-<script src="vendor/leaflet.js?v=74"></script>
-<script src="geo.js?v=74"></script>
-<script src="search.js?v=74"></script>
-<script src="rides.js?v=74"></script>
-<script src="suggest.js?v=74"></script>
-<script src="concepts.js?v=74"></script>
-<script src="route.js?v=74"></script>
-<script src="app.js?v=74"></script>
+<script src="vendor/leaflet.js?v=75"></script>
+<script src="geo.js?v=75"></script>
+<script src="heading.js?v=75"></script>
+<script src="search.js?v=75"></script>
+<script src="rides.js?v=75"></script>
+<script src="suggest.js?v=75"></script>
+<script src="concepts.js?v=75"></script>
+<script src="route.js?v=75"></script>
+<script src="app.js?v=75"></script>
 </body>
 </html>

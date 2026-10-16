@@ -21,13 +21,14 @@ No account and no API key.
 - `type: "food"` returns booths whose menu matches.
 - `type: "booth"` matches booth and vendor names.
 - `type: "ride"` matches public ride names and lot-label aliases.
+- `type: "amenity"` matches restrooms, ATMs, first aid, Mothers' Rooms, information, Lost & Found (Reconnection Center) and wheelchair/stroller rental (words like bathroom, toilet, potty, cash, medical, nurse). Positions are approximate (fair's 2026 grounds-map icons; 10 restrooms use the 2022 NCDA&CS GIS position).
 - `type: "any"` (default) mixes them.
 
 Each hit is `tier: "direct"` or `tier: "likely"`. Direct hits are exact or strong name and lot-label matches, plus menu matches on the user's own words (light typos, plurals, and spacing). Likely hits are matches that needed a synonym or concept expansion, or partial matches. `direct` is filled before `likely`. `limit` caps the two lists together (default 10, max 25).
 
 `get_details` returns the full record for one id such as `L0-1099`. Matching is case-insensitive and ignores trailing punctuation.
 
-`nearby` lists booths and rides within `radius_m` of a lat/lon, closest first (default 150 m, max 2000 m). `type: "food"` means booths with the food flag. A point more than 3 km from the fairgrounds returns an empty list.
+`nearby` lists booths, rides and amenities (`type: "amenity"`) within `radius_m` of a lat/lon, closest first (default 150 m, max 2000 m). `type: "food"` means booths with the food flag. A point more than 3 km from the fairgrounds returns an empty list.
 
 Every hit includes `fair_finder_link` (`https://realwitt.github.io/fair-finder/?booth=` plus the id) so someone can open walking directions on their phone.
 

@@ -73,10 +73,23 @@
     opts = opts || {};
     const booths = opts.booths || [], rides = opts.rides || [], extraFoods = opts.foods || [];
     const entries = [];
+    const rideNameN = new Map();
     for (let i = 0; i < rides.length; i++) {
       const r = rides[i];
       if (!r || !r.name) continue;
-      entries.push(entry('ride', r.id, r.name, r.name, { sub: r.area || '' }));
+      const k = compact(r.name);
+      rideNameN.set(k, (rideNameN.get(k) || 0) + 1);
+    }
+    for (let i = 0; i < rides.length; i++) {
+      const r = rides[i];
+      if (!r || !r.name) continue;
+      let sub = r.area || '';
+      if (rideNameN.get(compact(r.name)) > 1) {
+        const aka = (r.aliases && r.aliases.length) ? ('aka ' + r.aliases.join(', ')) : '';
+        const tickets = r.tickets != null ? (r.tickets + ' tickets') : '';
+        sub = [aka, r.area || '', tickets].filter(Boolean).join(' · ');
+      }
+      entries.push(entry('ride', r.id, r.name, r.name, { sub: sub }));
       const al = r.aliases || [];
       for (let j = 0; j < al.length; j++) {
         if (!al[j]) continue;
@@ -142,43 +155,46 @@
     }
     return true;
   }
-  function fuzzy(e, qc, qtoks) {
-    if (qc.length < 4) return 0;
-    const max = qc.length >= 7 ? 2 : 1;
-    if (e.c.length >= qc.length && levWithin(qc, e.c, 0, qc.length, max) <= max) return 40;
+  function editMax(len) { return len <= 8 ? 1 : 2; }
+  function fuzzy(e, qc, qtoks, allowFuzzy) {
+    if (!allowFuzzy || qc.length < 4) return 0;
+    const max = editMax(qc.length);
+    const firstOk = (text, off) => qc.length > 8 || text.charCodeAt(off) === qc.charCodeAt(0);
+    if (e.c.length >= qc.length && firstOk(e.c, 0) && levWithin(qc, e.c, 0, qc.length, max) <= max) return 40;
     if (qtoks.length === 1) {
       const toks = e.toks;
       for (let i = 0; i < toks.length; i++) {
         const t = toks[i];
         if (t.length >= qc.length) {
-          if (levWithin(qc, t, 0, qc.length, max) <= max) return 40;
-        } else if (qc.length - t.length <= max && levWithin(qc, t, 0, t.length, max) <= max) return 40;
+          if (firstOk(t, 0) && levWithin(qc, t, 0, qc.length, max) <= max) return 40;
+        } else if (qc.length - t.length <= max && firstOk(t, 0) && levWithin(qc, t, 0, t.length, max) <= max) return 40;
       }
     }
     return 0;
   }
-  function scoreEntry(e, qn, qc, qtoks) {
+  function scoreEntry(e, qn, qc, qtoks, allowFuzzy) {
     let s = 0;
     if (e.c === qc) s = 100;
     else if (e.c.startsWith(qc)) s = 90;
     else if (e.n.startsWith(qn)) s = 88;
     else if (toksPrefix(qtoks, e.toks)) s = 75;
     else if (qc.length >= 3 && e.c.indexOf(qc) !== -1) s = 60;
-    else s = fuzzy(e, qc, qtoks);
+    else s = fuzzy(e, qc, qtoks, allowFuzzy);
     if (!s) return 0;
     if (e.isAlias) s -= 15;
     return s;
   }
   function typeRank(t) { return t === 'ride' ? 2 : t === 'booth' ? 1 : 0; }
-  function query(index, q, limit) {
+  function query(index, q, limit, opts) {
     const entries = (index && index.entries) || [];
     const qn = norm(q), qc = compactFromNorm(qn);
     if (qc.length < 1) return [];
     if (limit == null) limit = 8;
+    const allowFuzzy = !(opts && opts.noFuzzy);
     const qtoks = tokensFromNorm(qn);
     const scored = [];
     for (let i = 0; i < entries.length; i++) {
-      const s = scoreEntry(entries[i], qn, qc, qtoks);
+      const s = scoreEntry(entries[i], qn, qc, qtoks, allowFuzzy);
       if (s > 0) scored.push(entries[i], s);
     }
     const order = [];

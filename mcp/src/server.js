@@ -1,6 +1,6 @@
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 const PROTOCOLS = ['2025-11-25', '2025-06-18', '2025-03-26', '2024-11-05'];
-const INSTRUCTIONS = 'Fair Finder is an independent, UNOFFICIAL guide to the 2026 N.C. State Fair (Oct 15-25, Raleigh). It is not affiliated with or endorsed by the N.C. State Fair or NCDA&CS. Data: the fair\'s published Food & Ride Finder booth and ride points (names, menus, ticket counts), plus approximate ride height/category from the midway operator. Use search to find foods, booths or rides; get_details for one item; nearby for things close to a lat/lon. Every result has a fair_finder_link the user can open on their phone to walk there with live directions. Menus and tickets can change; tell users to check posted signs. Official info: https://www.ncstatefair.org/';
+const INSTRUCTIONS = 'Fair Finder is an independent, UNOFFICIAL guide to the 2026 N.C. State Fair (Oct 15-25, Raleigh). It is not affiliated with or endorsed by the N.C. State Fair or NCDA&CS. Data: the fair\'s published Food & Ride Finder booth and ride points (names, menus, ticket counts), plus approximate ride height/category from the midway operator. Use search to find foods, booths, rides, or approximate amenities (restrooms, ATMs, first aid, nursing rooms, information, lost and found, wheelchair rental); get_details for one item; nearby for things close to a lat/lon. Every result has a fair_finder_link the user can open on their phone to walk there with live directions. Menus and tickets can change; tell users to check posted signs. Official info: https://www.ncstatefair.org/';
 const UNOFFICIAL_NOTE = 'Unofficial guide. Locations/menus from the fair\u2019s published data; may change.';
 const DETAILS_SOURCE = 'Ticket counts come from the fair\u2019s published Food & Ride Finder. Heights and categories, when present, are per midway operator (approximate).';
 const SRC = 'per midway operator (approximate)';
@@ -75,6 +75,20 @@ const RIDE_INDEX = Suggest.buildIndex({ rides: DATA.rides });
 const BOOTH_INDEX = Suggest.buildIndex({ booths: DATA.booths });
 const RIDE_BY = new Map(DATA.rides.map(r => [r.id, r]));
 const BOOTH_BY = new Map(DATA.booths.map(b => [b.id, b]));
+const AMENITY_BY = new Map((DATA.amenities || []).map(a => [a.id, a]));
+const EXACT_TERMS = new Set();
+(function collectExact() {
+  const syn = (typeof SYNONYMS === 'object' && SYNONYMS) || {};
+  for (const bucket of ['foods', 'ride_types', 'amenities']) {
+    const o = syn[bucket] || {};
+    for (const k in o) {
+      const terms = (o[k] && o[k].terms) || [];
+      for (const t of terms) EXACT_TERMS.add(Suggest.compact(t));
+    }
+  }
+})();
+function exactConcept(query) { return EXACT_TERMS.has(Suggest.compact(query)); }
+let allowWordFuzzy = true;
 
 function stem(w) {
   if (w.length > 4 && w.endsWith('ies')) return w.slice(0, -3) + 'y';
@@ -136,7 +150,12 @@ function wordEq(a, b) {
   if (a === b) return true;
   const sa = stem(a), sb = stem(b);
   if (sa === sb && sa.length >= 3) return true;
-  return a.length >= 5 && b.length >= 5 && FoodSearch.lev(a, b, 1) <= 1;
+  if (!allowWordFuzzy) return false;
+  const len = a.length;
+  if (len < 4) return false;
+  const max = len <= 8 ? 1 : 2;
+  if (len <= 8 && a.charCodeAt(0) !== b.charCodeAt(0)) return false;
+  return FoodSearch.lev(a, b, max) <= max;
 }
 
 function phraseIn(phrase, words) {
@@ -328,7 +347,7 @@ function boothSummary(booth, match, quality, note, items) {
 
 function rideHits(query) {
   const qc = Suggest.compact(query);
-  const raw = Suggest.query(RIDE_INDEX, query, 25);
+  const raw = Suggest.query(RIDE_INDEX, query, 25, { noFuzzy: exactConcept(query) });
   const byName = DATA.rides.filter(r => Suggest.compact(r.name) === qc);
   const byAlias = DATA.rides.filter(r => (r.aliases || []).some(a => Suggest.compact(a) === qc));
   const out = [];
@@ -358,7 +377,7 @@ function rideHits(query) {
 }
 
 function boothNameHits(query) {
-  const raw = Suggest.query(BOOTH_INDEX, query, 25);
+  const raw = Suggest.query(BOOTH_INDEX, query, 25, { noFuzzy: exactConcept(query) });
   const out = [];
   for (const hit of raw) {
     if (hit.type !== 'booth') continue;
@@ -385,6 +404,11 @@ function scoreFood(hits, matchedLen, booth, phrases) {
 }
 
 function foodHits(query) {
+  allowWordFuzzy = !exactConcept(query);
+  try { return foodHitsBody(query); }
+  finally { allowWordFuzzy = true; }
+}
+function foodHitsBody(query) {
   const tokens = contentTokens(query);
   if (!tokens.length) return { fail: 'Say a food, booth, or ride.' };
   const full = [];
@@ -448,8 +472,10 @@ function capTiers(rows, limit) {
     if (o.tier === 'likely') likely.push(o);
     else direct.push(o);
   }
+  const directIds = new Set(direct.map(row => row.id));
+  const likelyOnly = likely.filter(row => !directIds.has(row.id));
   const d = direct.slice(0, limit);
-  const l = likely.slice(0, Math.max(0, limit - d.length));
+  const l = likelyOnly.slice(0, Math.max(0, limit - d.length));
   const results = d.concat(l);
   return { direct: d, likely: l, results, count: results.length };
 }
@@ -479,7 +505,7 @@ function fail(text) { return { fail: text }; }
 function parseEnum(v, allowed) {
   if (v == null || v === '') return { value: 'any' };
   if (typeof v !== 'string' || !allowed.includes(v.trim())) {
-    return { error: 'type must be any, food, booth, or ride.' };
+    return { error: 'type must be any, food, booth, ride, or amenity.' };
   }
   return { value: v.trim() };
 }
@@ -497,15 +523,16 @@ function searchTool(args) {
   if (typeof args.query !== 'string') return fail('query is required and must be a string of 1 to 100 characters.');
   const query = args.query.trim();
   if (query.length < 1 || query.length > 100) return fail('query is required and must be a string of 1 to 100 characters.');
-  const typeP = parseEnum(args.type, ['any', 'food', 'booth', 'ride']);
+  const typeP = parseEnum(args.type, ['any', 'food', 'booth', 'ride', 'amenity']);
   if (typeP.error) return fail(typeP.error);
   const limP = parseLimit(args.limit, 1, 25);
   if (limP.error) return fail(limP.error);
   const type = typeP.value;
   const limit = limP.value == null ? 10 : limP.value;
-  if (!contentTokens(query).length) return fail('Say a food, booth, or ride.');
+  if (type !== 'amenity' && !contentTokens(query).length) return fail('Say a food, booth, or ride.');
   let rows;
-  if (type === 'ride') rows = rideHits(query);
+  if (type === 'amenity') rows = amenityHits(query);
+  else if (type === 'ride') rows = rideHits(query);
   else if (type === 'booth') rows = boothNameHits(query);
   else if (type === 'food') {
     const foods = foodHits(query);
@@ -515,8 +542,10 @@ function searchTool(args) {
     const foods = foodHits(query);
     if (foods.fail) return foods;
     rows = mergeAny(rideHits(query), boothNameHits(query), foods);
+    const seen = new Set(rows.map(r => r.id));
+    for (const a of amenityHits(query)) if (!seen.has(a.id)) { seen.add(a.id); rows.push(a); }
   }
-  if (CONCEPTS) {
+  if (type !== 'amenity' && CONCEPTS) {
     const have = new Set(rows.map(r => r.id));
     const extra = CONCEPTS.likely(query, {
       rides: type === 'any' || type === 'ride' ? DATA.rides : [],
@@ -534,8 +563,38 @@ function searchTool(args) {
   return { query, type, count: packed.count, direct: packed.direct, likely: packed.likely, note: UNOFFICIAL_NOTE + ' direct = matches your words; likely = related items found via synonyms/concepts or partial matches.' };
 }
 
+function amenityHits(query) {
+  if (!CONCEPTS || !DATA.amenities) return [];
+  const ks = CONCEPTS.match(query).filter(k => k.kind === 'amenity');
+  if (!ks.length) return [];
+  const types = new Set(ks.map(k => k.id));
+  const out = [];
+  for (const a of DATA.amenities) {
+    if (!types.has(a.amenity_type)) continue;
+    out.push({
+      id: a.id,
+      type: 'amenity',
+      amenity_type: a.amenity_type,
+      name: a.name,
+      area: a.area || '',
+      lat: a.lat,
+      lon: a.lon,
+      location: 'approximate',
+      fair_finder_link: link(a.id),
+      match: 'amenity',
+      match_quality: 'exact',
+      tier: 'direct',
+      score: 100,
+    });
+  }
+  return out;
+}
+
 function parseId(v) {
-  const m = String(v == null ? '' : v).match(/\b(L\d-\d+|atm\d+)/i);
+  const s = String(v == null ? '' : v);
+  const am = s.match(/am-[a-z0-9-]+/i);
+  if (am) return am[0].toLowerCase();
+  const m = s.match(/\b(L\d-\d+|atm\d+)/i);
   if (!m) return null;
   return /^l/i.test(m[1]) ? 'L' + m[1].slice(1) : m[1].toLowerCase();
 }
@@ -585,6 +644,20 @@ function getDetails(args) {
       fair_finder_link: link(booth.id),
     };
   }
+  const amenity = AMENITY_BY.get(id);
+  if (amenity) {
+    return {
+      id: amenity.id,
+      type: 'amenity',
+      amenity_type: amenity.amenity_type,
+      name: amenity.name,
+      area: amenity.area || '',
+      lat: amenity.lat,
+      lon: amenity.lon,
+      location: 'approximate',
+      fair_finder_link: link(amenity.id),
+    };
+  }
   return fail('No booth or ride with id "' + id + '". Ids look like L0-1099. Use search to find one.');
 }
 
@@ -597,6 +670,22 @@ function haversine(lat1, lon1, lat2, lon2) {
 }
 
 function nearbySummary(entry, meters) {
+  if (entry.type === 'amenity') {
+    const base = {
+      id: entry.id,
+      type: 'amenity',
+      amenity_type: entry.amenity_type,
+      name: entry.name,
+      area: entry.area || '',
+      lat: entry.lat,
+      lon: entry.lon,
+      location: 'approximate',
+      fair_finder_link: link(entry.id),
+    };
+    base.distance_m = Math.round(meters);
+    base.distance_ft = Math.round(meters * 3.28084);
+    return base;
+  }
   const base = entry.type === 'ride'
     ? rideSummary(entry, 'name', 'exact')
     : boothSummary(entry, 'name', 'exact');
@@ -622,7 +711,7 @@ function nearbyTool(args) {
   const limP = parseLimit(args.limit, 1, 50);
   if (limP.error) return fail(limP.error);
   const limit = limP.value == null ? 15 : limP.value;
-  const typeP = parseEnum(args.type, ['any', 'food', 'booth', 'ride']);
+  const typeP = parseEnum(args.type, ['any', 'food', 'booth', 'ride', 'amenity']);
   if (typeP.error) return fail(typeP.error);
   const type = typeP.value;
   const distFair = haversine(args.lat, args.lon, DATA.fair.lat, DATA.fair.lon);
@@ -634,6 +723,12 @@ function nearbyTool(args) {
     for (const ride of DATA.rides) {
       const meters = haversine(args.lat, args.lon, ride.lat, ride.lon);
       if (meters <= radius) rows.push({ meters, row: nearbySummary(Object.assign({ type: 'ride' }, ride), meters) });
+    }
+  }
+  if (type === 'any' || type === 'amenity') {
+    for (const amenity of DATA.amenities || []) {
+      const meters = haversine(args.lat, args.lon, amenity.lat, amenity.lon);
+      if (meters <= radius) rows.push({ meters, row: nearbySummary(Object.assign({ type: 'amenity' }, amenity), meters) });
     }
   }
   if (type === 'any' || type === 'booth' || type === 'food') {
@@ -666,12 +761,12 @@ function tools() {
     {
       name: 'search',
       title: 'Search the fair',
-      description: 'Find foods, food booths, or rides at the 2026 N.C. State Fair by name or menu text. Tolerates typos, spacing, hyphens, and synonyms (hotdog, sno cone, cherry slush, Tilt-A-Whirl). type food returns booths whose menu matches. type booth matches booth and vendor names. type ride matches public ride names and lot-label aliases. Every hit includes fair_finder_link. Results are split into direct (the user\'s own words, including light typos and plurals) and likely (synonym, concept, or partial matches). direct is filled before likely.',
+      description: 'Find foods, food booths, rides, or approximate amenities at the 2026 N.C. State Fair by name or menu text. Tolerates typos, spacing, hyphens, and synonyms (hotdog, sno cone, cherry slush, Tilt-A-Whirl). type food returns booths whose menu matches. type booth matches booth and vendor names. type ride matches public ride names and lot-label aliases. Amenities (restrooms, ATMs, first aid, nursing rooms, information, lost and found, wheelchair rental) are direct hits for those words and their synonyms; type amenity returns only those. Locations for amenities are approximate. Every hit includes fair_finder_link. Results are split into direct (the user\'s own words, including light typos and plurals) and likely (synonym, concept, or partial matches). direct is filled before likely.',
       inputSchema: {
         type: 'object',
         properties: {
           query: { type: 'string', minLength: 1, maxLength: 100, description: 'Food, booth, or ride text to look up. 1 to 100 characters.' },
-          type: { type: 'string', enum: ['any', 'food', 'booth', 'ride'], description: 'any (default) mixes name and menu hits. food is menu matches. booth is vendor names. ride is public names and lot labels.' },
+          type: { type: 'string', enum: ['any', 'food', 'booth', 'ride', 'amenity'], description: 'any (default) mixes name, menu, and amenity hits. food is menu matches. booth is vendor names. ride is public names and lot labels. amenity is approximate amenity points only.' },
           limit: { type: 'integer', minimum: 1, maximum: 25, description: 'Max hits across direct and likely combined. Default 10.' },
         },
         required: ['query'],
@@ -694,14 +789,14 @@ function tools() {
     {
       name: 'nearby',
       title: 'What is near a point',
-      description: 'Booths and rides within radius_m of a lat/lon, closest first. type food means booths with the food flag. type booth means booths. type ride means rides. A point more than 3 km from the fairgrounds returns an empty list.',
+      description: 'Booths, rides, and amenities within radius_m of a lat/lon, closest first. type food means booths with the food flag. type booth means booths. type ride means rides. type amenity is amenity points (approximate locations). any includes them. A point more than 3 km from the fairgrounds returns an empty list.',
       inputSchema: {
         type: 'object',
         properties: {
           lat: { type: 'number', description: 'Latitude of the point.' },
           lon: { type: 'number', description: 'Longitude of the point.' },
           radius_m: { type: 'number', minimum: 10, maximum: 2000, description: 'Search radius in meters. Default 150. Min 10, max 2000.' },
-          type: { type: 'string', enum: ['any', 'food', 'booth', 'ride'], description: 'any (default), food (booths with the food flag), booth, or ride.' },
+          type: { type: 'string', enum: ['any', 'food', 'booth', 'ride', 'amenity'], description: 'any (default), food (booths with the food flag), booth, ride, or amenity (amenity points; any includes them).' },
           limit: { type: 'integer', minimum: 1, maximum: 50, description: 'Max rows. Default 15.' },
         },
         required: ['lat', 'lon'],

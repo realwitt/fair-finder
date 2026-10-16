@@ -10,7 +10,7 @@ button{font:inherit;cursor:pointer}
 #clearQ{width:52px;height:52px;border-radius:14px;border:3px solid #000;background:#fff;font-size:22px;font-weight:800}
 #chips{display:flex;gap:6px;overflow-x:auto;padding-top:8px;scrollbar-width:none}
 #chips::-webkit-scrollbar{display:none}
-.chip{flex:none;height:42px;padding:0 14px;border-radius:21px;border:2px solid #000;background:var(--hi);color:#000;font-weight:700;font-size:16px}
+.chip{flex:none;height:42px;padding:0 10px;border-radius:21px;border:2px solid #000;background:var(--hi);color:#000;font-weight:700;font-size:16px}
 #status{position:absolute;z-index:1000;left:8px;top:calc(var(--safe-t) + 130px);max-width:calc(100% - 90px);background:#000d;color:#fff;font-weight:600;font-size:14px;padding:6px 10px;border-radius:10px;pointer-events:none}
 #fab{position:absolute;z-index:1000;right:10px;top:calc(var(--safe-t) + 130px);display:flex;flex-direction:column;gap:10px}
 .fab{width:62px;height:62px;border-radius:50%;border:3px solid #000;background:#fff;font-size:28px;font-weight:900;box-shadow:0 3px 10px #0007}
@@ -77,7 +77,7 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;display
 #guide.arrived #arrow path{fill:#0a8a2a}
 #guide.arrived #guideHint{font-size:24px;color:#0a6a20}
 #guideMenu{max-height:22vh;overflow:auto}
-body.guiding #results{bottom:var(--sheetVis,104px);max-height:calc(100% - var(--sheetVis,104px) - 150px);z-index:4000;border-radius:18px;border:3px solid #000}
+body.guiding #results,body.guiding #nearPanel,body.guiding #favPanel{bottom:var(--sheetVis,104px);max-height:calc(100% - var(--sheetVis,104px) - 150px);z-index:4000;border-radius:18px;border:3px solid #000}
 body.guiding.typing #guide{opacity:.96}
 #version{position:fixed;z-index:1000;left:8px;top:calc(var(--safe-t) + 168px);font-size:11px;font-weight:700;color:#fff;background:#0009;padding:2px 6px;border-radius:6px;pointer-events:none}
 .panel{z-index:6000}
@@ -107,7 +107,7 @@ body.guiding #map{bottom:var(--sheetVis)}
 #guide.arrived #miniArrow path{fill:#0a8a2a}
 #miniNorth{position:absolute;top:-4px;right:-6px;font:900 10px/1 sans-serif;background:#000;color:#fff;border-radius:4px;padding:2px 3px}
 #barText{min-width:0}
-#guide #guideDist{font-size:26px;font-weight:900;line-height:32px;height:32px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#guide #guideDist{font-size:16px;font-weight:900;line-height:16px;height:32px;margin:0;white-space:normal;overflow:hidden;text-overflow:clip}
 #guide #guideHint{font-size:16px;font-weight:800;line-height:21px;height:42px;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#111;overflow-wrap:anywhere}
 #guide.arrived #guideHint{font-size:16px;color:#0a6a20}
 #btnCompassMini{width:48px;height:48px;min-height:0;padding:0;font-size:24px;border:3px solid #000;border-radius:12px;background:var(--hi)}
@@ -167,6 +167,11 @@ body.popup #btnShareMe,body.popup #aboutPill,body.popup #version,body.popup #sta
 .meIconWrap{background:none;border:0}
 .me{position:relative;width:120px;height:120px;pointer-events:none}
 .meCore{position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 1px 6px #0009;transition:background-color .4s}
+.meArrow{display:none;position:absolute;left:50%;top:50%;width:32px;height:32px;margin:-22px 0 0 -16px;transform-origin:50% 68%}
+.meArrow path{fill:#1a73e8;stroke:#fff;stroke-width:2;stroke-linejoin:round}
+.me.hasHead .meArrow{display:block}
+.me.hasHead .meCore{visibility:hidden}
+.me.stale .meArrow path{fill:#8a8f98}
 .mePulse{position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:#1a73e8;opacity:0;transform:scale(1)}
 .mePulse.blip{animation:meBlip 1.6s ease-out 1}
 @keyframes meBlip{0%{opacity:.55;transform:scale(1)}100%{opacity:0;transform:scale(4.2)}}
@@ -176,7 +181,7 @@ body.popup #btnShareMe,body.popup #aboutPill,body.popup #version,body.popup #sta
 .me.stale .meCore{background:#8a8f98}
 .me.stale .mePulse{animation:none;opacity:0}
 .me.stale .meBeam{filter:grayscale(1)}
-@media (prefers-reduced-motion:reduce){.mePulse.blip{animation:none}.meBeam,#btnGpsRefresh,#miniArrow,#arrow,#guide{transition:none}}
+@media (prefers-reduced-motion:reduce){.mePulse.blip{animation:none}.meBeam,.meArrow,#btnGpsRefresh,#miniArrow,#arrow,#guide{transition:none}}
 
 /* Rides + autocomplete */
 #suggest{position:absolute;z-index:6000;left:8px;right:8px;top:100%;margin:0;padding:0;list-style:none;background:#fff;border:3px solid #000;border-radius:12px;max-height:50vh;overflow:auto;-webkit-overflow-scrolling:touch}
@@ -205,3 +210,17 @@ body.ac.acCover #results{visibility:hidden}
 #suggest li .sgHead{border-top:2px solid #7b2ff7;padding-top:4px}
 .badge.likely{background:#efe6ff;color:#3d1a80;border:1px solid #7b2ff7}
 .sgWhy{color:#5a2bb0;font-weight:700}
+#searchFocus.hidden{display:none!important}
+#searchFocus{display:flex;gap:6px;overflow-x:auto;padding-top:8px}
+.qa{flex:none;height:42px;padding:0 12px;border-radius:12px;border:2px solid #000;background:#fff;font-weight:800;font-size:15px}
+.qaRow{flex:1 0 100%;display:flex;gap:6px;overflow-x:auto;padding:4px 0 8px}
+#nearList,#favList{list-style:none;margin:0;padding:0}
+#nearList li,#favList li{min-height:52px;padding:8px 12px;border-bottom:1px solid #ddd;display:flex;align-items:center;gap:8px}
+.amenityIcon .am{width:26px;height:26px;border-radius:13px;border:2px solid #000;background:#fff;font-size:15px;line-height:22px;text-align:center}
+.fav{width:44px;height:44px;background:#fff;border:2px solid #000;border-radius:12px;font-size:22px;line-height:1;flex:none}
+#guide #btnFav{height:44px}
+#resList li.likelyHead,#suggest li.sgSep{min-height:0;cursor:default;background:#fff;font-size:12px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:#5a2bb0}
+#suggest li.sgSep{border-top:2px solid #7b2ff7}
+#resList li.likelyHead{border-top:3px solid #7b2ff7;padding:8px 14px}
+
+#nearList .r-sub{display:block;font-size:12px;font-weight:400;color:#555;line-height:1.2}

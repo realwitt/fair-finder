@@ -32,7 +32,12 @@ function slim() {
       lat: r.lat, lon: r.lon,
     };
   });
-  return { booths, rides, fair: { lat: 35.7948, lon: -78.7115 } };
+  const amenFile = JSON.parse(readFileSync(join(repo, 'data/amenities.json'), 'utf8'));
+  const amenities = (amenFile.amenities || []).map(a => ({
+    id: a.id, name: a.name, area: a.area || '', lat: a.lat, lon: a.lon,
+    amenity_type: a.type, location: 'approximate',
+  }));
+  return { booths, rides, amenities, fair: { lat: 35.7948, lon: -78.7115 } };
 }
 
 const DATA = slim();
@@ -77,6 +82,6 @@ const bytes = Buffer.byteLength(js);
 const sha256 = createHash('sha256').update(js).digest('hex');
 writeFileSync(join(mcpDir, 'dist/meta.json'), JSON.stringify({
   built: new Date().toISOString(), bytes, sha256,
-  booths: DATA.booths.length, rides: DATA.rides.length,
+  booths: DATA.booths.length, rides: DATA.rides.length, amenities: DATA.amenities.length,
 }));
 process.stdout.write('worker.js ' + bytes + ' bytes\n');

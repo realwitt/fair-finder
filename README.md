@@ -35,3 +35,6 @@ Fair Finder is an independent, free project. It is not affiliated with, endorsed
 
 ## v7.4: AI connector (MCP)
 `mcp/` is a read-only, no-auth remote MCP server (Cloudflare Worker) at https://fair-finder-mcp.lively-shape-f373.workers.dev/mcp with tools `search`, `get_details`, `nearby`. It bundles the same `data/booths.json`, `data/rides.json`, `data/synonyms.json`, `search.js`, `suggest.js` and `concepts.js` at build time (`node mcp/build.mjs`), so the app and AI connectors agree (direct + likely tiers). See `mcp/README.md`.
+
+## v7.5
+Near me (walking-distance list of food, rides and amenities), Favorites (local only), amenities layer + search + "Nearest restroom / ATM / first aid" (data/amenities.json, built by tools/build_amenities.py from the fair's 2026 grounds-map icons; approximate), navigation arrow for the you-are-here marker (heading.js: GPS course while walking, compass when stopped), search tightening for exact synonym terms, list Share carries only q=. MCP 1.1.0 adds amenities.

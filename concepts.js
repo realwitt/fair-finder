@@ -12,18 +12,29 @@
       concepts.push({ kind, id, label, terms: ts });
     };
     const rt = (data && data.ride_types) || {}, fd = (data && data.foods) || {};
+    const am = (data && data.amenities) || {};
     for (const id in rt) add('ride', id, rt[id].label || id, rt[id].terms);
     for (const id in fd) add('food', id, fd[id].label || (fd[id].terms && fd[id].terms[0]) || id, fd[id].terms);
+    for (const id in am) add('amenity', id, am[id].label || id, am[id].terms);
     const rideTypes = {};
     const rd = (data && data.rides) || {};
     for (const id in rd) rideTypes[id] = rd[id].types || [];
     // Concepts the query names. Only the best match level is kept: exact term > query is a term's prefix (still typing)
     // > query contains the term as a phrase. So 'bumper cars' means bumper cars, not also 'cars'.
+    function exactTerm(q) {
+      const qc = S.compact(q);
+      if (!qc) return false;
+      for (const k of concepts) for (const t of k.terms) {
+        if (t.c === qc || t.c + 's' === qc || t.c === qc + 's') return true;
+      }
+      return false;
+    }
     function match(q) {
       const qn = S.norm(q), qc = S.compact(q);
-      if (qc.length < 3) return [];
+      if (qc.length < 2) return [];
       let best = 0, out = [];
       for (const k of concepts) {
+        if (qc.length === 2 && k.kind !== 'amenity') continue;
         let lv = 0;
         for (const t of k.terms) {
           let l = 0;
@@ -68,7 +79,7 @@
       }
       return out;
     }
-    return { match, likely, rideTypes };
+    return { match, likely, rideTypes, exactTerm };
   }
   const api = { create };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

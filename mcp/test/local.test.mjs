@@ -172,4 +172,49 @@ const workerPath = join(dirname(fileURLToPath(import.meta.url)), '../dist/worker
 const src = readFileSync(workerPath, 'utf8');
 check('no console.', !src.includes('console.'));
 
+check('version 1.1.0 and amenity enum',
+  init.json && init.json.result && init.json.result.serverInfo.version === '1.1.0'
+  && toolArr.some(t => t.name === 'search' && t.inputSchema.properties.type.enum.includes('amenity'))
+  && toolArr.some(t => t.name === 'nearby' && t.inputSchema.properties.type.enum.includes('amenity')));
+
+const bath = await tool('search', { query: 'bathroom', type: 'amenity' });
+check('search bathroom amenity',
+  bath.sc && bath.sc.count >= 1
+  && bath.sc.results.every(r => r.type === 'amenity' && r.amenity_type === 'restroom' && r.location === 'approximate' && String(r.fair_finder_link).includes('?booth=am-restroom-')));
+
+const atm = await tool('search', { query: 'atm' });
+const atmDirect = new Set((atm.sc && atm.sc.direct || []).map(r => r.id));
+check('search atm',
+  atm.sc && atm.sc.results.some(r => r.amenity_type === 'atm')
+  && (atm.sc.likely || []).every(r => !atmDirect.has(r.id)));
+
+const aid = await tool('search', { query: 'first aid', type: 'any' });
+check('search first aid',
+  aid.sc && (aid.sc.direct || []).some(r => r.amenity_type === 'first_aid'));
+
+const slush = await tool('search', { query: 'slushie', limit: 25 });
+const slushDirect = new Set((slush.sc && slush.sc.direct || []).map(r => r.id));
+check('search slushie no fuzzy dup',
+  slush.sc && !(slush.sc.results || []).some(r => /Sushi Rolls|Plushipop/.test(r.name || ''))
+  && (slush.sc.likely || []).every(r => !slushDirect.has(r.id))
+  && slush.sc.count === slush.sc.direct.length + slush.sc.likely.length);
+
+const nearAm = await tool('nearby', { lat: 35.79485, lon: -78.7093, radius_m: 200, type: 'amenity' });
+let nearAmOk = !!(nearAm.sc && nearAm.sc.results && nearAm.sc.results.length);
+if (nearAmOk) {
+  let prev = -1;
+  for (const row of nearAm.sc.results) {
+    if (row.type !== 'amenity' || row.distance_m < prev || row.distance_m > 200) nearAmOk = false;
+    prev = row.distance_m;
+  }
+}
+check('nearby amenity 200m', nearAmOk);
+
+const amDet = await tool('get_details', { id: 'am-restroom-3' });
+const amDet2 = await tool('get_details', { id: 'am-restroom-3.' });
+check('get_details am-restroom-3',
+  amDet.sc && amDet.sc.type === 'amenity' && amDet.sc.amenity_type === 'restroom' && amDet.sc.location === 'approximate'
+  && String(amDet.sc.fair_finder_link).includes('?booth=am-restroom-3')
+  && amDet2.sc && amDet2.sc.id === 'am-restroom-3');
+
 if (failed) process.exitCode = 1;

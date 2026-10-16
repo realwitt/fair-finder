@@ -1,0 +1,477 @@
+{
+ "generated": "2026-10-15",
+ "source": "Icons on the fair's published 2026 grounds map (Graphic_2026_WTL1); 10 restrooms use the NCDA&CS 2022 restroom GIS layer position. See tools/build_amenities.py.",
+ "location": "approximate",
+ "amenities": [
+  {
+   "id": "am-restroom-1",
+   "type": "restroom",
+   "name": "Restrooms",
+   "area": "",
+   "lat": 35.797775,
+   "lon": -78.718176,
+   "location": "approximate",
+   "position_source": "ncda_gis_2022"
+  },
+  {
+   "id": "am-restroom-2",
+   "type": "restroom",
+   "name": "Restrooms",
+   "area": "Heritage Village",
+   "lat": 35.796739,
+   "lon": -78.714399,
+   "location": "approximate",
+   "position_source": "ncda_gis_2022"
+  },
+  {
+   "id": "am-restroom-3",
+   "type": "restroom",
+   "name": "Restrooms",
+   "area": "Gate Nine",
+   "lat": 35.796957,
+   "lon": -78.711856,
+   "location": "approximate",
+   "position_source": "ncda_gis_2022"
+  },
+  {
+   "id": "am-restroom-4",
+   "type": "restroom",
+   "name": "Restrooms",
+   "area": "Scott Building",
+   "lat": 35.796021,
+   "lon": -78.708026,
+   "location": "approximate",
+   "position_source": "ncda_gis_2022"
+  },
+  {
+   "id": "am-restroom-5",
+   "type": "restroom",
+   "name": "Restrooms",
+   "area": "A Lot",
+   "lat": 35.795882,
+   "lon": -78.713702,
+   "location": "approximate",
+   "position_source": "ncda_gis_2022"
+  },
+  {
+   "id": "am-restroom-6",
+   "type": "restroom",
+   "name": "Restrooms",
+   "area": "Hv",
+   "lat": 35.795865,
+   "lon": -78.715528,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-restroom-7",
+   "type": "restroom",
+   "name": "Restrooms",
+   "area": "Lunchstand",
+   "lat": 35.795354,
+   "lon": -78.710156,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-restroom-8",
+   "type": "restroom",
+   "name": "Restrooms",
+   "area": "D Lot",
+   "lat": 35.794995,
+   "lon": -78.711255,
+   "location": "approximate",
+   "position_source": "ncda_gis_2022"
+  },
+  {
+   "id": "am-restroom-9",
+   "type": "restroom",
+   "name": "Restrooms",
+   "area": "Expo",
+   "lat": 35.794507,
+   "lon": -78.712682,
+   "location": "approximate",
+   "position_source": "ncda_gis_2022"
+  },
+  {
+   "id": "am-restroom-10",
+   "type": "restroom",
+   "name": "Restrooms",
+   "area": "J Lot",
+   "lat": 35.794703,
+   "lon": -78.708605,
+   "location": "approximate",
+   "position_source": "ncda_gis_2022"
+  },
+  {
+   "id": "am-restroom-11",
+   "type": "restroom",
+   "name": "Restrooms",
+   "area": "Graham/Dorton",
+   "lat": 35.794303,
+   "lon": -78.71058,
+   "location": "approximate",
+   "position_source": "ncda_gis_2022"
+  },
+  {
+   "id": "am-restroom-12",
+   "type": "restroom",
+   "name": "Restrooms",
+   "area": "Graham/Dorton",
+   "lat": 35.793889,
+   "lon": -78.71198,
+   "location": "approximate",
+   "position_source": "ncda_gis_2022"
+  },
+  {
+   "id": "am-first-aid-1",
+   "type": "first_aid",
+   "name": "First Aid",
+   "area": "",
+   "lat": 35.79714,
+   "lon": -78.71232,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-first-aid-2",
+   "type": "first_aid",
+   "name": "First Aid",
+   "area": "Heritage Village",
+   "lat": 35.796248,
+   "lon": -78.713651,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-first-aid-3",
+   "type": "first_aid",
+   "name": "First Aid",
+   "area": "L Lot",
+   "lat": 35.795095,
+   "lon": -78.709021,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-first-aid-4",
+   "type": "first_aid",
+   "name": "First Aid",
+   "area": "Expo",
+   "lat": 35.794799,
+   "lon": -78.71239,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-information-1",
+   "type": "information",
+   "name": "Information",
+   "area": "Gate Nine",
+   "lat": 35.796802,
+   "lon": -78.71198,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-information-2",
+   "type": "information",
+   "name": "Information",
+   "area": "Heritage Village",
+   "lat": 35.796202,
+   "lon": -78.714952,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-information-3",
+   "type": "information",
+   "name": "Information",
+   "area": "Scott Building",
+   "lat": 35.795889,
+   "lon": -78.708209,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-information-4",
+   "type": "information",
+   "name": "Information",
+   "area": "A Lot",
+   "lat": 35.795736,
+   "lon": -78.713868,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-information-5",
+   "type": "information",
+   "name": "Information",
+   "area": "L Lot",
+   "lat": 35.795419,
+   "lon": -78.708847,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-information-6",
+   "type": "information",
+   "name": "Information",
+   "area": "Graham/Dorton",
+   "lat": 35.794734,
+   "lon": -78.71003,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-information-7",
+   "type": "information",
+   "name": "Information",
+   "area": "Expo",
+   "lat": 35.794623,
+   "lon": -78.712221,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-nursing-room-1",
+   "type": "nursing_room",
+   "name": "Mothers' Room (nursing)",
+   "area": "Gate Nine",
+   "lat": 35.796726,
+   "lon": -78.711725,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-nursing-room-2",
+   "type": "nursing_room",
+   "name": "Mothers' Room (nursing)",
+   "area": "Scott Building",
+   "lat": 35.796478,
+   "lon": -78.708109,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-nursing-room-3",
+   "type": "nursing_room",
+   "name": "Mothers' Room (nursing)",
+   "area": "Lunchstand",
+   "lat": 35.795304,
+   "lon": -78.710411,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-nursing-room-4",
+   "type": "nursing_room",
+   "name": "Mothers' Room (nursing)",
+   "area": "Expo",
+   "lat": 35.794499,
+   "lon": -78.713077,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-nursing-room-5",
+   "type": "nursing_room",
+   "name": "Mothers' Room (nursing)",
+   "area": "Graham/Dorton",
+   "lat": 35.793946,
+   "lon": -78.711698,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-wheelchair-rental-1",
+   "type": "wheelchair_rental",
+   "name": "Wheelchair & Stroller Rental",
+   "area": "Gate 8",
+   "lat": 35.797953,
+   "lon": -78.716687,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-wheelchair-rental-2",
+   "type": "wheelchair_rental",
+   "name": "Wheelchair & Stroller Rental",
+   "area": "Gate Nine",
+   "lat": 35.797301,
+   "lon": -78.711017,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-wheelchair-rental-3",
+   "type": "wheelchair_rental",
+   "name": "Wheelchair & Stroller Rental",
+   "area": "Gate 10",
+   "lat": 35.797118,
+   "lon": -78.709005,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-wheelchair-rental-4",
+   "type": "wheelchair_rental",
+   "name": "Wheelchair & Stroller Rental",
+   "area": "Heritage Village",
+   "lat": 35.796357,
+   "lon": -78.71703,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-wheelchair-rental-5",
+   "type": "wheelchair_rental",
+   "name": "Wheelchair & Stroller Rental",
+   "area": "Dorton/Gate 1",
+   "lat": 35.793763,
+   "lon": -78.708978,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-lost-and-found-1",
+   "type": "lost_and_found",
+   "name": "Lost & Found (Reconnection Center)",
+   "area": "Expo",
+   "lat": 35.794494,
+   "lon": -78.712808,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-atm-1",
+   "type": "atm",
+   "name": "ATM",
+   "area": "Gate Nine",
+   "lat": 35.79729,
+   "lon": -78.711277,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-atm-2",
+   "type": "atm",
+   "name": "ATM",
+   "area": "Gate Nine",
+   "lat": 35.796992,
+   "lon": -78.711607,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-atm-3",
+   "type": "atm",
+   "name": "ATM",
+   "area": "Gate Nine",
+   "lat": 35.796326,
+   "lon": -78.711167,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-atm-4",
+   "type": "atm",
+   "name": "ATM",
+   "area": "Scott Building",
+   "lat": 35.7963,
+   "lon": -78.707964,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-atm-5",
+   "type": "atm",
+   "name": "ATM",
+   "area": "Heritage Village",
+   "lat": 35.796283,
+   "lon": -78.71467,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-atm-6",
+   "type": "atm",
+   "name": "ATM",
+   "area": "A Lot",
+   "lat": 35.795769,
+   "lon": -78.713581,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-atm-7",
+   "type": "atm",
+   "name": "ATM",
+   "area": "Scott South",
+   "lat": 35.795401,
+   "lon": -78.708273,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-atm-8",
+   "type": "atm",
+   "name": "ATM",
+   "area": "Grandstand",
+   "lat": 35.795169,
+   "lon": -78.71165,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-atm-9",
+   "type": "atm",
+   "name": "ATM",
+   "area": "Commercial Building",
+   "lat": 35.795051,
+   "lon": -78.70768,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-atm-10",
+   "type": "atm",
+   "name": "ATM",
+   "area": "Expo",
+   "lat": 35.794681,
+   "lon": -78.712959,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-atm-11",
+   "type": "atm",
+   "name": "ATM",
+   "area": "Dorton/Gate 1",
+   "lat": 35.794438,
+   "lon": -78.710561,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-atm-12",
+   "type": "atm",
+   "name": "ATM",
+   "area": "Dorton/Gate 1",
+   "lat": 35.794407,
+   "lon": -78.709778,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  },
+  {
+   "id": "am-atm-13",
+   "type": "atm",
+   "name": "ATM",
+   "area": "Graham/Dorton",
+   "lat": 35.793535,
+   "lon": -78.712049,
+   "location": "approximate",
+   "position_source": "grounds_map_2026"
+  }
+ ]
+}

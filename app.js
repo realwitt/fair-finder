@@ -7,10 +7,16 @@ const OSM = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 // Fair's published grounds-map tile layer full extent (EPSG:3857) converted to lat/lon
 const FAIR_BOUNDS = L.latLngBounds([35.79119, -78.72134], [35.79952, -78.70469]);
 const CENTER = [35.7948, -78.7115];
-const APP_VERSION = 'v7.4 · Oct 15';
+const APP_VERSION = 'v7.5 · Oct 15';
 const $ = id => document.getElementById(id);
 const LS_KEY = 'ff.guideTarget';
-const state = { me: null, acc: null, gpsHeading: null, compass: null, compassAt: 0, target: null, booths: [], rides: [], atms: [], results: [], query: '' };
+const FAV_KEY = 'ff.favorites.v1';
+const MAP_BEARING = 0;
+function loadFavs() { try { const a = JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); return Array.isArray(a) ? a.filter(x => typeof x === 'string') : []; } catch (e) { return []; } }
+function saveFavs(ids) { try { localStorage.setItem(FAV_KEY, JSON.stringify(ids)); } catch (e) {} }
+const state = { me: null, acc: null, gpsHeading: null, compass: null, compassAt: 0, target: null, booths: [], rides: [], atms: [], amenities: [], results: [], query: '', favs: [], nearType: 'all', pendingNearest: null };
+state.favs = loadFavs();
+state.heading = Heading.create();
 window.__ff = state; // exposed for testing
 
 // ---------- Map ----------
@@ -26,7 +32,7 @@ base.osm.addTo(map); // OSM street map is the default base map
 const fair = L.tileLayer(FAIR_TILES, { tileSize: 512, zoomOffset: -1, minNativeZoom: 14, maxNativeZoom: 21, maxZoom: 21, bounds: FAIR_BOUNDS.pad(0.05), opacity: 0.85, attribution: 'Grounds map © N.C. Department of Agriculture &amp; Consumer Services', className: 'fairTiles' }).addTo(map);
 const boothLayer = L.layerGroup().addTo(map), hitLayer = L.layerGroup().addTo(map);
 const rideLayer = L.layerGroup().addTo(map);
-const atmLayer = L.layerGroup(), drinkLayer = L.layerGroup();
+const atmLayer = L.layerGroup(), drinkLayer = L.layerGroup(), amenityLayer = L.layerGroup();
 const rideIcon = L.divIcon({ className: '', html: '<div class="rideIcon">🎡</div>', iconSize: [26, 26], iconAnchor: [13, 13] });
 const rideHitIcon = L.divIcon({ className: '', html: '<div class="rideIcon hit">🎡</div>', iconSize: [34, 34], iconAnchor: [17, 17] });
 const POP = { maxWidth: 300, autoPanPaddingTopLeft: [10, 170], autoPanPaddingBottomRight: [10, 20] };
@@ -46,6 +52,7 @@ document.querySelectorAll('input[name=base]').forEach(r => r.onchange = () => {
 $('tglFood').onchange = e => e.target.checked ? boothLayer.addTo(map) : map.removeLayer(boothLayer);
 $('tglRides').onchange = e => e.target.checked ? rideLayer.addTo(map) : map.removeLayer(rideLayer);
 $('tglATM').onchange = e => e.target.checked ? atmLayer.addTo(map) : map.removeLayer(atmLayer);
+$('tglAmenities').onchange = e => e.target.checked ? amenityLayer.addTo(map) : map.removeLayer(amenityLayer);
 $('tglDrinks').onchange = e => e.target.checked ? drinkLayer.addTo(map) : map.removeLayer(drinkLayer);
 
 // ---------- URL state (shareable links) ----------
@@ -70,7 +77,15 @@ function shareUrlFor(t) {
   const root = location.origin + location.pathname.replace(/[^/]*$/, '');
   const q = urlParams().get('q');
   if (t) return root + 'b/' + encodeURIComponent(t.id) + '.html' + (q ? '?q=' + encodeURIComponent(q) : '');
-  return location.href;
+  // Results-header Share: q= only (or new=1). Never booth, ll, or z.
+  const p = new URLSearchParams();
+  if (state.query === 'New foods 2026') p.set('new', '1');
+  else {
+    const qq = ($('q').value || '').trim();
+    if (qq) p.set('q', qq);
+  }
+  const qs = p.toString();
+  return root + (qs ? '?' + qs : '');
 }
 async function share(t) {
   const url = shareUrlFor(t), title = t ? `${t.name} · NC State Fair` : BASE_TITLE;
@@ -83,13 +98,39 @@ function toast(msg) { const el = $('toast'); el.textContent = msg; el.classList.
 let mvT; map.on('moveend', () => { clearTimeout(mvT); mvT = setTimeout(() => { const c = map.getCenter(); setUrl({ ll: c.lat.toFixed(5) + ',' + c.lng.toFixed(5), z: map.getZoom() }); }, 400); });
 
 // ---------- Legal text (shared with about/) ----------
-const L_ = {"disc_t": "Unofficial guide", "disc": "Fair Finder is an independent, free project. It is not affiliated with, endorsed by, or sponsored by the N.C. State Fair or the N.C. Department of Agriculture &amp; Consumer Services. ‘N.C. State Fair’ is used only to describe the event this guide covers. For official information, see <a href=\"https://www.ncstatefair.org/\" target=\"_blank\" rel=\"noopener\">ncstatefair.org</a>.", "acc": "Booth locations and menus come from the fair’s published data and may change during the fair. ATM locations are approximate. Walking routes come from OpenStreetMap and don’t reflect temporary booths, closures or crowds. Follow posted signs and staff directions; use at your own risk. Provided as-is, with no warranty.", "priv": "Your location is used only on your device to show where you are and guide you. It is never sent to us or stored on a server. No accounts, no analytics, no tracking cookies. The app saves the booth you’re guiding to in your browser so it can resume, and whether the guide panel was open. The site is hosted on GitHub Pages, which logs visitor IP addresses for security. Map images load from OpenStreetMap, Esri and the fair’s ArcGIS server, which see normal web requests. The optional AI connector (MCP server, hosted on Cloudflare Workers) serves only the same public booth and ride data and is read-only: no accounts, and no logging of what you search. To limit abuse it counts requests per minute using a salted, one-way hash of your IP address; raw IP addresses are not stored.", "cred": "<ul class=\"credits\"><li>Map data <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener\">© OpenStreetMap</a> contributors</li><li>Routes: OpenStreetMap data (ODbL) · <a href=\"https://www.openstreetmap.org/fixthemap\" target=\"_blank\" rel=\"noopener\">Report a map issue</a></li><li>Grounds map © N.C. Department of Agriculture &amp; Consumer Services</li><li>Booth data: N.C. State Fair Food &amp; Ride Finder</li><li>Satellite layer (optional): Powered by Esri · Imagery: Esri, Maxar, Earthstar Geographics, and the GIS User Community</li></ul>"};
+const L_ = {"disc_t": "Unofficial guide", "disc": "Fair Finder is an independent, free project. It is not affiliated with, endorsed by, or sponsored by the N.C. State Fair or the N.C. Department of Agriculture &amp; Consumer Services. ‘N.C. State Fair’ is used only to describe the event this guide covers. For official information, see <a href=\"https://www.ncstatefair.org/\" target=\"_blank\" rel=\"noopener\">ncstatefair.org</a>.", "acc": "Booth locations and menus come from the fair’s published data and may change during the fair. ATM locations are approximate. Walking routes come from OpenStreetMap and don’t reflect temporary booths, closures or crowds. Follow posted signs and staff directions; use at your own risk. Provided as-is, with no warranty.", "priv": "Your location is used only on your device to show where you are and guide you. It is never sent to us or stored on a server. No accounts, no analytics, no tracking cookies. The app saves the booth you’re guiding to in your browser so it can resume, and whether the guide panel was open. Favorites are stored only on this device (localStorage) and are never sent anywhere. The site is hosted on GitHub Pages, which logs visitor IP addresses for security. Map images load from OpenStreetMap, Esri and the fair’s ArcGIS server, which see normal web requests. The optional AI connector (MCP server, hosted on Cloudflare Workers) serves only the same public booth and ride data and is read-only: no accounts, and no logging of what you search. To limit abuse it counts requests per minute using a salted, one-way hash of your IP address; raw IP addresses are not stored.", "cred": "<ul class=\"credits\"><li>Map data <a href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\" rel=\"noopener\">© OpenStreetMap</a> contributors</li><li>Routes: OpenStreetMap data (ODbL) · <a href=\"https://www.openstreetmap.org/fixthemap\" target=\"_blank\" rel=\"noopener\">Report a map issue</a></li><li>Grounds map © N.C. Department of Agriculture &amp; Consumer Services</li><li>Booth data: N.C. State Fair Food &amp; Ride Finder</li><li>Satellite layer (optional): Powered by Esri · Imagery: Esri, Maxar, Earthstar Geographics, and the GIS User Community</li></ul>"};
 // ---------- Data ----------
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-function popBtns(b) {
-  return `<div class="popBtns"><button class="go" data-id="${esc(b.id)}">➜ Guide me here</button><button class="shareBooth" type="button" aria-label="Share ${esc(b.name)}">${SHARE_ICO}<span>Share</span></button></div>`;
+function isStarrable(b) {
+  if (!b) return false;
+  if (b.kind === 'ride') return true;
+  if (b.food || b.kind === 'newfood' || b.kind === 'sponsor') return true;
+  return false;
 }
+function favPressed(id) { return state.favs.indexOf(id) !== -1; }
+function favBtnHtml(b) {
+  if (!isStarrable(b)) return '';
+  const on = favPressed(b.id);
+  const label = on ? ('Remove ' + b.name + ' from favorites') : ('Save ' + b.name);
+  return `<button type="button" class="fav" data-fav="${esc(b.id)}" aria-pressed="${on ? 'true' : 'false'}" aria-label="${esc(label)}">${on ? '★' : '☆'}</button>`;
+}
+function paintFavBtn(btn, b) {
+  if (!btn || !b) return;
+  const on = favPressed(b.id);
+  btn.textContent = on ? '★' : '☆';
+  btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  btn.setAttribute('aria-label', on ? ('Remove ' + b.name + ' from favorites') : ('Save ' + b.name));
+}
+function popBtns(b) {
+  return `<div class="popBtns"><button class="go" data-id="${esc(b.id)}">➜ Guide me here</button><button class="shareBooth" type="button" aria-label="Share ${esc(b.name)}">${SHARE_ICO}<span>Share</span></button>${favBtnHtml(b)}</div>`;
+}
+const AM_ICON = { restroom: '🚻', first_aid: '⛑', nursing_room: '🍼', information: 'ℹ️', lost_and_found: '🧳', wheelchair_rental: '♿', atm: '💲' };
+function amIcon(type) { return AM_ICON[type] || '📍'; }
+function rideNameText(b) { return (b.name || '') + (b.aliases && b.aliases.length ? ' · aka ' + b.aliases.join(', ') : ''); }
 function popupHtml(b) {
+  if (b.kind === 'amenity') {
+    return `<b>${esc(b.name)}</b> <span class="badge approx">approximate location</span><br><small>${esc(b.area || '')}</small>${popBtns(b)}`;
+  }
   if (b.kind === 'ride') {
     const pay = b.tickets != null ? `<div>🎟 ${b.tickets} tickets (fair’s listing)</div>` : (b.cashOnly ? `<div>💵 Cash Only${b.cashPrice ? ' · ' + esc(b.cashPrice) + ' (fair’s listing)' : ''}</div>` : '');
     const extra = [];
@@ -117,10 +158,11 @@ function rideMarker(r, hit) {
 }
 map.on('popupopen', e => {
   document.body.classList.add('popup');
-  const el = e.popup.getElement(), btn = el.querySelector('.go'), sh = el.querySelector('.shareBooth'); if (!btn) return;
+  const el = e.popup.getElement(), btn = el.querySelector('.go'), sh = el.querySelector('.shareBooth'), fv = el.querySelector('.fav'); if (!btn) return;
   const id = btn.dataset.id; e.popup._ffId = id;
   btn.onclick = () => { map.closePopup(); startGuide(id); };
   if (sh) sh.onclick = () => share(findTarget(id));
+  if (fv) fv.onclick = () => { toggleFav(fv.dataset.fav); paintFavBtn(fv, findTarget(fv.dataset.fav)); };
   // v7 share-link fix: an open booth card is part of the URL, so the browser's own Share / copied address bar
   // carries the booth (previously only ll/z were in the URL and the recipient got no booth).
   if (!state.target) setUrl({ booth: id });
@@ -128,11 +170,12 @@ map.on('popupopen', e => {
 map.on('popupclose', e => { document.body.classList.remove('popup'); if (e.popup._ffId && !state.target && urlBoothId() === e.popup._ffId) setUrl({ booth: null }); });
 
 async function loadData() {
-  const [bd, ad, rd, syn] = await Promise.all([
+  const [bd, ad, rd, syn, amn] = await Promise.all([
     fetch('data/booths.json').then(r => r.json()),
     fetch('data/atms.json').then(r => r.json()).catch(() => null),
     fetch('data/rides.json').then(r => r.json()).catch(() => null),
     fetch('data/synonyms.json').then(r => r.json()).catch(() => null),
+    fetch('data/amenities.json').then(r => r.json()).catch(() => null),
   ]);
   state.meta = bd;
   state.rideMeta = rd;
@@ -157,6 +200,24 @@ async function loadData() {
     const icon = L.divIcon({ className: '', html: '<div class="atmIcon">$</div>', iconSize: [30, 30] });
     ad.atms.forEach(a => L.marker([a.lat, a.lon], { icon, keyboard: false }).bindPopup(`<b>ATM</b> <span class="badge approx">approx. location</span><br><small>Position of the ATM icon on the fair’s published grounds map, so it may be off by 10–30 m.</small><div class="popBtns"><button class="go" data-id="${a.id}">➜ Guide me here</button><button class="shareBooth" type="button" aria-label="Share this ATM">${SHARE_ICO}<span>Share</span></button></div>`).addTo(atmLayer));
   }
+  // ATMs come from data/atms.json (same machines, within ~1 m). Map the amenity ATM ids that the AI connector links to (am-atm-N) onto the nearest atms.json ATM.
+  state.atmAlias = {};
+  ((amn && amn.amenities) || []).filter(a => a.type === 'atm').forEach(a => {
+    let best = null, bd = Infinity;
+    (state.atms || []).forEach(x => { const d = Geo.distanceM(a.lat, a.lon, x.lat, x.lon); if (d < bd) { bd = d; best = x; } });
+    if (best && bd < 40) state.atmAlias[a.id] = best.id;
+  });
+  state.amenities = ((amn && amn.amenities) || []).filter(a => a.type !== 'atm').map(a => ({
+    id: a.id, name: a.name, area: a.area || '', lat: a.lat, lon: a.lon,
+    location: 'approximate', kind: 'amenity', amenityType: a.type, products: ''
+  }));
+  state.amenities.forEach(a => {
+    const icon = L.divIcon({ className: 'amenityIcon', html: `<div class="am am-${esc(a.amenityType)}">${amIcon(a.amenityType)}</div>`, iconSize: [26, 26], iconAnchor: [13, 13] });
+    const m = L.marker([a.lat, a.lon], { icon, keyboard: false });
+    m.bindPopup(() => popupHtml(a), POP);
+    m.addTo(amenityLayer);
+    state.markers.set(a.id, m);
+  });
   const nF = state.booths.filter(b => b.food || b.kind === 'newfood').length;
   setStatus(`${nF} food booths · ${state.rides.length} rides loaded`);
   buildAbout(bd, ad);
@@ -188,6 +249,7 @@ window.addEventListener('popstate', () => applyUrl(false));
 function parseBoothId(v) {
   if (!v) return null;
   const mm = String(v).match(/meet_(-?\d{1,3}\.\d{3,7})_(-?\d{1,3}\.\d{3,7})/); if (mm) return 'meet_' + mm[1] + '_' + mm[2];
+  const am = String(v).match(/am-[a-z0-9-]+/i); if (am) return am[0].toLowerCase();
   const m = String(v).match(/\b(L\d-\d+|atm\d+)/i); if (!m) return null;
   return /^l/i.test(m[1]) ? 'L' + m[1].slice(1) : m[1].toLowerCase();
 }
@@ -200,6 +262,7 @@ function buildAbout(bd, ad) {
   <p><b>${state.booths.length}</b> booths from the fair’s published booth data (Food &amp; Ride Finder: ${c.vendor} vendors, ${c.newfood} “New Foods 2026” entries, ${c.sponsor} sponsor booths). Booth positions are the fair’s published map points. Data generated ${esc(bd.generated)}.</p>
   <p><b>Rides:</b> ${state.rides.length} ride points from the fair’s published Food &amp; Ride Finder data (ride names as the fair’s app shows them; ticket counts from the fair’s listing, “Cash Only” where the fair lists no ticket price). Heights and categories, where shown, come from the midway operator’s published lists and are approximate.</p>
   <p><b>ATMs:</b> ${ad ? ad.atms.length + ' read from the ATM icons on the fair’s published grounds map, so their positions are <b>approximate</b>.' : 'not loaded'}</p>
+  <p><b>Amenities:</b> ${state.amenities.length} approximate amenity points (restrooms, first aid, nursing rooms, information, lost and found, wheelchair rental). Positions are approximate. ATMs stay on the ATM layer.</p>
   <p><b>Drinks:</b> booths whose fair listing mentions drinks (lemonade, tea, soda, water…). The fair publishes no separate drink-station or water-refill layer.</p>
   <p><b>Walking routes:</b> computed on your phone over OpenStreetMap footways and service roads inside the fairgrounds, with buildings and the pond as obstacles. OSM shows the permanent grounds, not this year’s temporary booths, so routes are <b>approximate</b>.</p>
   <h3>Privacy</h3><p>${L_.priv}</p>
@@ -225,8 +288,10 @@ function onPos(p) {
   state.raw = [lat, lon]; state.me = fuse(lat, lon, accuracy); state.acc = accuracy;
   state.fixCount = (state.fixCount || 0) + 1; state.lastFixAt = Date.now(); state.watchRestartsSinceFix = 0;
   if (heading != null && !isNaN(heading) && speed != null && speed > 0.7) { state.gpsHeading = heading; state.gpsHeadingAt = Date.now(); }
+  state.heading.onPosition({ latitude: lat, longitude: lon, accuracy: accuracy, speed: speed, heading: heading }, Date.now());
+  scheduleMeArrow();
   if (!meMarker) {
-    meMarker = L.marker(state.me, { icon: L.divIcon({ className: 'meIconWrap', html: '<div class="me" id="meDot"><div class="meBeam" id="meBeam"></div><div class="mePulse" id="mePulse"></div><div class="meCore"></div></div>', iconSize: [120, 120], iconAnchor: [60, 60] }), interactive: false, keyboard: false, zIndexOffset: 1000 }).addTo(map);
+    meMarker = L.marker(state.me, { icon: L.divIcon({ className: 'meIconWrap', html: '<div class="me" id="meDot"><div class="meBeam" id="meBeam"></div><div class="mePulse" id="mePulse"></div><div class="meCore"></div><svg class="meArrow" id="meArrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 L20 20 L12 15 L4 20 Z"/></svg></div>', iconSize: [120, 120], iconAnchor: [60, 60] }), interactive: false, keyboard: false, zIndexOffset: 100000 }).addTo(map);
     accCircle = L.circle(state.me, { radius: accuracy, color: '#1a73e8', weight: 1.5, opacity: 0.5, fillColor: '#1a73e8', fillOpacity: 0.12, interactive: false }).addTo(map);
     if (FAIR_BOUNDS.pad(0.5).contains(state.me) && !state.target) map.setView(state.me, 18);
   } else { meMarker.setLatLng(state.me); accCircle.setLatLng(state.me).setRadius(accuracy); }
@@ -235,21 +300,48 @@ function onPos(p) {
   setStatus(`GPS ±${Math.round(accuracy * 3.28084)} ft`);
   // Refresh distances in the list WITHOUT touching guide visibility or the map view.
   if (state.results.length) renderResults(false, true);
+  if ($('nearPanel') && !$('nearPanel').classList.contains('hidden')) renderNear();
+  if ($('favPanel') && !$('favPanel').classList.contains('hidden')) renderFav();
+  if (state.pendingNearest) { const pick = state.pendingNearest; state.pendingNearest = null; goNearest(pick); }
   updateGuide(); meStyle();
 }
 // Map "you" marker: blue dot, pulse ring that blips on each fix, compass beam, grey when stale.
 function blip() { const el = document.getElementById('mePulse'); if (!el) return; el.classList.remove('blip'); void el.offsetWidth; el.classList.add('blip'); }
+function normDeg(d) { return ((d % 360) + 360) % 360; }
+let arrowLoop = false;
+function scheduleMeArrow() {
+  if (arrowLoop) return;
+  arrowLoop = true;
+  const loop = () => {
+    if (!state.heading) { arrowLoop = false; return; }
+    const moving = state.heading.step(1 / 60);
+    meStyle();
+    if (moving && state.heading.current(Date.now()).deg != null) requestAnimationFrame(loop); // stop once settled; new readings restart it
+    else arrowLoop = false;
+  };
+  requestAnimationFrame(loop);
+}
 function meStyle() {
   const d = document.getElementById('meDot'); if (!d) return;
   const stale = Date.now() - (state.lastFixAt || 0) > 20000; d.classList.toggle('stale', stale);
-  const hd = currentHeading(), beam = document.getElementById('meBeam');
-  if (hd.h == null || hd.src === 'north') { beam.style.opacity = '0'; return; }
-  // unwrap so the CSS transition always takes the short way round
-  const prev = state._beamDeg == null ? hd.h : state._beamDeg, delta = ((hd.h - (prev % 360) + 540) % 360) - 180;
-  state._beamDeg = prev + delta; beam.style.transform = `rotate(${state._beamDeg}deg)`; beam.style.opacity = stale || hd.stale ? '0.35' : '1';
+  const beam = document.getElementById('meBeam'), arrow = document.getElementById('meArrow');
+  const hd = state.heading ? state.heading.current(Date.now()) : { deg: null };
+  if (hd.deg == null) {
+    d.classList.remove('hasHead');
+    if (beam) beam.style.opacity = '0';
+    return;
+  }
+  d.classList.add('hasHead');
+  const show = normDeg(hd.deg - MAP_BEARING);
+  const prev = state._beamDeg == null ? show : state._beamDeg, delta = ((show - (prev % 360) + 540) % 360) - 180;
+  state._beamDeg = prev + delta;
+  const tr = `rotate(${state._beamDeg}deg)`;
+  if (arrow) arrow.style.transform = tr;
+  if (beam) { beam.style.transform = tr; beam.style.opacity = stale ? '0.35' : '1'; }
 }
 function onPosErr(e) {
   state.gpsError = e.message || String(e.code); state.gpsDenied = e.code === 1; state.lastErrAt = Date.now(); state.errCount = (state.errCount || 0) + 1;
+  if (e.code === 1 && state.pendingNearest) { state.pendingNearest = null; toast('Allow location to find the nearest one'); }
   updateGuide(); setStatus(e.code === 1 ? 'Location blocked: allow it in Settings › Safari › Location' : 'Waiting for GPS… (' + e.message + ')');
   // iOS Safari often stops delivering after an error/timeout: restart the watch (not for a permission denial).
   if (e.code !== 1) restartSoon('error ' + e.code);
@@ -293,6 +385,8 @@ $('searchForm').onsubmit = e => { e.preventDefault(); hideSuggest(); runSearch()
 $('clearQ').onclick = () => { $('q').value = ''; hideSuggest(); clearResults(); };
 document.querySelectorAll('.chip').forEach(c => c.onclick = () => {
   hideSuggest();
+  if (c.dataset.q === 'near') { openNear(); return; }
+  if (c.dataset.q === 'favorites') { openFav(); return; }
   if (c.classList.contains('on') && !$('results').classList.contains('hidden')) { $('q').value = ''; clearResults(); return; } // second tap toggles off
   $('q').value = c.dataset.q === 'new' ? '' : c.dataset.q; runSearch(c.dataset.q === 'new');
 });
@@ -301,7 +395,10 @@ function syncChips() {
   const open = !$('results').classList.contains('hidden') && !!state.query;
   const q = String(state.query || '').toLowerCase();
   document.querySelectorAll('.chip').forEach(c => {
-    const on = open && (c.dataset.q === 'new' ? q === 'new foods 2026' : c.dataset.q === 'rides' ? q === 'rides' : q === c.dataset.q);
+    let on;
+    if (c.dataset.q === 'near') on = !$('nearPanel').classList.contains('hidden');
+    else if (c.dataset.q === 'favorites') on = !$('favPanel').classList.contains('hidden');
+    else on = open && (c.dataset.q === 'new' ? q === 'new foods 2026' : c.dataset.q === 'rides' ? q === 'rides' : q === c.dataset.q);
     c.classList.toggle('on', on); c.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
 }
@@ -313,8 +410,14 @@ function clearResults() {
   setUrl({ q: null, new: null });
   syncChips(); fitSuggest();
 }
-$('q').addEventListener('focus', () => document.body.classList.add('typing'));
-$('q').addEventListener('blur', () => { document.body.classList.remove('typing'); setTimeout(hideSuggest, 150); });
+$('q').addEventListener('focus', () => { document.body.classList.add('typing'); syncSearchFocus(); });
+$('q').addEventListener('blur', () => { document.body.classList.remove('typing'); setTimeout(() => { hideSuggest(); syncSearchFocus(); }, 200); });
+function syncSearchFocus() {
+  const el = $('searchFocus'); if (!el) return;
+  const q = $('q');
+  const show = document.activeElement === q && !(q.value || '').trim() && $('suggest').classList.contains('hidden');
+  el.classList.toggle('hidden', !show);
+}
 function dist(b) {
   if (!state.me) return null;
   const w = walkDist(b); if (w != null) return w;
@@ -336,6 +439,170 @@ function walkDist(b) {
   const w = g.walkLen(state.dj, state.snapMe, b._snap);
   return isFinite(w) ? w : null;
 }
+// Pure nearest list. Does not read state. pos is [lat, lon] or null. kind is food | ride | amenity.
+function nearMe(pos, items, opts) {
+  opts = opts || {};
+  const type = opts.type || 'all';
+  const limit = opts.limit == null ? 40 : opts.limit;
+  const graph = opts.graph;
+  let list = items || [];
+  if (type === 'food') list = list.filter(i => i.kind === 'food');
+  else if (type === 'rides') list = list.filter(i => i.kind === 'ride');
+  else if (type === 'amenities') list = list.filter(i => i.kind === 'amenity');
+  let snapMe = null, dj = null;
+  if (graph && pos) {
+    snapMe = graph.snap(pos[0], pos[1], 80);
+    if (snapMe) dj = graph.dijkstra(snapMe);
+  }
+  const rows = list.map(item => {
+    let meters = null, straight = false;
+    if (dj && snapMe && graph) {
+      if (item._snap === undefined) item._snap = graph.snap(item.lat, item.lon, 80);
+      if (item._snap) {
+        const w = graph.walkLen(dj, snapMe, item._snap);
+        if (isFinite(w)) meters = w;
+      }
+    }
+    if (meters == null && pos) {
+      meters = Geo.distanceM(pos[0], pos[1], item.lat, item.lon);
+      straight = true;
+    }
+    const minutes = meters == null ? null : Math.max(1, Math.round(meters / 1.1 / 60));
+    return { item, meters, minutes, straight };
+  });
+  rows.sort((a, b) => {
+    if (a.meters == null && b.meters == null) return String(a.item.name || '').localeCompare(String(b.item.name || ''));
+    if (a.meters == null) return 1;
+    if (b.meters == null) return -1;
+    if (a.meters !== b.meters) return a.meters - b.meters;
+    return String(a.item.name || '').localeCompare(String(b.item.name || ''));
+  });
+  return rows.slice(0, limit);
+}
+function nearItems() {
+  const out = [];
+  for (const b of state.booths) if (b.food || b.kind === 'newfood') out.push({ id: b.id, name: b.name, lat: b.lat, lon: b.lon, kind: 'food' });
+  for (const r of state.rides) out.push({ id: r.id, name: r.name, lat: r.lat, lon: r.lon, kind: 'ride', aliases: r.aliases, area: r.area, tickets: r.tickets });
+  for (const a of state.amenities) out.push({ id: a.id, name: a.name, lat: a.lat, lon: a.lon, kind: 'amenity', amenityType: a.amenityType, area: a.area });
+  for (const a of state.atms || []) out.push({ id: a.id, name: 'ATM', lat: a.lat, lon: a.lon, kind: 'amenity', amenityType: 'atm' });
+  return out;
+}
+function nearDistText(row) {
+  if (row.meters == null) return '—';
+  if (row.straight) return Geo.fmtFeet(row.meters);
+  return '🚶 ' + Geo.fmtFeet(row.meters) + ' · ' + row.minutes + ' min';
+}
+function rowIcon(item) {
+  if (item.kind === 'food') return '🍴';
+  if (item.kind === 'ride') return '🎡';
+  return amIcon(item.amenityType);
+}
+function openNear() {
+  hideSuggest();
+  $('favPanel').classList.add('hidden'); $('results').classList.add('hidden'); // one sheet at a time
+  $('nearPanel').classList.remove('hidden');
+  state.nearType = 'all';
+  document.querySelectorAll('#nearFilters .rideSub').forEach(b => {
+    const on = b.dataset.nt === 'all';
+    b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  renderNear();
+  syncChips();
+}
+function renderNear() {
+  const gps = $('nearGps'), list = $('nearList');
+  if (!state.me) {
+    gps.classList.remove('hidden');
+    gps.innerHTML = 'Turn on location to see what’s closest. Tap ◎, or the button below. <button type="button" id="nearLocate" aria-label="Turn on location">Turn on location</button>';
+    $('nearLocate').onclick = () => $('btnLocate').onclick();
+    list.innerHTML = '';
+    $('nearCount').textContent = 'Near me';
+    syncChips();
+    return;
+  }
+  gps.classList.add('hidden');
+  refreshWalk();
+  const rows = nearMe(state.me, nearItems(), { type: state.nearType || 'all', graph: state.graph });
+  $('nearCount').textContent = 'Near me';
+  const seen = {}; rows.forEach(r => { seen[r.item.name] = (seen[r.item.name] || 0) + 1; });
+  list.innerHTML = rows.map(row => {
+    const it = row.item;
+    const name = it.kind === 'ride' ? rideNameText(it) : it.name;
+    // Same-name neighbours (e.g. a booth and its seating area) get the lot + menu hint so they're distinguishable.
+    const src = it.kind === 'food' ? (state.booths.find(b => b.id === it.id) || {}) : it;
+    const sub = [src.area || '', seen[it.name] > 1 ? [String(src.lot || '').replace(/^LOT\s*/i, 'Lot '), String(src.products || '').slice(0, 28)].filter(Boolean).join(' · ') : '', it.kind === 'amenity' ? 'approx.' : ''].filter(Boolean).join(' · ');
+    return `<li data-id="${esc(it.id)}"><span class="r-ico" aria-hidden="true">${rowIcon(it)}</span><span class="r-name">${esc(name)}${sub ? `<small class="r-sub">${esc(sub)}</small>` : ''}</span><span class="r-dist">${esc(nearDistText(row))}</span></li>`;
+  }).join('');
+  syncChips();
+}
+function goNearest(pick) {
+  let list;
+  if (pick === 'restroom') list = state.amenities.filter(a => a.amenityType === 'restroom');
+  else if (pick === 'first_aid') list = state.amenities.filter(a => a.amenityType === 'first_aid');
+  else list = (state.atms || []).map(a => ({ id: a.id, lat: a.lat, lon: a.lon }));
+  if (!state.me) { state.pendingNearest = pick; startWatch('nearest'); toast('Finding your location…'); return; }
+  refreshWalk();
+  let best = null, bestD = Infinity;
+  for (const c of list) {
+    const w = walkDist(c);
+    const d = w != null ? w : Geo.distanceM(state.me[0], state.me[1], c.lat, c.lon);
+    if (d < bestD) { bestD = d; best = c; }
+  }
+  if (best) startGuide(best.id);
+}
+function toggleFav(id) {
+  const i = state.favs.indexOf(id);
+  if (i >= 0) state.favs.splice(i, 1); else state.favs.push(id);
+  saveFavs(state.favs);
+  document.querySelectorAll('.fav[data-fav="' + CSS.escape(id) + '"]').forEach(btn => paintFavBtn(btn, findTarget(id)));
+  syncGuideFav();
+  if ($('favPanel') && !$('favPanel').classList.contains('hidden')) renderFav();
+}
+function favDistText(t) {
+  if (!state.me || !t) return '—';
+  const d = dist(t);
+  if (d == null) return '—';
+  const w = walkDist(t);
+  return (w != null ? '🚶 ' : '') + Geo.fmtFeet(d);
+}
+function openFav() {
+  hideSuggest();
+  $('nearPanel').classList.add('hidden'); $('results').classList.add('hidden'); // one sheet at a time
+  $('favPanel').classList.remove('hidden');
+  renderFav();
+  syncChips();
+}
+function renderFav() {
+  const keep = [];
+  const rows = [];
+  for (const id of state.favs) {
+    const t = findTarget(id);
+    if (!t || !isStarrable(t)) continue;
+    keep.push(id);
+    rows.push(t);
+  }
+  if (keep.length !== state.favs.length) { state.favs = keep; saveFavs(keep); }
+  const empty = $('favEmpty');
+  if (!rows.length) {
+    empty.classList.remove('hidden');
+    $('favList').innerHTML = '';
+    $('favCount').textContent = '★ Favorites';
+    return;
+  }
+  empty.classList.add('hidden');
+  $('favCount').textContent = '★ Favorites';
+  $('favList').innerHTML = rows.map(t => {
+    const name = t.kind === 'ride' ? rideNameText(t) : t.name;
+    return `<li data-id="${esc(t.id)}"><span class="r-name">${esc(name)}</span><span class="r-dist">${esc(favDistText(t))}</span><button type="button" data-id="${esc(t.id)}">Guide me here</button><button type="button" class="favRemove" data-id="${esc(t.id)}" aria-label="Remove ${esc(t.name)}">Remove</button></li>`;
+  }).join('');
+}
+function syncGuideFav() {
+  const btn = $('btnFav'); if (!btn) return;
+  const t = state.target;
+  const show = isStarrable(t);
+  btn.classList.toggle('hidden', !show);
+  if (show) paintFavBtn(btn, t);
+}
 function ridesMatching(q) {
   const qc = Suggest.compact(q);
   if (qc.length < 2) return [];
@@ -349,39 +616,71 @@ function ridesMatching(q) {
   }
   return out;
 }
-// Concept matches (data/synonyms.json) not already direct hits, nearest first. Never for an exact name hit.
-function likelyFor(q, exclude, cap) {
-  if (!state.concepts) return [];
-  const qc = Suggest.compact(q);
-  if (state.rides.some(r => Suggest.compact(r.name) === qc) || state.booths.some(b => b.food && Suggest.compact(b.name) === qc)) return [];
-  const ls = state.concepts.likely(q, { rides: state.rides, booths: state.booths, exclude, limit: 200 });
-  refreshWalk();
-  ls.forEach(l => { l.d = dist(l.item); });
-  ls.sort((a, b) => (a.d != null && b.d != null ? a.d - b.d : 0));
-  return ls.slice(0, cap);
-}
 function isRidesQuery(q) { const n = String(q || '').trim().toLowerCase(); return n === 'rides' || n === 'ride'; }
+function amenityDirect(q) {
+  if (!state.concepts) return [];
+  const ks = state.concepts.match(q).filter(k => k.kind === 'amenity');
+  const out = [], seen = new Set();
+  for (const k of ks) {
+    if (k.id === 'atm') {
+      for (const a of state.atms || []) {
+        const t = findTarget(a.id);
+        if (t && !seen.has(t.id)) { seen.add(t.id); out.push(t); }
+      }
+    } else {
+      for (const a of state.amenities) if (a.amenityType === k.id && !seen.has(a.id)) { seen.add(a.id); out.push(a); }
+    }
+  }
+  return out;
+}
+// One classification for the results list and the dropdown. Direct wins over likely (by id).
+function packQuery(q) {
+  const exact = !!(state.concepts && state.concepts.exactTerm(q));
+  const opts = { allowFuzzy: !exact, synonymExpand: !exact };
+  const direct = [];
+  const seen = new Set();
+  function push(item, extra) {
+    if (!item || seen.has(item.id)) return;
+    seen.add(item.id);
+    direct.push(Object.assign({ booth: item, score: extra.score, matched: extra.matched || [], likely: false }, extra));
+  }
+  if (!isRidesQuery(q)) {
+    FoodSearch.search(state.booths, q, opts).forEach(h => push(h.booth, { score: h.score, matched: h.matched }));
+    ridesMatching(q).forEach(r => push(r, { score: 1, matched: [] }));
+    amenityDirect(q).forEach(a => push(a, { score: 1, matched: [], amenity: true }));
+  }
+  let likely = [];
+  if (state.concepts && !isRidesQuery(q)) {
+    const qc = Suggest.compact(q);
+    const exactName = state.rides.some(r => Suggest.compact(r.name) === qc)
+      || state.booths.some(b => b.food && Suggest.compact(b.name) === qc);
+    if (!exactName) {
+      likely = state.concepts.likely(q, {
+        rides: state.rides, booths: state.booths, exclude: seen, limit: 5
+      }).map(l => ({ booth: l.item, score: 0.5, matched: [], likely: true, why: l.why }));
+    }
+  }
+  return { direct, likely };
+}
 function runSearch(newOnly, fromUrl) {
   const q = $('q').value.trim();
   const ridesQ = !newOnly && isRidesQuery(q);
   if (!fromUrl) setUrl(newOnly === true ? { q: null, new: '1' } : { q: (ridesQ || q.length >= 2) ? q : null, new: null });
   if (newOnly === true) {
+    state.pack = null;
     state.results = state.booths.filter(b => b.kind === 'newfood').map(b => ({ booth: b, score: 1, matched: b.newFood ? [b.newFood.name] : [] }));
     state.query = 'New foods 2026';
   } else if (ridesQ) {
+    state.pack = null;
     state.query = 'Rides';
     state.rideSub = 'all';
     document.querySelectorAll('#rideSubs .rideSub').forEach(b => b.classList.toggle('on', b.dataset.sub === 'all'));
     state.results = state.rides.map(r => ({ booth: r, score: 1, matched: [] }));
   } else if (q.length < 2) return clearResults();
   else {
-    state.results = FoodSearch.search(state.booths, q);
-    const seen = new Set();
-    for (let i = 0; i < state.results.length; i++) seen.add(state.results[i].booth.id);
-    const extra = ridesMatching(q);
-    for (let i = 0; i < extra.length; i++) if (!seen.has(extra[i].id)) { seen.add(extra[i].id); state.results.push({ booth: extra[i], score: 1, matched: [] }); }
-    const nDirect = state.results.length;
-    likelyFor(q, seen, nDirect ? 5 : 30).forEach(l => state.results.push({ booth: l.item, score: 0.5, matched: [], likely: true, why: l.why }));
+    const pack = packQuery(q);
+    state.pack = pack;
+    state.results = pack.direct.concat(pack.likely);
     state.query = q;
   }
   renderResults(true);
@@ -393,7 +692,8 @@ function renderResults(fit, quiet) {
   rs.sort((a, b) => a.tier - b.tier || (a.d != null && b.d != null ? a.d - b.d : b.score - a.score));
   hitLayer.clearLayers();
   rs.forEach(r => (r.booth.kind === 'ride' ? rideMarker(r.booth, true) : boothMarker(r.booth, 'hit')).addTo(hitLayer));
-  const nLik = rs.filter(r => r.likely).length, nDir = rs.length - nLik;
+  const dirs = rs.filter(r => !r.likely), liks = rs.filter(r => r.likely);
+  const nLik = liks.length, nDir = dirs.length;
   const near = state.me ? (state.dj ? ', nearest walk first' : ', nearest first') : '';
   $('resCount').textContent = !rs.length ? `No results for “${state.query}”`
     : nDir ? `${nDir} result${nDir === 1 ? '' : 's'} for “${state.query}”${near}${nLik ? ` · ${nLik} likely` : ''}`
@@ -401,24 +701,26 @@ function renderResults(fit, quiet) {
   const subs = $('rideSubs'); if (subs) subs.classList.toggle('hidden', state.query !== 'Rides');
   const hl = (s) => esc(s);
   const cap = state.query === 'Rides' ? rs.length : 80;
-  const firstLik = rs.findIndex(r => r.likely);
-  $('resList').innerHTML = rs.slice(0, cap).map((r, i) => {
+  const shown = state.query === 'Rides' ? rs : dirs.slice(0, cap).concat(liks);
+  let sep = false;
+  $('resList').innerHTML = shown.map((r, i) => {
     const b = r.booth;
-    const lh = i === firstLik ? '<div class="likelyHead">Likely matches</div>' : '';
     const why = r.likely && r.why ? `<span class="badge likely">${esc(r.why)}</span>` : '';
+    const head = (r.likely && !sep) ? (sep = true, '<li class="likelyHead" role="presentation">Likely matches</li>') : '';
     if (b.kind === 'ride') {
       const pay = [Rides.payText(b), b.category ? Rides.catLabel(b).replace(' (per midway operator)', '') : ''].filter(Boolean).join(' · ');
-      return `<li data-id="${esc(b.id)}" data-i="${i}"${r.likely ? ' class="likely"' : ''}>${lh}
-        <div class="r-top"><span class="r-name">🎡 ${esc(b.name)}</span><span class="r-dist">${r.d != null ? (r.walk ? '🚶 ' : '') + Geo.fmtFeet(r.d) : ''}</span><button class="rShare" type="button" data-share="${esc(b.id)}" aria-label="Share ${esc(b.name)}">${SHARE_ICO}<span>Share</span></button></div>
+      return `${head}<li data-id="${esc(b.id)}" data-i="${i}"${r.likely ? ' class="likely"' : ''}>
+        <div class="r-top"><span class="r-name">🎡 ${esc(rideNameText(b))}</span><span class="r-dist">${r.d != null ? (r.walk ? '🚶 ' : '') + Geo.fmtFeet(r.d) : ''}</span><button class="rShare" type="button" data-share="${esc(b.id)}" aria-label="Share ${esc(b.name)}">${SHARE_ICO}<span>Share</span></button></div>
         <div class="r-items">${esc(pay)}</div>
         <div class="r-meta">${why}${esc(b.area || '')}</div></li>`;
     }
     const items = (r.matched.length ? r.matched : (b.items || [])).slice(0, 4);
-    return `<li data-id="${esc(b.id)}" data-i="${i}"${r.likely ? ' class="likely"' : ''}>${lh}
+    return `${head}<li data-id="${esc(b.id)}" data-i="${i}"${r.likely ? ' class="likely"' : ''}>
       <div class="r-top"><span class="r-name">${esc(b.name)}</span><span class="r-dist">${r.d != null ? (r.walk ? '🚶 ' : '') + Geo.fmtFeet(r.d) : ''}</span><button class="rShare" type="button" data-share="${esc(b.id)}" aria-label="Share ${esc(b.name)}">${SHARE_ICO}<span>Share</span></button></div>
       <div class="r-items">${items.map(it => r.matched.length ? `<mark>${hl(it)}</mark>` : hl(it)).join(', ')}</div>
-      <div class="r-meta">${why}${b.kind === 'newfood' ? '<span class="badge new">NEW 2026</span>' : ''}${r.tier === 1 ? '<span class="badge">related</span>' : ''}${b.location !== 'exact' ? '<span class="badge approx">approx.</span>' : ''}${esc(b.area)}${b.lot ? ' · ' + esc(b.lot) : ''}</div></li>`;
+      <div class="r-meta">${why}${b.kind === 'newfood' ? '<span class="badge new">NEW 2026</span>' : ''}${r.tier === 1 ? '<span class="badge">related</span>' : ''}${b.location !== 'exact' ? '<span class="badge approx">approx.</span>' : ''}${esc(b.area || '')}${b.lot ? ' · ' + esc(b.lot) : ''}</div></li>`;
   }).join('');
+  if (!quiet) { $('nearPanel').classList.add('hidden'); $('favPanel').classList.add('hidden'); }
   if (!quiet) $('results').classList.remove('hidden'); // guide stays up: it sits on top of the results sheet
   fitSuggest();
   document.body.classList.toggle('guiding', !!state.target);
@@ -451,6 +753,7 @@ function hideSuggest() {
   $('q').setAttribute('aria-expanded', 'false');
   $('q').removeAttribute('aria-activedescendant');
   document.body.classList.remove('ac', 'acCover');
+  syncSearchFocus();
   const pop = $('popular');
   if (pop && pop.dataset.ffAc) { pop.classList.remove('hidden'); delete pop.dataset.ffAc; }
 }
@@ -465,6 +768,8 @@ function fitSuggest() {
   below('guide');
   const top = el.getBoundingClientRect().top, beforeRes = bottom;
   below('results');
+  below('nearPanel');
+  below('favPanel');
   const cover = bottom - top < 150; // no room above the results sheet: let the dropdown use the space, sheet steps aside
   document.body.classList.toggle('acCover', cover);
   if (cover) bottom = beforeRes;
@@ -472,29 +777,58 @@ function fitSuggest() {
 }
 if (window.visualViewport) { visualViewport.addEventListener('resize', fitSuggest); visualViewport.addEventListener('scroll', fitSuggest); }
 window.addEventListener('resize', fitSuggest);
-function sgTag(type) { return type === 'ride' ? '🎡 Ride' : type === 'booth' ? '🍴 Booth' : '🍽 Food'; }
+function sgTag(type, it) {
+  if (type === 'ride') return '🎡 Ride';
+  if (type === 'booth') return '🍴 Booth';
+  if (type === 'amenity') {
+    const w = { restroom: 'Restroom', atm: 'ATM', first_aid: 'First aid', nursing_room: 'Nursing', information: 'Info', lost_and_found: 'Lost & found', wheelchair_rental: 'Rental' };
+    return amIcon(it && it.amenityType) + ' ' + (w[it && it.amenityType] || 'Amenity');
+  }
+  return '🍽 Food';
+}
 function renderSuggest() {
   const raw = $('q').value;
-  if (!raw.trim() || !state.suggestIndex) { hideSuggest(); return; }
-  const items = Suggest.query(state.suggestIndex, raw, 8);
-  if (!items.some(it => it.score >= 100)) { // concept matches after the direct ones, never for an exact hit
-    const ex = new Set(items.filter(it => it.type !== 'food').map(it => it.id));
-    likelyFor(raw, ex, 5).forEach(l => items.push({ type: l.type, id: l.item.id, label: l.item.name, sub: l.item.area || '', likely: true, why: l.why }));
+  if (!raw.trim() || !state.suggestIndex) { hideSuggest(); syncSearchFocus(); return; }
+  const pack = packQuery(raw);
+  const noFuzzy = !!(state.concepts && state.concepts.exactTerm(raw));
+  let items = Suggest.query(state.suggestIndex, raw, 8, { noFuzzy: noFuzzy });
+  const am = pack.direct.filter(d => d.amenity).slice().sort((a, b) => {
+    const da = dist(a.booth), db = dist(b.booth);
+    if (da == null && db == null) return 0;
+    if (da == null) return 1;
+    if (db == null) return -1;
+    return da - db;
+  });
+  const have = new Set(items.map(it => it.type + '\0' + it.id));
+  const prepend = [];
+  for (const a of am) {
+    const key = 'amenity\0' + a.booth.id;
+    if (have.has(key)) continue;
+    have.add(key);
+    prepend.push({ type: 'amenity', id: a.booth.id, label: a.booth.name, sub: a.booth.area || '', score: 95, amenityType: a.booth.amenityType });
   }
+  items = prepend.concat(items);
+  const likelyItems = pack.likely.map(l => ({
+    type: l.booth.kind === 'ride' ? 'ride' : (l.booth.kind === 'amenity' ? 'amenity' : 'booth'),
+    id: l.booth.id, label: l.booth.name, sub: l.booth.area || '', likely: true, why: l.why, amenityType: l.booth.amenityType
+  }));
+  items = items.concat(likelyItems);
   lastSuggest = items;
   const el = $('suggest');
-  if (!items.length) { hideSuggest(); return; }
+  if (!items.length) { hideSuggest(); syncSearchFocus(); return; }
   sgActive = -1;
+  let seenLikely = false;
   el.innerHTML = items.map((it, i) => {
     const aka = it.alias ? ` <small>aka ${esc(it.alias)}</small>` : '';
     const sub = it.sub ? ` <small>${esc(it.sub)}</small>` : '';
-    const head = it.likely && !(items[i - 1] && items[i - 1].likely) ? '<span class="sgHead">Likely matches · did you mean</span>' : '';
+    const head = it.likely && !seenLikely ? (seenLikely = true, '<li class="sgSep" role="presentation">Likely matches · did you mean</li>') : '';
     const why = it.likely && it.why ? ` <small class="sgWhy">${esc(it.why)}</small>` : '';
-    return `<li role="option" id="sg-${i}" data-i="${i}" data-type="${esc(it.type)}" data-id="${esc(it.id)}"${it.likely ? ' class="likely"' : ''}>${head}<span class="sgTag">${sgTag(it.type)}</span> ${esc(it.label)}${aka}${sub}${why}</li>`;
+    return `${head}<li role="option" id="sg-${i}" data-i="${i}" data-type="${esc(it.type)}" data-id="${esc(it.id)}"${it.likely ? ' class="likely"' : ''}>${''}<span class="sgTag">${sgTag(it.type, it)}</span> ${esc(it.label)}${aka}${sub}${why}</li>`;
   }).join('');
   el.classList.remove('hidden');
   $('q').setAttribute('aria-expanded', 'true');
   document.body.classList.add('ac');
+  syncSearchFocus();
   fitSuggest();
   const pop = $('popular');
   if (pop && !pop.classList.contains('hidden')) { pop.classList.add('hidden'); pop.dataset.ffAc = '1'; }
@@ -508,7 +842,7 @@ function openTarget(id) {
   if (!t) return;
   map.setView([t.lat, t.lon], 19, { animate: false });
   if (m && map.hasLayer(m)) m.openPopup();
-  else if (t.kind === 'ride' || t.food || t.kind === 'newfood' || t.kind === 'sponsor') L.popup(POP).setLatLng([t.lat, t.lon]).setContent(popupHtml(t)).openOn(map); // layer hidden: still show the card
+  else if (t.kind === 'ride' || t.kind === 'amenity' || t.food || t.kind === 'newfood' || t.kind === 'sponsor') L.popup(POP).setLatLng([t.lat, t.lon]).setContent(popupHtml(t)).openOn(map); // layer hidden: still show the card
   else startGuide(id);
 }
 function selectSuggest(li) {
@@ -534,14 +868,15 @@ function selectSuggest(li) {
 $('q').addEventListener('input', () => {
   clearTimeout(sgT);
   if (suppressAc) { suppressAc = false; hideSuggest(); return; }
-  if (!$('q').value.trim()) { hideSuggest(); return; }
+  if (!$('q').value.trim()) { hideSuggest(); syncSearchFocus(); return; }
+  syncSearchFocus();
   sgT = setTimeout(renderSuggest, 60);
 });
 $('q').addEventListener('keydown', e => {
   if (e.isComposing) return;
   const el = $('suggest');
   if (!el || el.classList.contains('hidden')) return;
-  const lis = el.children;
+  const lis = el.querySelectorAll('li[role="option"]');
   if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
     e.preventDefault();
     if (!lis.length) return;
@@ -558,10 +893,10 @@ $('q').addEventListener('keydown', e => {
     if (sgActive >= 0 && lis[sgActive]) { e.preventDefault(); selectSuggest(lis[sgActive]); }
   } else if (e.key === 'Escape') { e.preventDefault(); hideSuggest(); }
 });
-$('suggest').addEventListener('pointerdown', e => { if (e.target.closest('li')) e.preventDefault(); }); // keep focus; pick on click so touch can scroll the list
+$('suggest').addEventListener('pointerdown', e => { if (e.target.closest('li[role="option"]')) e.preventDefault(); }); // keep focus; pick on click so touch can scroll the list
 $('suggest').addEventListener('mousedown', e => e.preventDefault());
 $('suggest').addEventListener('click', e => {
-  const li = e.target.closest('li');
+  const li = e.target.closest('li[role="option"]');
   if (li) selectSuggest(li);
 });
 window.__ffSuggest = { query: q => state.suggestIndex ? Suggest.query(state.suggestIndex, q) : [] };
@@ -576,7 +911,9 @@ function findTarget(id) {
   if (mt) { const lat = +mt[1], lon = +mt[2]; if (Math.abs(lat) <= 90 && Math.abs(lon) <= 180) return { id, meet: true, name: '📍 Shared spot', lat, lon, location: 'approximate', area: 'A friend’s shared GPS position', products: '' }; }
   const r = (state.rides || []).find(x => x.id === id); if (r) return r;
   const b = state.booths.find(x => x.id === id); if (b) return b;
-  const a = state.atms.find(x => x.id === id); if (a) return { id: a.id, name: 'ATM', lat: a.lat, lon: a.lon, location: 'approximate', area: 'From the fair’s published grounds map', products: '' };
+  const am = (state.amenities || []).find(x => x.id === id); if (am) return am;
+  if (state.atmAlias && state.atmAlias[id]) id = state.atmAlias[id];
+  const a = (state.atms || []).find(x => x.id === id); if (a) return { id: a.id, name: 'ATM', lat: a.lat, lon: a.lon, location: 'approximate', area: 'From the fair’s published grounds map', products: '' };
 }
 function startGuide(id, resume, fromUrl) {
   hideSuggest();
@@ -586,7 +923,7 @@ function startGuide(id, resume, fromUrl) {
   if (!fromUrl && prev !== id) setUrl({ booth: id }, true); // pushState so Back returns to the list/map
   document.title = `${t.name} · Fair Finder`;
   try { localStorage.setItem(LS_KEY, id); } catch (e) {}
-  $('results').classList.add('hidden'); $('guide').classList.remove('hidden');
+  $('results').classList.add('hidden'); $('nearPanel').classList.add('hidden'); $('favPanel').classList.add('hidden'); $('guide').classList.remove('hidden');
   document.body.classList.add('guiding');
   requestWake();
   $('guideName').textContent = t.name;
@@ -613,6 +950,8 @@ function startGuide(id, resume, fromUrl) {
   // Opened from a shared link: show the full booth card once (name, menu, Share) without changing the saved preference.
   if (fromUrl && state.fromLink) { state.fromLink = false; sheet.state = 'expanded'; }
   sheet.show();
+  syncGuideFav();
+  syncChips();
   state.fittedRouteAt = null;
   const pts = [[t.lat, t.lon]]; if (state.me) pts.push(state.me);
   if (!resume || pts.length > 1) fitGuideView(true, pts);
@@ -678,7 +1017,7 @@ function updateGuide() {
   $('arrow').style.transform = `rotate(${rot}deg)`; $('miniArrow').style.transform = `rotate(${rot}deg)`;
   $('northTag').style.visibility = h == null ? 'visible' : 'hidden'; $('miniNorth').style.visibility = h == null ? 'visible' : 'hidden';
   const mins = Math.max(1, Math.round(remaining / 1.1 / 60)); // ~1.1 m/s walking in fair crowds
-  $('guideDist').textContent = mode === 'route' ? `${Geo.fmtFeet(remaining)} walk` : Geo.fmtFeet(d);
+  $('guideDist').textContent = mode === 'route' ? (Geo.fmtFeet(remaining) + ' walk · ' + mins + ' min') : (Geo.fmtFeet(d) + ' walk');
   $('guideRoute').textContent = mode === 'route' ? `~${mins} min walking · route is approximate (OSM paths, not this year's booth layout)` : (state.graph ? 'Straight-line arrow: no walking route found here' : 'Straight-line arrow (walking routes loading…)');
   $('guideRoute').className = mode === 'route' ? 'route' : 'straight';
   const arrived = d <= 15;
@@ -760,15 +1099,13 @@ function screenAngle() {
   return (screen.orientation && screen.orientation.angle) || 90;
 }
 function onOrient(e) {
-  let h = null;
-  if (typeof e.webkitCompassHeading === 'number' && !isNaN(e.webkitCompassHeading)) h = e.webkitCompassHeading; // already corrected for screen on iOS? (relative to device top)
-  else if ((e.absolute || e.type === 'deviceorientationabsolute') && e.alpha != null) h = (360 - e.alpha) % 360;
-  if (h == null) return;
-  h = (h + screenAngle() + 360) % 360;
-  state.compass = h; state.compassAt = Date.now(); state.compassOn = true;
+  const deg = Heading.readingFromEvent(e, screenAngle());
+  if (deg == null) return;
+  state.compass = deg; state.compassAt = Date.now(); state.compassOn = true;
+  state.heading.onCompass(deg, state.compassAt, true);
   if (typeof e.webkitCompassAccuracy === 'number') state.compassAcc = e.webkitCompassAccuracy;
   if (!state._cui) { state._cui = true; compassUi(); }
-  if (!state._lastG || Date.now() - state._lastG > 150) { state._lastG = Date.now(); updateGuide(); meStyle(); }
+  if (!state._lastG || Date.now() - state._lastG > 150) { state._lastG = Date.now(); updateGuide(); scheduleMeArrow(); }
 }
 function startCompass() {
   window.removeEventListener('deviceorientationabsolute', onOrient); window.removeEventListener('deviceorientation', onOrient);
@@ -903,8 +1240,35 @@ $('btnOffline').onclick = async () => {
   msg.textContent = `Saved ${done - fail}/${urls.length} map tiles for offline use.`;
 };
 $('version').textContent = APP_VERSION;
+$('closeNear').onclick = () => { $('nearPanel').classList.add('hidden'); syncChips(); };
+$('closeFav').onclick = () => { $('favPanel').classList.add('hidden'); syncChips(); };
+$('nearFilters').onclick = e => {
+  const b = e.target.closest('[data-nt]'); if (!b) return;
+  state.nearType = b.dataset.nt;
+  $('nearFilters').querySelectorAll('.rideSub').forEach(x => {
+    const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  renderNear();
+};
+$('nearList').onclick = e => { const li = e.target.closest('li[data-id]'); if (li) startGuide(li.dataset.id); };
+$('favList').onclick = e => {
+  const rm = e.target.closest('.favRemove');
+  if (rm) { toggleFav(rm.dataset.id); return; }
+  const b = e.target.closest('button[data-id]');
+  if (b) startGuide(b.dataset.id);
+};
+$('qaNear').onclick = () => openNear();
+$('qaRestroom').onclick = () => goNearest('restroom');
+$('qaAtm').onclick = () => goNearest('atm');
+$('qaAid').onclick = () => goNearest('first_aid');
+$('nearQaRestroom').onclick = () => goNearest('restroom');
+$('nearQaAtm').onclick = () => goNearest('atm');
+$('nearQaAid').onclick = () => goNearest('first_aid');
+$('btnFav').onclick = () => { if (state.target) toggleFav(state.target.id); };
+$('searchFocus').addEventListener('pointerdown', e => { if (e.target.closest('button')) e.preventDefault(); });
+window.FF = { nearMe };
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js?v=74', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
+  navigator.serviceWorker.register('sw.js?v=75', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
 }
 
 loadData().catch(e => setStatus('Could not load booth data: ' + e.message));

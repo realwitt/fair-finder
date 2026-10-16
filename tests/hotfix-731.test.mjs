@@ -80,9 +80,10 @@ await shot('05-after-stop');
 // likely matches
 await p.goto(URL, { waitUntil: 'networkidle' }); await ready(); await p.evaluate(() => localStorage.removeItem('ff.guideTarget'));
 await typeQ('pirate');
-const sg = await p.$$eval('#suggest li', ls => ls.map(l => ({ t: l.innerText.replace(/\n/g, ' '), lik: l.classList.contains('likely') })));
+const sg = await p.$$eval('#suggest li', ls => ls.map(l => ({ t: l.innerText.replace(/\n/g, ' '), lik: l.classList.contains('likely'), sep: l.getAttribute('role') === 'presentation' })));
 const iPI = sg.findIndex(s => /Pirate's Island/.test(s.t) && !s.lik), iSR = sg.findIndex(s => /Sea Ray Ship/.test(s.t) && s.lik);
-ok(iPI >= 0 && iSR > iPI && /Likely matches/i.test(sg[sg.findIndex(s => s.lik)].t), 'pirate dropdown: Pirate\'s Island direct, then Likely matches incl. Sea Ray Ship: ' + sg.map(s => (s.lik ? '~' : '') + s.t).join(' | '));
+const iSep = sg.findIndex(s => s.sep && /Likely matches/i.test(s.t));
+ok(iPI >= 0 && iSep > iPI && iSR > iSep, 'pirate dropdown: Pirate\'s Island direct, then Likely matches incl. Sea Ray Ship: ' + sg.map(s => (s.sep ? 'sep ' : s.lik ? '~' : '') + s.t).join(' | '));
 await shot('10-pirate-dropdown-likely');
 await p.press('#q', 'Enter'); await p.waitForTimeout(700);
 const rl = await p.$$eval('#resList li', ls => ls.map(l => ({ t: l.innerText.replace(/\n/g, ' '), lik: l.classList.contains('likely') })));

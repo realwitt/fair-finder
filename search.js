@@ -69,13 +69,21 @@
   }
   const groupsFor = q => { const nq = norm(q); return SYN.filter(g => g.some(s => norm(s) === nq || (nq.length > 3 && norm(s).includes(nq)) )); };
   // Phrase match: every token of phrase found (fuzzy) in the token list, in order-insensitive fashion
-  function phraseScore(phraseToks, docToks, docJoined) {
+  // Edit budget for a query token. Length ≤ 8 needs the same first letter (keeps funel→funnel, blocks slush/plush).
+  function editMax(len) { return len <= 8 ? 1 : 2; }
+  function editOk(pt, dt) {
+    const max = editMax(pt.length);
+    if (pt.length <= 8 && pt[0] !== dt[0]) return false;
+    return lev(pt, dt, max) <= max;
+  }
+  function phraseScore(phraseToks, docToks, docJoined, allowFuzzy) {
+    if (allowFuzzy == null) allowFuzzy = true;
     if (!phraseToks.length) return 0;
     if (docJoined.includes(' ' + phraseToks.join(' ') + ' ')) return 1;
     let hit = 0;
     for (const pt of phraseToks) {
       let ok = docToks.includes(pt);
-      if (!ok && pt.length >= 4) ok = docToks.some(dt => dt.length >= 3 && (dt.startsWith(pt) || lev(pt, dt, pt.length >= 7 ? 2 : 1) <= (pt.length >= 7 ? 2 : 1)));
+      if (!ok && pt.length >= 4) ok = docToks.some(dt => dt.length >= 3 && (dt.startsWith(pt) || (allowFuzzy && editOk(pt, dt))));
       if (!ok && pt.length >= 5) ok = docJoined.replace(/ /g, '').includes(pt); // hotdog vs "hot dog"
       if (ok) hit++;
     }
@@ -89,31 +97,38 @@
     booth._items = (booth.items || []).map(it => { const tk = tokens(it); return { raw: it, toks: tk, joined: ' ' + tk.join(' ') + ' ' }; });
     return booth;
   }
-  // Returns {score, matched:[item strings]} or null
-  function match(booth, query) {
+  // Returns {score, matched:[item strings]} or null.
+  // opts.allowFuzzy === false skips edit distance. opts.synonymExpand === false skips SYN/RELATED phrases.
+  function match(booth, query, opts) {
+    opts = opts || {};
+    const allowFuzzy = opts.allowFuzzy !== false;
+    const synonymExpand = opts.synonymExpand !== false;
     const q = tokens(query); if (!q.length) return null;
     const phrases = [{ toks: q, w: 1 }];
-    for (const g of groupsFor(query)) {
-      for (const s of g) { const t = tokens(s); if (t.join(' ') !== q.join(' ')) phrases.push({ toks: t, w: 0.9 }); }
-      for (const s of (RELATED[g[0]] || [])) phrases.push({ toks: tokens(s), w: 0.6 });
+    if (synonymExpand) {
+      for (const g of groupsFor(query)) {
+        for (const s of g) { const t = tokens(s); if (t.join(' ') !== q.join(' ')) phrases.push({ toks: t, w: 0.9 }); }
+        for (const s of (RELATED[g[0]] || [])) phrases.push({ toks: tokens(s), w: 0.6 });
+      }
     }
+    const ps = (toks, docToks, joined) => phraseScore(toks, docToks, joined, allowFuzzy);
     let best = 0;
     for (const p of phrases) {
-      best = Math.max(best, p.w * phraseScore(p.toks, booth._toks, booth._joined));
+      best = Math.max(best, p.w * ps(p.toks, booth._toks, booth._joined));
     }
     if (!best) return null;
     const matched = [];
     for (const it of booth._items) {
-      if (phrases.some(p => phraseScore(p.toks, it.toks, it.joined) > 0)) matched.push(it.raw);
+      if (phrases.some(p => ps(p.toks, it.toks, it.joined) > 0)) matched.push(it.raw);
     }
     let score = best + Math.min(matched.length, 3) * 0.05;
-    if (phrases.some(p => phraseScore(p.toks, booth._nameToks, booth._nameJoined) > 0)) score += 0.1;
-    if (booth.newFood && phrases.some(p => phraseScore(p.toks, tokens(booth.newFood.name), ' ' + tokens(booth.newFood.name).join(' ') + ' ') > 0)) score += 0.1;
+    if (phrases.some(p => ps(p.toks, booth._nameToks, booth._nameJoined) > 0)) score += 0.1;
+    if (booth.newFood && phrases.some(p => ps(p.toks, tokens(booth.newFood.name), ' ' + tokens(booth.newFood.name).join(' ') + ' ') > 0)) score += 0.1;
     return { score, matched };
   }
-  function search(booths, query) {
+  function search(booths, query, opts) {
     const out = [];
-    for (const b of booths) { const m = match(b, query); if (m) out.push({ booth: b, ...m }); }
+    for (const b of booths) { const m = match(b, query, opts); if (m) out.push({ booth: b, ...m }); }
     return out;
   }
   const api = { prepare, match, search, norm, tokens, lev, SYN };
