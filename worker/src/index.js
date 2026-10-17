@@ -1,6 +1,6 @@
 import { BOOTH_IDS, CHIP_KEYS } from './allowlist.js';
 
-const ORIGINS = new Set(['https://realwitt.github.io', 'https://fairfinder.birbol.com']);
+const ORIGINS = new Set(['https://realwitt.github.io', 'https://fairfinder.birbol.com', 'https://ncstatefair.app']);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const CHIP_SET = new Set(CHIP_KEYS);
 const THREE_H = 3 * 60 * 60 * 1000;

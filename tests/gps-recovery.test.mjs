@@ -20,7 +20,7 @@ await ctx.addInitScript(() => {
   F.error = code => { for (const [, w] of F.watches) w.err({ code, message: code === 3 ? 'Timeout expired' : 'Position unavailable' }); };
   Object.defineProperty(navigator, 'geolocation', { value: geo, configurable: true });
 });
-const p = await ctx.newPage(); p.on('pageerror', e => fails.push('pageerror ' + e.message));
+await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const p = await ctx.newPage(); p.on('pageerror', e => fails.push('pageerror ' + e.message));
 await p.goto(URL + '?booth=L0-1387'); await p.waitForFunction(() => window.__ff && __ff.route && __ff.guide && __ff.guide.mode === 'route', null, { timeout: 25000 });
 const F = () => p.evaluate(() => ({ starts: __fakeGeo.starts, gets: __fakeGeo.gets, opts: __fakeGeo.opts.at(-1), fixes: __ff.fixCount, rem: __ff.guide.remainingM, dist: document.getElementById('guideDist').textContent, upd: document.getElementById('guideUpd').textContent, why: __ff.lastRestartWhy, btn: document.getElementById('btnGpsRefresh').classList.contains('show'), stale: document.getElementById('meDot').classList.contains('stale') }));
 let s0 = await F();

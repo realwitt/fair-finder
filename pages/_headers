@@ -1,0 +1,98 @@
+/*
+  ! Access-Control-Allow-Origin
+
+/style.css
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/app.js
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/geo.js
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/search.js
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/rides.js
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/suggest.js
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/concepts.js
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/route.js
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/stats.js
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/heading.js
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/vendor/leaflet.js
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/vendor/leaflet.css
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/about/about.css
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/icons/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/config.js
+  ! Cache-Control
+  Cache-Control: public, max-age=0, must-revalidate
+
+/
+  ! Cache-Control
+  Cache-Control: public, max-age=0, must-revalidate
+
+/index.html
+  ! Cache-Control
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.html
+  ! Cache-Control
+  Cache-Control: public, max-age=0, must-revalidate
+
+/about
+  ! Cache-Control
+  Cache-Control: public, max-age=0, must-revalidate
+
+/about/
+  ! Cache-Control
+  Cache-Control: public, max-age=0, must-revalidate
+
+/b/*
+  ! Cache-Control
+  Cache-Control: public, max-age=0, must-revalidate
+
+/data/*
+  ! Cache-Control
+  Cache-Control: public, max-age=0, must-revalidate
+
+/manifest.webmanifest
+  ! Cache-Control
+  Cache-Control: public, max-age=0, must-revalidate
+
+/sw.js
+  ! Cache-Control
+  Cache-Control: no-cache

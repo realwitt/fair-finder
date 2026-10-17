@@ -23,7 +23,7 @@ await ctx.route('**/*', route => {
   if (/workers\.dev|127\.0\.0\.1:9/.test(u)) return route.abort();
   return route.continue();
 });
-const p = await ctx.newPage();
+await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const p = await ctx.newPage();
 const errs = [];
 p.on('pageerror', e => errs.push(e.message));
 const ready = () => p.waitForFunction(() => window.__ff && __ff.graph && __ff.me && __ff.booths && __ff.booths.length > 100, null, { timeout: 25000 });

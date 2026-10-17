@@ -250,3 +250,23 @@ body.ac.acCover #results{visibility:hidden}
 #favList .favGo,#favList .favRemove{white-space:nowrap;min-height:44px;border-radius:12px;border:2px solid #000;font-weight:800;font-size:15px;padding:0 12px}
 #favList .favGo{flex:1;background:var(--navy);color:#fff}
 #favList .favRemove{flex:0 0 auto;background:#fff;color:#111}
+
+/* v7.9 title gate */
+html.ff-no-title #titleScreen{display:none!important}
+#titleScreen{position:fixed;inset:0;z-index:8000;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:calc(var(--safe-t) + 36px) 24px calc(var(--safe-b) + 22px);background:radial-gradient(900px 420px at 50% -8%,#2450b8 0%,transparent 58%),linear-gradient(180deg,#0b1f4d 0%,#07142f 100%);color:#fff;text-align:center;overflow:auto}
+#titleInner{width:min(100%,640px);margin:auto 0;display:flex;flex-direction:column;align-items:center}
+#titleScreen h1{margin:0;max-width:14ch;font-size:clamp(36px,9.2vw,68px);line-height:1.02;font-weight:900;letter-spacing:-.035em}
+#titleScreen h1 .unofficial{color:var(--hi)}
+#titleNote{margin:18px 0 0;max-width:34ch;font-size:17px;line-height:1.4;font-weight:600;color:#d5e2f8}
+#openMap{margin-top:28px;min-height:64px;width:min(100%,340px);padding:0 28px;border-radius:16px;border:3px solid #000;background:var(--hi);color:#111;font-size:22px;font-weight:900;box-shadow:0 6px 0 #000}
+#openMap:active{transform:translateY(2px);box-shadow:0 4px 0 #000}
+#titleCredit{margin-top:28px;display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:800;font-size:16px;padding:8px 4px}
+#titleCredit img{width:42px;height:auto;display:block;background:#fff;border-radius:10px;padding:3px}
+@media (min-width:800px){
+  #titleScreen{padding:48px 32px 32px}
+  #titleScreen h1{max-width:16ch;font-size:68px}
+  #titleNote{font-size:20px}
+  #openMap{min-height:72px;font-size:24px;width:360px}
+  #titleCredit{font-size:18px}
+  #titleCredit img{width:48px}
+}

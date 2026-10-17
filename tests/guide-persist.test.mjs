@@ -6,7 +6,7 @@ const START = { latitude: 35.79485, longitude: -78.7093, accuracy: 6 };
 const fails = []; const ok = (c, m) => { if (!c) { fails.push(m); console.log('FAIL ' + m); } else if (process.env.V) console.log('PASS ' + m); };
 const b = await eng.launch();
 const ctx = await b.newContext({ ...devices['iPhone 14 Pro'], geolocation: START, permissions: process.env.FF_ENGINE === 'webkit' ? ['geolocation'] : ['geolocation', 'accelerometer', 'gyroscope', 'magnetometer'] });
-const p = await ctx.newPage(); p.on('pageerror', e => fails.push('pageerror ' + e.message));
+await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const p = await ctx.newPage(); p.on('pageerror', e => fails.push('pageerror ' + e.message));
 await p.goto(URL, { waitUntil: 'networkidle' });
 await p.waitForFunction(() => window.__ff && window.__ff.booths.length > 100 && window.__ff.me);
 const ver = await p.textContent('#version'); ok(/v\d+/.test(ver), 'version label: ' + ver); console.log('version label:', ver);

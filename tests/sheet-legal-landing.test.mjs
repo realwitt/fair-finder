@@ -9,7 +9,7 @@ const NAME = 'Fair Finder: Unofficial Guide to the 2026 N.C. State Fair';
 const fails = []; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails.push(m); };
 const b = await eng.launch();
 const ctx = await b.newContext({ ...devices['iPhone 14 Pro'], geolocation: ME, permissions: process.env.FF_ENGINE === 'webkit' ? ['geolocation'] : ['geolocation', 'accelerometer', 'gyroscope', 'magnetometer'] });
-const p = await ctx.newPage(); p.on('pageerror', e => fails.push('pageerror ' + e.message));
+await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const p = await ctx.newPage(); p.on('pageerror', e => fails.push('pageerror ' + e.message));
 await p.goto(URL + '?booth=L0-1387', { waitUntil: 'networkidle' });
 await p.waitForFunction(() => window.__ff && __ff.route && __ff.guide && __ff.guide.mode === 'route', null, { timeout: 25000 });
 await p.waitForTimeout(800);
@@ -99,7 +99,7 @@ ok(!offl, 'offline download no longer includes satellite tiles');
 const sp = await p.evaluate(async () => (await (await fetch('b/L0-1387.html')).text()).match(/<title>([^<]*)/)[1]);
 ok(/· Fair Finder \(unofficial\)$/.test(sp), 'share page title: ' + sp);
 // 10. landing page
-const lp = await ctx.newPage(); lp.on('pageerror', e => fails.push('landing pageerror ' + e.message));
+await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const lp = await ctx.newPage(); lp.on('pageerror', e => fails.push('landing pageerror ' + e.message));
 await lp.goto(URL + 'about/', { waitUntil: 'networkidle' });
 const L = await lp.evaluate(() => ({ h1: document.querySelector('h1').textContent, cta: [...document.querySelectorAll('a.cta')].map(a => a.href), imgs: [...document.images].map(i => (i.scrollIntoView(), i.currentSrc)), feats: [...document.querySelectorAll('.feature h3')].map(h => h.textContent), og: ['og:title', 'og:description', 'og:image', 'og:url', 'og:site_name'].every(k => document.querySelector(`meta[property="${k}"]`)), txt: document.body.innerText, title: document.title }));
 await lp.waitForTimeout(800);
@@ -118,7 +118,7 @@ ok(ogimg === 200, 'og:image reachable');
 await lp.screenshot({ path: `${SH}/20-v7-landing.png`, fullPage: true });
 await lp.screenshot({ path: `${SH}/20-v7-landing-top.png` });
 // default snap for a guide started in-app (fresh storage) is collapsed
-{ const c2 = await b.newContext({ ...devices['iPhone 14 Pro'], geolocation: ME, permissions: ['geolocation'] }); const q = await c2.newPage();
+{ const c2 = await b.newContext({ ...devices['iPhone 14 Pro'], geolocation: ME, permissions: ['geolocation'] }); await c2.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const q = await c2.newPage();
   await q.goto(URL, { waitUntil: 'networkidle' }); await q.waitForFunction(() => window.__ff && __ff.dj, null, { timeout: 20000 });
   await q.fill('#q', 'turkey leg'); await q.waitForTimeout(700); await q.click('#resList li'); await q.waitForTimeout(600);
   ok(await q.evaluate(() => __ffSheet.state === 'collapsed' && document.getElementById('sheetBar').getAttribute('aria-expanded') === 'false'), 'guide started from the list opens collapsed by default'); await c2.close(); }

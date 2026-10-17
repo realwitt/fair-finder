@@ -1,5 +1,7 @@
 # Fair Finder: NC State Fair 2026 food finder
 
+Live at https://ncstatefair.app.
+
 A mobile-first static web app for finding food at the 2026 N.C. State Fair (Oct 15–25, Raleigh). Search a food, see matching booths nearest-first, and tap one to get a big guide arrow, a distance in feet, and a line on the map.
 
 ## Data (all from the fair's published sources and OpenStreetMap, nothing invented)

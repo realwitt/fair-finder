@@ -8,7 +8,7 @@ const b = await eng.launch();
 async function page(withShare) {
   const ctx = await b.newContext({ ...devices['iPhone 14 Pro'], geolocation: ME, permissions: process.env.FF_ENGINE === 'webkit' ? ['geolocation'] : ['geolocation', 'clipboard-read', 'clipboard-write', 'accelerometer', 'gyroscope', 'magnetometer'] });
   await ctx.addInitScript(ws => { window.__shared = []; if (ws) navigator.share = async d => { window.__shared.push(d); }; else { try { delete Navigator.prototype.share; } catch (e) {} navigator.share = undefined; Object.defineProperty(navigator, 'clipboard', { value: { writeText: async t => { window.__copied = t; } }, configurable: true }); } }, withShare);
-  const p = await ctx.newPage(); p.on('pageerror', e => fails.push('pageerror ' + e.message)); return p;
+  await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const p = await ctx.newPage(); p.on('pageerror', e => fails.push('pageerror ' + e.message)); return p;
 }
 let p = await page(true);
 await p.goto(URL, { waitUntil: 'networkidle' }); await p.waitForFunction(() => window.__ff && __ff.dj, null, { timeout: 20000 });

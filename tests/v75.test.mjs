@@ -15,7 +15,7 @@ const ctx = await b.newContext({
   geolocation: ME,
   permissions: ['geolocation', 'accelerometer', 'magnetometer', 'gyroscope'],
 });
-await ctx.addInitScript(() => { window.__shared = []; navigator.share = async d => { window.__shared.push(d); }; });
+await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen', '1'); } catch (e) {} window.__shared = []; navigator.share = async d => { window.__shared.push(d); }; });
 const p = await ctx.newPage();
 const errs = [];
 p.on('pageerror', e => errs.push(e.message));
@@ -325,7 +325,7 @@ const stopped = await p.evaluate(() => {
 ok(!stopped.has && stopped.display === 'none' && stopped.circle, 'no heading hides the arrow, accuracy circle stays ' + JSON.stringify(stopped));
 
 // 16. version + privacy
-ok((await p.textContent('#version')) === 'v7.7.1 · Oct 16', 'version ' + await p.textContent('#version'));
+ok((await p.textContent('#version')) === 'v7.9 · Oct 17', 'version ' + await p.textContent('#version'));
 await p.click('#btnLayers');
 await p.click('#aboutLink');
 await p.waitForTimeout(200);

@@ -7,7 +7,7 @@ const fails = []; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m
 const engine = process.env.FF_ENGINE === 'webkit' ? webkit : chromium;
 const browser = await engine.launch();
 const ctx = await browser.newContext({ ...devices['iPhone 14 Pro'], geolocation: ME, permissions: process.env.FF_ENGINE === 'webkit' ? ['geolocation'] : ['geolocation', 'accelerometer', 'gyroscope', 'magnetometer'] });
-const page = await ctx.newPage();
+await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const page = await ctx.newPage();
 page.on('pageerror', e => fails.push('pageerror: ' + e.message));
 await page.goto(URL, { waitUntil: 'networkidle' });
 await page.waitForFunction(() => window.__ff && window.__ff.booths.length > 100 && window.__ff.me);

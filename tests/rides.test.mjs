@@ -19,7 +19,7 @@ const b = await chromium.launch();
 const errs = [];
 const ctxOpts = { ...devices['iPhone 14 Pro'], viewport: { width: 390, height: 844 }, geolocation: ME, permissions: ['geolocation'] };
 let ctx = await b.newContext(ctxOpts);
-let p = await ctx.newPage();
+await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); let p = await ctx.newPage();
 p.on('pageerror', e => errs.push(e.message));
 const ready = pg => pg.waitForFunction(() => window.__ff && window.__ff.rides && window.__ff.rides.length >= 99);
 await p.goto(URL, { waitUntil: 'networkidle' });
@@ -55,7 +55,7 @@ const sh = await p.evaluate(() => window.__shared);
 ok(sh && sh.url.includes('/b/L0-1099.html'), 'share url ' + (sh && sh.url));
 
 let ctx2 = await b.newContext(ctxOpts);
-let p2 = await ctx2.newPage();
+await ctx2.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); let p2 = await ctx2.newPage();
 p2.on('pageerror', e => errs.push('fresh ' + e.message));
 await p2.goto(URL + '?booth=L0-1099', { waitUntil: 'networkidle' });
 await ready(p2);

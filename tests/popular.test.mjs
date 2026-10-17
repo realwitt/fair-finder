@@ -80,7 +80,7 @@ async function boot(b, opts, optOut) {
     }
     return route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"counted":true}' });
   });
-  const p = await ctx.newPage();
+  await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const p = await ctx.newPage();
   p.on('pageerror', e => fails.push('pageerror ' + e.message));
   await p.goto(FF, { waitUntil: 'domcontentloaded' });
   await p.waitForFunction(() => window.__ff && __ff.booths && __ff.booths.length > 100 && __ff.tracker, null, { timeout: 25000 });
@@ -187,7 +187,7 @@ try {
     const priv = JSON.parse('"' + pm[1] + '"');
     const inApp = await p.locator('#aboutBody h3', { hasText: 'Privacy' }).locator('xpath=following-sibling::p[1]').innerText();
     ok(inApp === priv, 'in-app privacy equals L_.priv');
-    const lp = await ctx.newPage();
+    await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const lp = await ctx.newPage();
     await lp.goto(FF + 'about/', { waitUntil: 'domcontentloaded' });
     const aboutP = await lp.locator('h3', { hasText: 'Privacy' }).locator('xpath=following-sibling::p[1]').innerText();
     ok(aboutP === priv, 'about privacy text equals L_.priv');

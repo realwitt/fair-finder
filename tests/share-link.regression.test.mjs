@@ -6,7 +6,7 @@ const ME = { latitude: 35.79485, longitude: -78.7093, accuracy: 5 };
 const b = await eng.launch(); const bad = [];
 async function run(name, url, opts = {}) { const { perms = ['geolocation'], geo = ME, pre = null, grantLater = false } = opts;
   const ctx = await b.newContext({ ...devices['iPhone 14 Pro'], geolocation: geo, permissions: perms });
-  const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+  await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
   if (pre) await pre(p, ctx);
   await p.goto(url); await p.waitForTimeout(4000);
   if (grantLater) { await ctx.grantPermissions(['geolocation']); await p.evaluate(() => 0); await p.waitForTimeout(3000); }
@@ -33,7 +33,7 @@ await run('SW + already guiding other booth · share page', BASE + 'b/' + ID + '
 await run('SW + already guiding other booth · ?booth=', BASE + '?booth=' + ID, { pre: warmGuiding });
 await run('SW + offline · share page', BASE + 'b/' + ID + '.html', { pre: async (p, ctx) => { await warm(p); await ctx.setOffline(true); } });
 // booth card (popup) open -> the page URL itself must carry the booth, and that URL must open it for a friend
-{ const ctx = await b.newContext({ ...devices['iPhone 14 Pro'], geolocation: ME, permissions: ['geolocation'] }); const p = await ctx.newPage();
+{ const ctx = await b.newContext({ ...devices['iPhone 14 Pro'], geolocation: ME, permissions: ['geolocation'] }); await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const p = await ctx.newPage();
   await p.goto(BASE + '?ll=35.79513,-78.71064&z=20'); await p.waitForTimeout(4000); await ctx.setGeolocation({ latitude: 35.7951274, longitude: -78.712, accuracy: 5 });
   const pt = await p.evaluate(id => { const b = __ff.booths.find(x => x.id === id); return window.__ffLL([b.lat, b.lon]); }, ID);
   await p.mouse.click(pt[0], pt[1]); await p.waitForTimeout(1200);

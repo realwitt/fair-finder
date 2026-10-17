@@ -14,7 +14,7 @@ const ctx = await b.newContext({
   geolocation: ME,
   permissions: ['geolocation'],
 });
-const p = await ctx.newPage();
+await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const p = await ctx.newPage();
 const errs = [];
 p.on('pageerror', e => errs.push(e.message));
 const ready = () => p.waitForFunction(() => window.__ff && __ff.graph && __ff.me && __ff.amenities && __ff.amenities.length === 34, null, { timeout: 25000 });

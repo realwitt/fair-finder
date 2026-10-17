@@ -309,7 +309,7 @@ function partialNote(tokens, chosen) {
   return 'Partial match: the listing has "' + chosen + '" (or a close synonym) but does not mention ' + (others || 'the other words') + '. Ask at the booth.';
 }
 
-function link(id) { return 'https://fairfinder.birbol.com/?booth=' + id; }
+function link(id) { return 'https://ncstatefair.app/?booth=' + id; }
 
 const STATS_BASE = 'https://fair-finder-stats.lively-shape-f373.workers.dev';
 const QUIET_NOTE = 'not enough recent activity yet';

@@ -8,6 +8,7 @@ const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails.p
 
 const ORIGIN = 'https://realwitt.github.io';
 const ORIGIN2 = 'https://fairfinder.birbol.com';
+const ORIGIN3 = 'https://ncstatefair.app';
 const NOW = Date.parse('2026-10-15T16:00:00Z');
 const IP = '203.0.113.44';
 const DEV = '12345678-1234-4abc-8def-123456789abc';
@@ -66,6 +67,8 @@ ok(!BOOTH_IDS['L0-1335'] && !BOOTH_IDS['L0-1149'], 'ride ids are not allowlisted
     && opt.res.headers.get('Access-Control-Max-Age') === '86400', 'CORS preflight allow');
   const opt2 = await call(env, '/search', { method: 'OPTIONS', headers: { Origin: ORIGIN2 } });
   ok(opt2.res.status === 204 && opt2.res.headers.get('Access-Control-Allow-Origin') === ORIGIN2, 'second origin preflight');
+  const opt3 = await call(env, '/top', { method: 'OPTIONS', headers: { Origin: ORIGIN3 } });
+  ok(opt3.res.status === 204 && opt3.res.headers.get('Access-Control-Allow-Origin') === ORIGIN3, 'ncstatefair.app preflight');
   const denied = await call(env, '/visit', { method: 'OPTIONS', headers: { Origin: 'https://evil.example' } });
   ok(denied.res.status === 403 && denied.res.headers.get('Access-Control-Allow-Origin') == null, 'CORS preflight deny');
   const postDeny = await post(env, '/visit', { d: DEV, b: A }, { Origin: 'http://127.0.0.1:8765' });

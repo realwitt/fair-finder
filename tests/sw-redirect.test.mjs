@@ -1,7 +1,7 @@
 // The SW must not trap or break users when the site moves (GitHub Pages custom-domain 301s every
 // /fair-finder/* URL, including sw.js, to the new origin and sends Access-Control-Allow-Origin: *).
 // Serves this repo at /fair-finder/ on origin A; after the "flip", A 301s to origin B (repo at root).
-import { chromium } from 'playwright';
+import { chromium, webkit } from 'playwright';
 import http from 'http'; import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const fails = []; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails.push(m); };
@@ -23,9 +23,9 @@ const A = http.createServer((q, res) => {
   serveFile(res, '/' + rest);
 }); await new Promise(r => A.listen(0, '127.0.0.1', r));
 const aURL = 'http://127.0.0.1:' + A.address().port + '/fair-finder/';
-const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 390, height: 844 } });
+const b = await (process.env.FF_ENGINE === 'webkit' ? webkit : chromium).launch(); const ctx = await b.newContext({ viewport: { width: 390, height: 844 } });
 await ctx.route(/workers\.dev/, r => r.abort());
-const p = await ctx.newPage();
+await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const p = await ctx.newPage();
 await p.goto(aURL); await p.waitForFunction(() => navigator.serviceWorker.controller || new Promise(r => navigator.serviceWorker.addEventListener('controllerchange', () => r(true))), null, { timeout: 20000 });
 await p.reload(); await p.waitForTimeout(800);
 ok(await p.evaluate(() => !!navigator.serviceWorker.controller), 'SW controls the old origin before the move');
@@ -35,7 +35,7 @@ for (const [u, want] of [['', bURL], ['?booth=L0-1387', bURL + '?booth=L0-1387']
   await p.waitForTimeout(600);
   ok(!err && p.url().startsWith(want), 'old ' + (u || '/') + ' -> ' + p.url() + (err ? ' ERR ' + err : ''));
 }
-const p2 = await ctx.newPage(); await p2.goto('http://127.0.0.1:' + A.address().port + '/x').catch(() => {});
+await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const p2 = await ctx.newPage(); await p2.goto('http://127.0.0.1:' + A.address().port + '/x').catch(() => {});
 const regs = await p2.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).map(r => r.scope));
 ok(!regs.some(s => s.includes('/fair-finder/')), 'old-origin SW unregistered itself after the move ' + JSON.stringify(regs));
 await b.close(); A.close(); B.close();

@@ -9,7 +9,7 @@ const ME = { latitude: 35.7944, longitude: -78.7097, accuracy: 6 };
 const fails = []; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails.push(m); };
 const b = await chromium.launch();
 const ctx = await b.newContext({ ...devices['iPhone 14 Pro'], viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2, geolocation: ME, permissions: ['geolocation'] });
-const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
 const ready = () => p.waitForFunction(() => window.__ff && window.__ff.rides && window.__ff.rides.length >= 99 && window.__ff.suggestIndex);
 const shot = n => p.screenshot({ path: `${SH}/${n}.png` });
 const typeQ = async q => { await p.tap('#q'); await p.fill('#q', ''); await p.type('#q', q, { delay: 40 }); await p.waitForTimeout(450); };

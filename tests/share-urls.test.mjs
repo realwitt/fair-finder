@@ -7,7 +7,7 @@ const b = await eng.launch();
 const ready = p => p.waitForFunction(() => window.__ff && window.__ff.booths.length > 100);
 // 1. search link
 let ctx = await b.newContext({ ...devices['iPhone 14 Pro'], geolocation: ME, permissions: ['geolocation'] });
-let p = await ctx.newPage(); p.on('pageerror', e => fails.push('pageerror ' + e.message));
+await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); let p = await ctx.newPage(); p.on('pageerror', e => fails.push('pageerror ' + e.message));
 await p.goto(URL + '?q=empanada', { waitUntil: 'networkidle' }); await ready(p); await p.waitForTimeout(800);
 ok(await p.inputValue('#q') === 'empanada' && await p.locator('#resList li').count() === 3 && await p.locator('#results').isVisible(), '?q=empanada restores search (3 results)');
 ok(/v\d+/.test(await p.textContent('#version')), 'version ' + await p.textContent('#version'));
@@ -45,7 +45,7 @@ await p.goto(URL + '?q=pizza&x=' + Date.now()).catch(e => fails.push('offline na
 ok(await p.locator('#resList li').count() > 5, 'offline ?q=pizza served from SW: ' + await p.locator('#resList li').count());
 await ctx.close();
 // 7. location denied: shared booth link just shows the booth
-ctx = await b.newContext({ ...devices['iPhone 14 Pro'] }); p = await ctx.newPage();
+ctx = await b.newContext({ ...devices['iPhone 14 Pro'] }); await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); p = await ctx.newPage();
 await p.goto(URL + '?booth=' + id, { waitUntil: 'networkidle' }); await ready(p); await p.waitForTimeout(2500);
 const nl = await p.evaluate(() => ({ cls: document.getElementById('guide').className, hint: document.getElementById('guideHint').textContent, me: __ff.me }));
 ok(!nl.me && /noloc/.test(nl.cls) && /Allow location/.test(nl.hint), 'no location permission: shows booth only: ' + nl.hint);

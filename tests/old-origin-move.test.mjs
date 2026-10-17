@@ -20,7 +20,7 @@ const B = http.createServer((q, r) => { const fromOldSW = q.headers.origin === `
 await new Promise(z => A.listen(0, '127.0.0.1', z)); await new Promise(z => B.listen(0, '127.0.0.1', z)); PA = A.address().port; PB = B.address().port;
 const ST = `http://127.0.0.1:${PA}/fair-finder/`;
 const b = await chromium.launch();
-async function oldInstall() { const ctx = await b.newContext({ viewport: { width: 390, height: 844 } }); await ctx.route(/workers\.dev|tile|arcgis/, r => r.abort()); const p = await ctx.newPage(); flipped = false;
+async function oldInstall() { const ctx = await b.newContext({ viewport: { width: 390, height: 844 } }); await ctx.route(/workers\.dev|tile|arcgis/, r => r.abort()); await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const p = await ctx.newPage(); flipped = false;
   await p.goto(ST); await p.waitForFunction(() => navigator.serviceWorker.controller || new Promise(z => navigator.serviceWorker.addEventListener('controllerchange', () => z(true))), null, { timeout: 20000 });
   await p.reload(); await p.waitForTimeout(800); const v = await p.textContent('#version'); flipped = true; return { ctx, p, v }; }
 async function go(p, u) { let err = null; try { await p.goto(u, { timeout: 20000 }); } catch (e) { err = e.message.split('\n')[0]; } await p.waitForTimeout(2500); return { landed: p.url(), err }; }
@@ -31,8 +31,8 @@ async function go(p, u) { let err = null; try { await p.goto(u, { timeout: 20000
   const { ctx, p, v } = await oldInstall(); ok(v === 'v7.6.1 · Oct 16', 'old v7.6.1 installed (slow case) ' + v); slow = true;
   const r = await go(p, ST + '?booth=L0-1387'); await p.waitForTimeout(2000);
   const now = await p.evaluate(() => ({ url: location.href, ver: (document.getElementById('version') || {}).textContent, guiding: document.body.classList.contains('guiding') })).catch(e => ({ e: e.message }));
-  ok(now.url && now.url.startsWith(`http://localhost:${PB}/?booth=L0-1387`) && /^v7\.7\.1/.test(now.ver || ''), 'slow-network old install moves to the new origin with ?booth kept ' + JSON.stringify({ r, now }));
-  const p2 = await ctx.newPage(); slow = false; flipped = false; await p2.goto(`http://127.0.0.1:${PA}/fair-finder/robots-x`).catch(() => {});
+  ok(now.url && now.url.startsWith(`http://localhost:${PB}/?booth=L0-1387`) && /^v7\.8/.test(now.ver || ''), 'slow-network old install moves to the new origin with ?booth kept ' + JSON.stringify({ r, now }));
+  await ctx.addInitScript(() => { try { localStorage.setItem('ff-title-seen','1'); } catch (e) {} }); const p2 = await ctx.newPage(); slow = false; flipped = false; await p2.goto(`http://127.0.0.1:${PA}/fair-finder/robots-x`).catch(() => {});
   const regs = await p2.evaluate(async () => ({ regs: (await navigator.serviceWorker.getRegistrations()).map(x => x.scope), caches: await caches.keys() }));
   ok(regs.regs.length === 0 && !regs.caches.some(k => k.startsWith('ff-shell-')), 'old-origin SW unregistered and app-shell cache removed (a tile cache recreated by in-flight tile requests may remain) ' + JSON.stringify(regs)); await ctx.close(); }
 await b.close(); A.close(); B.close(); fs.rmSync(OLD, { recursive: true, force: true });

@@ -4,7 +4,7 @@ Unofficial read-only guide to the 2026 N.C. State Fair (October 15–25, Raleigh
 
 Official fair info: https://www.ncstatefair.org/
 
-The map and walking directions live in the Fair Finder app: https://fairfinder.birbol.com/
+The map and walking directions live in the Fair Finder app: https://ncstatefair.app/
 
 ## Endpoint
 
@@ -32,7 +32,7 @@ Each hit is `tier: "direct"` or `tier: "likely"`. Direct hits are exact or stron
 
 `nearby` lists booths, rides and amenities (`type: "amenity"`) within `radius_m` of a lat/lon, closest first (default 150 m, max 2000 m). `type: "food"` means booths with the food flag. A point more than 3 km from the fairgrounds returns an empty list.
 
-Every hit includes `fair_finder_link` (`https://fairfinder.birbol.com/?booth=` plus the id) so someone can open walking directions on their phone.
+Every hit includes `fair_finder_link` (`https://ncstatefair.app/?booth=` plus the id) so someone can open walking directions on their phone.
 
 Menus and ticket counts come from the fair's published Food & Ride Finder and can change. Check the signs at the booth. Ride height and category, when present, are approximate and come from the midway operator.
 

@@ -1,6 +1,17 @@
-const V = 'ff-shell-v7-7-1';
-const SHELL = ['./', 'index.html', 'style.css?v=771', 'app.js?v=771', 'geo.js?v=771', 'search.js?v=771', 'rides.js?v=771', 'suggest.js?v=771', 'concepts.js?v=771', 'route.js?v=771', 'config.js?v=771', 'stats.js?v=771', 'vendor/leaflet.js?v=771', 'vendor/leaflet.css?v=771', 'data/booths.json', 'data/rides.json', 'data/synonyms.json', 'data/atms.json', 'data/walkways.json', 'manifest.webmanifest', 'icons/icon-192.png', 'about/', 'about/about.css?v=771', 'heading.js?v=771', 'data/amenities.json'];
-self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting())); });
+const V = 'ff-shell-v7-9';
+const SHELL = ['./', 'style.css?v=79', 'app.js?v=79', 'geo.js?v=79', 'search.js?v=79', 'rides.js?v=79', 'suggest.js?v=79', 'concepts.js?v=79', 'route.js?v=79', 'config.js?v=79', 'stats.js?v=79', 'vendor/leaflet.js?v=79', 'vendor/leaflet.css?v=79', 'data/booths.json', 'data/rides.json', 'data/synonyms.json', 'data/atms.json', 'data/walkways.json', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/birbol.svg?v=79', 'about/', 'about/about.css?v=79', 'heading.js?v=79', 'data/amenities.json'];
+function shellOk(r) { return r.ok && !r.redirected && r.type !== 'opaqueredirect'; }
+self.addEventListener('install', e => {
+  e.waitUntil((async () => {
+    const c = await caches.open(V);
+    for (const u of SHELL) {
+      const r = await fetch(u, { cache: 'reload', redirect: 'manual' });
+      if (!shellOk(r)) throw new Error('shell ' + u);
+      await c.put(u, r);
+    }
+    await self.skipWaiting();
+  })());
+});
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('ff-shell-') && k !== V).map(k => caches.delete(k))))
   .then(() => caches.open('ff-tiles-v1')).then(async c => { for (const r of await c.keys()) if (!isTile(r.url)) await c.delete(r); }) // purge OSM/Esri tiles cached by v1–v6
   .then(() => self.clients.claim())); });
@@ -60,15 +71,21 @@ self.addEventListener('fetch', e => {
           e.waitUntil(self.registration.unregister().then(() => caches.keys()).then(ks => Promise.all(ks.filter(k => k.startsWith('ff-')).map(k => caches.delete(k)))));
         return r;
       }
-      if (r.redirected) return nav ? Response.redirect(r.url, 302) : r; // never cache or hand a followed redirect to a navigation
-      if (r.ok) c.put(req, r.clone()); return r;
+      if (r.redirected || (r.status >= 300 && r.status < 400)) return nav ? Response.redirect(r.url, 302) : r; // never cache a redirect
+      if (r.ok && !r.redirected && r.type !== 'opaqueredirect') await c.put(req, r.clone());
+      return r;
     } catch (err) {
       if (req.mode === 'navigate') {
-        // Offline share links: /b/<id>.html -> app with ?booth=<id>; any ?query URL -> cached index.html
-        const m = new URL(url).pathname.match(/\/b\/([^/]+)\.html$/);
-        if (m) return Response.redirect(new URL('../?booth=' + m[1], url).href, 302);
-        if (/\/about\/?(index\.html)?$/.test(new URL(url).pathname)) { const a = await c.match('about/', { ignoreSearch: true }); if (a) return a; }
-        return (await c.match('index.html')) || (await c.match('./')) || Response.error();
+        // Offline share links: /b/<id> and /b/<id>.html -> app with ?booth=<id>; /about/ -> cached about page
+        const path = new URL(url).pathname;
+        const m = path.match(/\/b\/([^/]+)$/);
+        if (m) { let id = m[1]; if (id.endsWith('.html')) id = id.slice(0, -5); return Response.redirect(new URL('../?booth=' + id, url).href, 302); }
+        if (/\/about\/?(index\.html)?$/.test(path)) { const a = await c.match('about/', { ignoreSearch: true }); if (a) return a; }
+        for (const key of ['./', 'index.html']) {
+          const hit = await c.match(key);
+          if (hit && hit.ok && !hit.redirected && hit.type !== 'opaqueredirect') return hit;
+        }
+        return Response.error();
       }
       return (await c.match(req)) || (await c.match(req, { ignoreSearch: true })) || Response.error();
     }
