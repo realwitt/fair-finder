@@ -1,4 +1,4 @@
-// Pages emulator: headers, service worker install, offline share links, v7.7.1 -> v7.9 update.
+// Pages emulator: headers, service worker install, offline share links, v7.7.1 -> v7.9.1 update.
 import { chromium, webkit } from '/workspace/ff-node/node_modules/playwright/index.mjs';
 import { execFileSync } from 'child_process';
 import fs from 'fs';
@@ -56,7 +56,7 @@ function isImm(h, label) { ok(h.cc === IMMUTABLE, label + ' immutable ' + h.cc);
   const sw = await headers('/sw.js');
   ok(sw.status === 200 && sw.cc === 'no-cache', 'sw.js no-cache ' + sw.cc);
   noAcao(sw, '/sw.js');
-  isImm(await headers('/app.js?v=79'), '/app.js?v=79');
+  isImm(await headers('/app.js?v=791'), '/app.js?v=791');
   isReval(await headers('/config.js'), '/config.js');
   isReval(await headers('/config.js?v=761'), '/config.js?v=761');
   isReval(await headers('/'), '/');
@@ -73,7 +73,7 @@ function isImm(h, label) { ok(h.cc === IMMUTABLE, label + ' immutable ' + h.cc);
 
 async function shellInfo(page) {
   return page.evaluate(async () => {
-    const name = 'ff-shell-v7-9';
+    const name = 'ff-shell-v7-9-1';
     const keys = await caches.keys();
     if (!keys.includes(name)) return { keys, entries: [] };
     const c = await caches.open(name);
@@ -97,7 +97,7 @@ async function online(engine, name) {
   p.on('pageerror', e => errs.push(e.message));
   await p.goto(base + '/', { waitUntil: 'domcontentloaded' });
   await p.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 20000 });
-  await p.waitForFunction(() => (document.getElementById('version') || {}).textContent === 'v7.9 · Oct 17', null, { timeout: 20000 });
+  await p.waitForFunction(() => (document.getElementById('version') || {}).textContent === 'v7.9.1 · Oct 17', null, { timeout: 20000 });
   const info = await shellInfo(p);
   ok(info.entries.some(e => new URL(e.url).pathname === '/'), name + ' cache has / ' + JSON.stringify(info.entries.map(e => e.url)));
   ok(!info.entries.some(e => /\/index\.html$/.test(new URL(e.url).pathname) && (e.redirected || e.type === 'opaqueredirect' || !e.ok)), name + ' no redirected index.html');
@@ -109,8 +109,8 @@ async function online(engine, name) {
   ok(appErrors(errs).length === 0, name + ' no pageerror ' + appErrors(errs).join(' | '));
   await ctx.setOffline(true);
   await p.goto(base + '/', { waitUntil: 'domcontentloaded' });
-  await p.waitForFunction(() => (document.getElementById('version') || {}).textContent === 'v7.9 · Oct 17', null, { timeout: 15000 });
-  ok((await p.textContent('#version')) === 'v7.9 · Oct 17', name + ' offline reload shows v7.9');
+  await p.waitForFunction(() => (document.getElementById('version') || {}).textContent === 'v7.9.1 · Oct 17', null, { timeout: 15000 });
+  ok((await p.textContent('#version')) === 'v7.9.1 · Oct 17', name + ' offline reload shows v7.9.1');
   for (const u of ['/b/L0-1387.html', '/b/L0-1387']) {
     await p.goto(base + u, { waitUntil: 'domcontentloaded' });
     await p.waitForURL(/[?&]booth=/, { timeout: 15000 });
@@ -137,20 +137,20 @@ async function update(engine, name) {
   ok((await p.textContent('#version')) === 'v7.7.1 · Oct 16', name + ' installed v7.7.1');
   mode = 'pages'; root = dist;
   await p.reload({ waitUntil: 'domcontentloaded' });
-  await p.waitForFunction(() => (document.getElementById('version') || {}).textContent === 'v7.9 · Oct 17', null, { timeout: 20000 });
-  await p.waitForFunction(() => navigator.serviceWorker.controller && navigator.serviceWorker.controller.scriptURL.includes('v=79'), null, { timeout: 20000 });
+  await p.waitForFunction(() => (document.getElementById('version') || {}).textContent === 'v7.9.1 · Oct 17', null, { timeout: 20000 });
+  await p.waitForFunction(() => navigator.serviceWorker.controller && navigator.serviceWorker.controller.scriptURL.includes('v=791'), null, { timeout: 20000 });
   let shells = [];
   for (let i = 0; i < 40; i++) {
     shells = await p.evaluate(async () => (await caches.keys()).filter(k => k.startsWith('ff-shell-')));
-    if (shells.length === 1 && shells[0] === 'ff-shell-v7-9') break;
+    if (shells.length === 1 && shells[0] === 'ff-shell-v7-9-1') break;
     await p.waitForTimeout(250);
   }
-  ok(shells.length === 1 && shells[0] === 'ff-shell-v7-9', name + ' only ff-shell-v7-9 ' + JSON.stringify(shells));
-  ok((await p.textContent('#version')) === 'v7.9 · Oct 17', name + ' updated to v7.9');
+  ok(shells.length === 1 && shells[0] === 'ff-shell-v7-9-1', name + ' only ff-shell-v7-9-1 ' + JSON.stringify(shells));
+  ok((await p.textContent('#version')) === 'v7.9.1 · Oct 17', name + ' updated to v7.9.1');
   await ctx.setOffline(true);
   await p.goto(base + '/', { waitUntil: 'domcontentloaded' });
-  await p.waitForFunction(() => (document.getElementById('version') || {}).textContent === 'v7.9 · Oct 17', null, { timeout: 15000 });
-  ok((await p.textContent('#version')) === 'v7.9 · Oct 17', name + ' offline after update');
+  await p.waitForFunction(() => (document.getElementById('version') || {}).textContent === 'v7.9.1 · Oct 17', null, { timeout: 15000 });
+  ok((await p.textContent('#version')) === 'v7.9.1 · Oct 17', name + ' offline after update');
   ok(appErrors(errs).length === 0, name + ' update no pageerror ' + appErrors(errs).join(' | '));
   await ctx.close();
   fs.rmSync(oldDir, { recursive: true, force: true });

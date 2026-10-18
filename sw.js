@@ -1,5 +1,5 @@
-const V = 'ff-shell-v7-9';
-const SHELL = ['./', 'style.css?v=79', 'app.js?v=79', 'geo.js?v=79', 'search.js?v=79', 'rides.js?v=79', 'suggest.js?v=79', 'concepts.js?v=79', 'route.js?v=79', 'config.js?v=79', 'stats.js?v=79', 'vendor/leaflet.js?v=79', 'vendor/leaflet.css?v=79', 'data/booths.json', 'data/rides.json', 'data/synonyms.json', 'data/atms.json', 'data/walkways.json', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/birbol.svg?v=79', 'about/', 'about/about.css?v=79', 'heading.js?v=79', 'data/amenities.json'];
+const V = 'ff-shell-v7-9-1';
+const SHELL = ['./', 'style.css?v=791', 'app.js?v=791', 'desc.js?v=791', 'geo.js?v=791', 'search.js?v=791', 'rides.js?v=791', 'suggest.js?v=791', 'concepts.js?v=791', 'route.js?v=791', 'config.js?v=791', 'stats.js?v=791', 'vendor/leaflet.js?v=791', 'vendor/leaflet.css?v=791', 'data/booths.json', 'data/rides.json', 'data/synonyms.json', 'data/atms.json', 'data/walkways.json', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/birbol.svg?v=791', 'about/', 'about/about.css?v=791', 'heading.js?v=791', 'data/amenities.json'];
 function shellOk(r) { return r.ok && !r.redirected && r.type !== 'opaqueredirect'; }
 self.addEventListener('install', e => {
   e.waitUntil((async () => {

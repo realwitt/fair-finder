@@ -7,7 +7,7 @@ const OSM = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 // Fair's published grounds-map tile layer full extent (EPSG:3857) converted to lat/lon
 const FAIR_BOUNDS = L.latLngBounds([35.79119, -78.72134], [35.79952, -78.70469]);
 const CENTER = [35.7948, -78.7115];
-const APP_VERSION = 'v7.9 · Oct 17';
+const APP_VERSION = 'v7.9.1 · Oct 17';
 const $ = id => document.getElementById(id);
 const LS_KEY = 'ff.guideTarget';
 const FAV_KEY = 'ff.favorites.v1';
@@ -35,7 +35,7 @@ const rideLayer = L.layerGroup().addTo(map);
 const atmLayer = L.layerGroup(), drinkLayer = L.layerGroup(), amenityLayer = L.layerGroup();
 const rideIcon = L.divIcon({ className: '', html: '<div class="rideIcon">🎡</div>', iconSize: [26, 26], iconAnchor: [13, 13] });
 const rideHitIcon = L.divIcon({ className: '', html: '<div class="rideIcon hit">🎡</div>', iconSize: [34, 34], iconAnchor: [17, 17] });
-const POP = { maxWidth: 300, autoPanPaddingTopLeft: [10, 170], autoPanPaddingBottomRight: [10, 20] };
+const POP = { className: 'ffPop', maxWidth: 280, minWidth: 200, autoPan: false };
 const guideLine = L.polyline([], { color: '#e6007e', weight: 6, dashArray: '10 8', opacity: 0.95 }).addTo(map);
 const routeLine = L.polyline([], { color: '#e6007e', weight: 8, opacity: 0.9, lineJoin: 'round' }).addTo(map);
 const routeCasing = L.polyline([], { color: '#000', weight: 12, opacity: 0.6 }).addTo(map); routeCasing.bringToBack();
@@ -167,23 +167,152 @@ function rideNameText(b) {
   const al = rideAliases(b);
   return (b.name || '') + (al.length ? ' · aka ' + al.join(', ') : '');
 }
+let descSeq = 0;
+function cardBadges(b) {
+  if (b.kind === 'amenity') return ' <span class="badge approx">approximate location</span>';
+  if (b.kind === 'ride') return ' <span class="badge ride">RIDE</span>';
+  return `${popBadge(b.id)}${b.kind === 'newfood' ? ' <span class="badge new">NEW 2026</span>' : ''}${b.location !== 'exact' ? ' <span class="badge approx">approx. location</span>' : ''}`;
+}
+function cardWrap(b, bodyHtml, loc) {
+  return `<div class="popCard"><div class="popHead"><div class="popHeadMain"><div class="popTitle"><b>${esc(b.name)}</b>${cardBadges(b)}</div>${loc ? `<small class="popLoc">${loc}</small>` : ''}</div></div>${bodyHtml ? `<div class="popBody">${bodyHtml}</div>` : ''}${popBtns(b)}</div>`;
+}
+function menuBlock(b, matched) {
+  const m = Desc.model(b);
+  const long = Desc.isLong(m);
+  const id = 'd' + (++descSeq);
+  const hi = (name) => {
+    const n = name.toLowerCase();
+    const hit = (matched || []).some(x => {
+      const s = String(x || '').toLowerCase();
+      return s && (n.includes(s) || s.includes(n));
+    });
+    return hit ? '<mark>' + esc(name) + '</mark>' : esc(name);
+  };
+  let full = '';
+  if (m.news.length) {
+    full += '<div class="popNew"><b>New:</b><ul class="popNews">';
+    for (let i = 0; i < m.news.length; i++) {
+      const n = m.news[i];
+      full += '<li><span class="popName">' + hi(n.name) + '</span>';
+      if (n.description) full += '<span class="popDet">: ' + esc(n.description) + '</span>';
+      full += '</li>';
+    }
+    full += '</ul></div>';
+  }
+  if (m.rest) full += '<div class="popRest">' + esc(m.rest) + '</div>';
+  if (!full) full = '<div class="popRest">(no menu listed)</div>';
+  const short = esc(Desc.shortPlain(m) || '(no menu listed)');
+  const btn = long ? `<button type="button" class="descToggle" aria-expanded="false" aria-controls="${id}">More</button>` : '';
+  return `<div class="popText" id="${id}" data-long="${long ? '1' : '0'}" data-open="${long ? '0' : '1'}"><div class="popShort">${short}</div><div class="popFull">${full}</div></div>${btn}`;
+}
+function toggleDesc(btn) {
+  const text = document.getElementById(btn.getAttribute('aria-controls'));
+  if (!text) return;
+  const open = text.getAttribute('data-open') !== '1';
+  text.setAttribute('data-open', open ? '1' : '0');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  btn.textContent = open ? 'Less' : 'More';
+}
+function popupSafe() {
+  const top = $('top').getBoundingClientRect();
+  const fab = $('fab').getBoundingClientRect();
+  let bottom = window.innerHeight - 6;
+  const consider = (el) => {
+    if (!el || el.classList.contains('hidden')) return;
+    const r = el.getBoundingClientRect();
+    if (r.width < 20 || r.height < 20) return;
+    if (r.top < window.innerHeight - 4 && r.bottom > top.bottom + 40 && r.top < bottom) bottom = r.top;
+  };
+  consider($('guide'));
+  consider($('results'));
+  consider($('nearPanel'));
+  consider($('favPanel'));
+  const attr = document.querySelector('.leaflet-control-attribution');
+  if (attr) {
+    const r = attr.getBoundingClientRect();
+    if (r.width > 20 && r.height > 8 && r.top > top.bottom + 80 && r.top < bottom) bottom = r.top;
+  }
+  return { topY: Math.round(top.bottom + 4), bottom: Math.round(bottom - 4), rightEdge: Math.round(fab.left - 6), left: 6 };
+}
+function applyPopupBox(popup) {
+  const s = popupSafe();
+  const maxW = Math.max(168, s.rightEdge - s.left - 28);
+  POP.maxWidth = maxW;
+  POP.minWidth = Math.min(200, maxW);
+  POP.autoPanPaddingTopLeft = [s.left, s.topY];
+  POP.autoPanPaddingBottomRight = [Math.max(8, window.innerWidth - s.rightEdge), Math.max(8, window.innerHeight - s.bottom + 8)];
+  const contentMax = Math.max(150, s.bottom - s.topY - 28);
+  document.documentElement.style.setProperty('--popMax', contentMax + 'px');
+  const el = popup.getElement && popup.getElement();
+  const card = el && el.querySelector('.popCard');
+  const body = el && el.querySelector('.popBody');
+  if (card) card.style.maxHeight = contentMax + 'px';
+  if (card && body) {
+    const head = card.querySelector('.popHead');
+    const btns = card.querySelector('.popBtns');
+    const toggle = body.querySelector('.descToggle');
+    const chrome = (head ? head.offsetHeight : 0) + (btns ? btns.offsetHeight : 0) + 4;
+    body.style.maxHeight = Math.max(72, contentMax - chrome) + 'px';
+    const text = body.querySelector('.popText');
+    if (text) {
+      const toggleH = toggle ? toggle.offsetHeight + 8 : 0;
+      text.style.maxHeight = Math.max(48, contentMax - chrome - toggleH) + 'px';
+      text.style.overflowY = 'auto';
+    }
+  }
+}
+function shovePopup() {
+  // A popup that is fading out stays in the DOM, so a page-wide query would pan for the wrong card.
+  const popup = map && map._popup;
+  const el = popup && popup.isOpen() && popup.getElement();
+  if (!el || !map) return;
+  if (map.stop) map.stop();
+  for (let i = 0; i < 5; i++) {
+    const r = el.getBoundingClientRect();
+    const s = popupSafe();
+    let shiftX = 0, shiftY = 0;
+    if (r.right > s.rightEdge) shiftX = s.rightEdge - r.right;
+    if (r.left < s.left) shiftX = s.left - r.left;
+    if (r.left < s.left && r.right > s.rightEdge) shiftX = s.left - r.left;
+    if (r.bottom > s.bottom) shiftY = s.bottom - r.bottom;
+    if (r.top < s.topY) shiftY = s.topY - r.top;
+    if (r.top < s.topY && r.bottom > s.bottom) shiftY = s.topY - r.top;
+    if (Math.abs(shiftX) < 2 && Math.abs(shiftY) < 2) return;
+    map.panBy([-shiftX, -shiftY], { animate: false });
+  }
+}
+// Leaflet Popup.update() reruns a function content template and would wipe More/Less and the button handlers.
+function relayoutPopup(popup) {
+  applyPopupBox(popup);
+  if (popup._updateLayout) popup._updateLayout();
+  if (popup._updatePosition) popup._updatePosition();
+  if (popup._adjustPan) popup._adjustPan();
+}
+function fitOpenPopup() {
+  const popup = map._popup;
+  if (!popup || !popup.isOpen()) return;
+  relayoutPopup(popup);
+  requestAnimationFrame(() => {
+    const cur = map._popup;
+    if (!cur || !cur.isOpen()) return;
+    relayoutPopup(cur);
+    shovePopup();
+  });
+}
 function popupHtml(b) {
   if (b.kind === 'amenity') {
-    return `<b>${esc(b.name)}</b> <span class="badge approx">approximate location</span><br><small>${esc(b.area || '')}</small>${popBtns(b)}`;
+    return cardWrap(b, '', esc(b.area || ''));
   }
   if (b.kind === 'ride') {
     const pay = b.tickets != null ? `<div>🎟 ${b.tickets} tickets (fair’s listing)</div>` : (b.cashOnly ? `<div>💵 Cash Only${b.cashPrice ? ' · ' + esc(b.cashPrice) + ' (fair’s listing)' : ''}</div>` : '');
     const extra = [];
     if (b.heightText) extra.push(`<div>${esc(b.heightText)} (per midway operator)</div>`);
     if (b.category) extra.push(`<div class="rideCat">${esc(Rides.catLabel(b))}</div>`);
-    const alias = b.aliases && b.aliases.length ? `<small>Lot label: ${esc(b.aliases.join(', '))}</small>` : '';
-    return `<b>${esc(b.name)}</b> <span class="badge ride">RIDE</span><br><small>${esc(b.area || '')}</small>${pay}${extra.join('')}${alias ? '<br>' + alias : ''}${popBtns(b)}`;
+    const alias = b.aliases && b.aliases.length ? `<div><small>Lot label: ${esc(b.aliases.join(', '))}</small></div>` : '';
+    return cardWrap(b, `${pay}${extra.join('')}${alias}`, esc(b.area || ''));
   }
-  return `<b>${esc(b.name)}</b>${popBadge(b.id)}${b.kind === 'newfood' ? ' <span class="badge new">NEW 2026</span>' : ''}${b.location !== 'exact' ? ' <span class="badge approx">approx. location</span>' : ''}<br>
-  <small>${esc(b.area)}${b.lot ? ' · ' + esc(b.lot) : ''}</small>
-  ${b.newFood ? `<div><b>New:</b> ${esc(b.newFood.name)}: ${esc(b.newFood.description)}</div>` : ''}
-  <div style="max-height:9em;overflow:auto">${esc(b.products || '(no menu listed)')}</div>
-  ${popBtns(b)}`;
+  const loc = `${esc(b.area || '')}${b.lot ? ' · ' + esc(b.lot) : ''}`;
+  return cardWrap(b, menuBlock(b), loc);
 }
 function boothMarker(b, cls) {
   const color = cls === 'hit' ? '#e6007e' : b.kind === 'newfood' ? '#ffd400' : (b.drinks && !b.food ? '#00b3ff' : '#ff5a00');
@@ -196,16 +325,48 @@ function rideMarker(r, hit) {
   m.bindPopup(() => popupHtml(r), POP);
   return m;
 }
+// Delegation survives Leaflet rewriting the popup HTML on a later update().
+document.addEventListener('click', e => {
+  const t = e.target;
+  if (!t.closest) return;
+  const tgl = t.closest('.descToggle');
+  if (tgl) {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleDesc(tgl);
+    if (tgl.closest('.leaflet-popup')) fitOpenPopup();
+    return;
+  }
+  const pop = t.closest('.leaflet-popup');
+  if (!pop) return;
+  const go = t.closest('.go');
+  const sh = t.closest('.shareBooth');
+  const fv = t.closest('.fav');
+  if (!go && !sh && !fv) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const goBtn = pop.querySelector('.go');
+  const id = goBtn && goBtn.dataset.id;
+  if (go && id) { map.closePopup(); startGuide(id); return; }
+  if (sh && id) { share(findTarget(id)); return; }
+  if (fv) { toggleFav(fv.dataset.fav); paintFavBtn(fv, findTarget(fv.dataset.fav)); }
+}, true);
 map.on('popupopen', e => {
   document.body.classList.add('popup');
-  const el = e.popup.getElement(), btn = el.querySelector('.go'), sh = el.querySelector('.shareBooth'), fv = el.querySelector('.fav'); if (!btn) return;
-  const id = btn.dataset.id; e.popup._ffId = id;
-  btn.onclick = () => { map.closePopup(); startGuide(id); };
-  if (sh) sh.onclick = () => share(findTarget(id));
-  if (fv) fv.onclick = () => { toggleFav(fv.dataset.fav); paintFavBtn(fv, findTarget(fv.dataset.fav)); };
-  // v7 share-link fix: an open booth card is part of the URL, so the browser's own Share / copied address bar
-  // carries the booth (previously only ll/z were in the URL and the recipient got no booth).
-  if (!state.target) setUrl({ booth: id });
+  const el = e.popup.getElement();
+  const x = el && el.querySelector('.leaflet-popup-close-button');
+  if (x) x.setAttribute('aria-label', 'Close');
+  const btn = el.querySelector('.go');
+  if (btn) {
+    const id = btn.dataset.id; e.popup._ffId = id;
+    // An open booth card is part of the URL, so the browser's own Share / copied address bar carries the booth.
+    if (!state.target) setUrl({ booth: id });
+  }
+  if (!e.popup._ffHook) {
+    e.popup._ffHook = true;
+    e.popup.on('contentupdate', fitOpenPopup);
+  }
+  fitOpenPopup();
 });
 map.on('popupclose', e => { document.body.classList.remove('popup'); if (e.popup._ffId && !state.target && urlBoothId() === e.popup._ffId) setUrl({ booth: null }); });
 
@@ -992,9 +1153,11 @@ function renderResults(fit, quiet) {
     }
     const items = (r.matched.length ? r.matched : (b.items || [])).slice(0, 4);
     const label = b.kind === 'amenity' && b.area ? (b.name + ' · ' + b.area) : b.name;
+    const longMenu = b.kind !== 'amenity' && Desc.isLong(Desc.model(b));
+    const blurb = longMenu ? `<div class="r-desc">${menuBlock(b, r.matched)}</div>` : `<div class="r-items">${items.map(it => r.matched.length ? `<mark>${hl(it)}</mark>` : hl(it)).join(', ')}</div>`;
     return `${head}<li data-id="${esc(b.id)}" data-i="${i}"${r.likely ? ' class="likely"' : ''}>
       <div class="r-top"><span class="r-name">${esc(label)}</span><span class="r-dist">${r.d != null ? (r.walk ? '🚶 ' : '') + Geo.fmtFeet(r.d) : ''}</span><button class="rShare" type="button" data-share="${esc(b.id)}" aria-label="Share ${esc(b.name)}">${SHARE_ICO}<span>Share</span></button></div>
-      <div class="r-items">${items.map(it => r.matched.length ? `<mark>${hl(it)}</mark>` : hl(it)).join(', ')}</div>
+      ${blurb}
       <div class="r-meta">${popBadge(b.id)}${why}${b.kind === 'newfood' ? '<span class="badge new">NEW 2026</span>' : ''}${r.tier === 1 ? '<span class="badge">related</span>' : ''}${b.location !== 'exact' ? '<span class="badge approx">approx.</span>' : ''}${esc(b.area || '')}${b.lot ? ' · ' + esc(b.lot) : ''}</div></li>`;
   }).join('');
   if (!quiet) { collapseGuideForSheet(); $('nearPanel').classList.add('hidden'); $('favPanel').classList.add('hidden'); }
@@ -1009,6 +1172,7 @@ function renderResults(fit, quiet) {
   syncChips();
 }
 $('resList').onclick = e => {
+  if (e.target.closest('.descToggle')) return;
   const sb = e.target.closest('[data-share]');
   if (sb) { e.stopPropagation(); share(findTarget(sb.dataset.share)); return; }
   const li = e.target.closest('li[data-id]');
@@ -1067,7 +1231,7 @@ function fitSuggest() {
   el.style.maxHeight = Math.max(96, Math.floor(bottom - top - 8)) + 'px';
 }
 if (window.visualViewport) { visualViewport.addEventListener('resize', fitSuggest); visualViewport.addEventListener('scroll', fitSuggest); }
-window.addEventListener('resize', fitSuggest);
+window.addEventListener('resize', () => { fitSuggest(); fitOpenPopup(); });
 function sgTag(type, it) {
   if (type === 'ride') return '🎡 Ride';
   if (type === 'booth') return '🍴 Booth';
@@ -1239,8 +1403,10 @@ function startGuide(id, resume, fromUrl) {
   } else {
     if (h3) h3.textContent = 'Menu (from fair listing)';
     menu.setAttribute('aria-label', 'Menu, from fair listing');
-    $('guideMenuBody').textContent = (t.newFood ? 'NEW: ' + t.newFood.name + ': ' + t.newFood.description + ' | ' : '') + (t.products || '(no menu listed)');
-    menu.style.visibility = t.products ? 'visible' : 'hidden';
+    const menuModel = Desc.model(t);
+    const hasMenu = menuModel.news.length || menuModel.rest;
+    $('guideMenuBody').innerHTML = hasMenu ? menuBlock(t) : '(no menu listed)';
+    menu.style.visibility = hasMenu ? 'visible' : 'hidden';
   }
   $('guideMenu').scrollTop = 0;
   compassUi();
@@ -1470,7 +1636,8 @@ const sheet = {
     this.bar.setAttribute('aria-label', exp ? 'Collapse guide panel' : 'Expand guide panel');
     if (exp) { this.more.removeAttribute('inert'); this.more.removeAttribute('aria-hidden'); }
     else { this.more.setAttribute('inert', ''); this.more.setAttribute('aria-hidden', 'true'); }
-    clearTimeout(this._inv); this._inv = setTimeout(() => { map.invalidateSize({ pan: false }); }, 260);
+    clearTimeout(this._inv); this._inv = setTimeout(() => { map.invalidateSize({ pan: false }); fitOpenPopup(); }, 260);
+    if (map._popup && map._popup.isOpen()) fitOpenPopup();
   },
   set(st, anim = true) {
     this.state = st; try { localStorage.setItem(SHEET_KEY, st); } catch (e) {}
@@ -1581,7 +1748,7 @@ $('btnFav').onclick = () => { if (state.target) toggleFav(state.target.id); };
 $('searchFocus').addEventListener('pointerdown', e => { if (e.target.closest('button')) e.preventDefault(); });
 window.FF = { nearMe };
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js?v=79', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
+  navigator.serviceWorker.register('sw.js?v=791', { updateViaCache: 'none' }).then(r => r.update && r.update()).catch(() => {});
 }
 
 renderPopular();

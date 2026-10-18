@@ -17,7 +17,7 @@ const built = fs.readFileSync(path.join(dist, '_headers'));
 const src = fs.readFileSync(path.join(ROOT, 'pages', '_headers'));
 ok(built.equals(src), 'dist/_headers byte-equals pages/_headers');
 
-const files = ['index.html', 'style.css', 'manifest.webmanifest', 'sw.js', 'app.js', 'concepts.js', 'config.js', 'geo.js', 'heading.js', 'rides.js', 'route.js', 'search.js', 'stats.js', 'suggest.js'];
+const files = ['index.html', 'style.css', 'manifest.webmanifest', 'sw.js', 'app.js', 'desc.js', 'concepts.js', 'config.js', 'geo.js', 'heading.js', 'rides.js', 'route.js', 'search.js', 'stats.js', 'suggest.js'];
 const dirs = ['data', 'vendor', 'icons', 'about', 'b'];
 const top = fs.readdirSync(dist).sort();
 const expect = [...files, '_headers', ...dirs].sort();
